@@ -39,6 +39,7 @@ export interface StorefrontBootstrap {
     name: string;
     slug: string;
     imageUrl?: string | null;
+    productCount?: number;
   }>;
   featuredProducts?: Array<any>;
   deliveryCharge?: StoreDeliveryCharge;

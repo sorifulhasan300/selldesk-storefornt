@@ -117,8 +117,8 @@ export interface HomePageSection {
   isActive?: boolean;
   order?: number;
   sortOrder?: number;
-  config?: Record<string, any>;
+  config?: Record<string, unknown>;
   styles?: SectionStyles;
-  data?: any;
+  data?: unknown;
 }
 

@@ -9,8 +9,8 @@ interface StoreHomePageClientProps {
   store: StoreConfig;
   currency?: string;
   products?: Product[];
-  categories?: any[];
-  sliders?: any[];
+  categories?: unknown[];
+  sliders?: unknown[];
   isPreview?: boolean;
 }
 

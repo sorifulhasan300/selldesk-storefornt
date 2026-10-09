@@ -5,6 +5,11 @@ import Link from "next/link";
 import { HomePageSection, Product } from "@/types";
 import { ProductCard } from "@/components/catalog/product-card";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { normalizeProductList } from "../utils/product-normalizer.utils";
+import {
+  getDesktopGridClass,
+  getMobileGridClass,
+} from "../utils/grid-layout.utils";
 
 interface ProductShowcaseBlockProps {
   section: HomePageSection;
@@ -20,124 +25,20 @@ export function ProductShowcaseBlock({
   const { config = {}, styles = {}, data } = section;
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Normalize incoming product entities into the required Product shape
-  const rawProducts = Array.isArray(data) && data.length > 0
-    ? data
-    : Array.isArray(config.products) && config.products.length > 0
-    ? config.products
-    : fallbackProducts;
+  const raw = Array.isArray(data) && data.length > 0 ? data : config.products;
+  const products = normalizeProductList(raw, fallbackProducts);
 
-  const products: Product[] = rawProducts.map((p: any, idx: number) => {
-    const id = String(p.id || p._id || `prod-${idx}`);
-    const name = String(p.name || p.title || "Product");
-    const slug = String(p.slug || id);
-    const description = String(p.description || "");
+  if (products.length === 0) return null;
 
-    // Price extraction
-    let price = 0;
-    let salePrice: number | null = null;
+  const desktopCols = Number(
+    config.columns || config.productColumns || styles.columns || 4,
+  );
+  const mobileCols = Number(
+    config.mobileColumns || styles.mobileColumns || 2,
+  );
 
-    if (p.price && typeof p.price === "object") {
-      price = Number(p.price.regular ?? p.price.sale ?? 0);
-      salePrice = p.price.hasDiscount ? Number(p.price.sale) : null;
-    } else {
-      price = Number(p.regularPrice ?? p.price ?? 0);
-      salePrice = p.salePrice != null ? Number(p.salePrice) : null;
-    }
-
-    // Stock extraction
-    let stock = 10;
-    if (typeof p.stock === "number") {
-      stock = p.stock;
-    } else if (p.stock && typeof p.stock === "object") {
-      stock = p.stock.inStock !== false ? 10 : 0;
-    }
-
-    // Images extraction
-    let images: string[] = [];
-    if (Array.isArray(p.images) && p.images.length > 0) {
-      images = p.images;
-    } else if (p.imageUrl) {
-      images = [p.imageUrl];
-    } else if (p.image?.large || p.image?.medium) {
-      images = [p.image.large || p.image.medium];
-    } else {
-      images = [
-        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80",
-      ];
-    }
-
-    const category =
-      p.category ||
-      (Array.isArray(p.categories) && p.categories[0]
-        ? {
-            id: p.categories[0]._id || p.categories[0].id,
-            name: p.categories[0].name,
-            slug: p.categories[0].slug,
-          }
-        : null);
-
-    return {
-      id,
-      name,
-      slug,
-      description,
-      price,
-      salePrice,
-      stock,
-      images,
-      category,
-      hasVariants: Boolean(p.hasVariants || (p.variants && p.variants.length > 0)),
-      variants: Array.isArray(p.variants) ? p.variants : [],
-    };
-  });
-
-  if (products.length === 0) {
-    return null;
-  }
-
-  // Column preferences
-  const desktopCols =
-    config.columns ||
-    config.productColumns ||
-    styles.columns ||
-    styles.productColumns ||
-    4;
-  const mobileCols =
-    config.mobileColumns ||
-    styles.mobileColumns ||
-    2;
-
-  const viewType = config.viewType || "grid"; // 'grid' | 'carousel'
+  const viewType = config.viewType === "carousel" ? "carousel" : "grid";
   const showViewAll = config.showViewAll !== false;
-
-  const getDesktopGridClass = (cols: number) => {
-    switch (cols) {
-      case 2:
-        return "md:grid-cols-2";
-      case 3:
-        return "md:grid-cols-3";
-      case 5:
-        return "md:grid-cols-3 lg:grid-cols-5";
-      case 6:
-        return "md:grid-cols-3 lg:grid-cols-6";
-      case 4:
-      default:
-        return "md:grid-cols-3 lg:grid-cols-4";
-    }
-  };
-
-  const getMobileGridClass = (cols: number) => {
-    switch (cols) {
-      case 1:
-        return "grid-cols-1";
-      case 3:
-        return "grid-cols-3";
-      case 2:
-      default:
-        return "grid-cols-2";
-    }
-  };
 
   const scroll = (direction: "left" | "right") => {
     if (!scrollRef.current) return;
@@ -148,20 +49,21 @@ export function ProductShowcaseBlock({
     });
   };
 
-  const viewAllLink = config.categoryId
-    ? `/products?categoryId=${config.categoryId}`
-    : "/products";
+  const viewAllLink =
+    typeof config.categoryId === "string"
+      ? `/products?categoryId=${config.categoryId}`
+      : "/products";
 
   return (
     <div className="relative">
-      {/* Optional Top Action Link when inside standalone blocks */}
       {showViewAll && (
         <div className="flex justify-end mb-4 sm:hidden">
           <Link
             href={viewAllLink}
             className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 hover:underline"
           >
-            Explore all <ArrowRight className="w-3.5 h-3.5" />
+            <span>Explore all</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       )}
@@ -215,4 +117,3 @@ export function ProductShowcaseBlock({
     </div>
   );
 }
-

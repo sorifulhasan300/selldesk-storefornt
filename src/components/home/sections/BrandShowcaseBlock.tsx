@@ -3,79 +3,63 @@
 import Image from "next/image";
 import Link from "next/link";
 import { HomePageSection, BrandItem } from "@/types";
+import {
+  getDesktopGridClass,
+  getMobileGridClass,
+} from "../utils/grid-layout.utils";
 
 interface BrandShowcaseBlockProps {
   section: HomePageSection;
 }
 
+interface RawBrandRecord {
+  _id?: string;
+  id?: string;
+  name?: string;
+  slug?: string;
+  logo?: string | null;
+  imageUrl?: string | null;
+}
+
+const FALLBACK_BRANDS: BrandItem[] = [
+  { id: "b1", name: "Apple", slug: "apple" },
+  { id: "b2", name: "Sony", slug: "sony" },
+  { id: "b3", name: "Samsung", slug: "samsung" },
+  { id: "b4", name: "Nike", slug: "nike" },
+  { id: "b5", name: "Adidas", slug: "adidas" },
+  { id: "b6", name: "Puma", slug: "puma" },
+];
+
+function normalizeBrands(input: unknown): BrandItem[] {
+  if (!Array.isArray(input)) return [];
+  return (input as RawBrandRecord[]).map((b, i) => ({
+    _id: b._id || b.id || `brand-${i}`,
+    id: b.id || b._id || `brand-${i}`,
+    name: b.name || `Brand #${i + 1}`,
+    slug: b.slug || b.id || `brand-${i}`,
+    logo: b.logo || b.imageUrl || null,
+  }));
+}
+
 export function BrandShowcaseBlock({ section }: BrandShowcaseBlockProps) {
   const { config = {}, styles = {}, data } = section;
 
-  // Extract brand items
-  const rawBrands: any[] = Array.isArray(data) && data.length > 0
-    ? data
-    : Array.isArray(config.brands) && config.brands.length > 0
-    ? config.brands
-    : [];
+  const raw =
+    Array.isArray(data) && data.length > 0
+      ? data
+      : Array.isArray(config.brands) && config.brands.length > 0
+      ? config.brands
+      : null;
 
-  const brands: BrandItem[] =
-    rawBrands.length > 0
-      ? rawBrands.map((b, i) => ({
-          _id: b._id || b.id || `brand-${i}`,
-          id: b.id || b._id || `brand-${i}`,
-          name: b.name || `Brand #${i + 1}`,
-          slug: b.slug || b.id || `brand-${i}`,
-          logo: b.logo || b.imageUrl || null,
-        }))
-      : [
-          { id: "b1", name: "Apple", slug: "apple" },
-          { id: "b2", name: "Sony", slug: "sony" },
-          { id: "b3", name: "Samsung", slug: "samsung" },
-          { id: "b4", name: "Nike", slug: "nike" },
-          { id: "b5", name: "Adidas", slug: "adidas" },
-          { id: "b6", name: "Puma", slug: "puma" },
-        ];
-
+  const brands = raw ? normalizeBrands(raw) : FALLBACK_BRANDS;
   if (brands.length === 0) return null;
 
-  const desktopCols =
-    config.columns ||
-    config.brandColumns ||
-    styles.columns ||
-    styles.brandColumns ||
-    6;
-  const mobileCols =
-    config.mobileColumns ||
-    styles.mobileColumns ||
-    3;
-
-  const getDesktopGridClass = (cols: number) => {
-    switch (cols) {
-      case 3:
-        return "md:grid-cols-3";
-      case 4:
-        return "md:grid-cols-4";
-      case 5:
-        return "md:grid-cols-5";
-      case 8:
-        return "md:grid-cols-4 lg:grid-cols-8";
-      case 6:
-      default:
-        return "md:grid-cols-3 lg:grid-cols-6";
-    }
-  };
-
-  const getMobileGridClass = (cols: number) => {
-    switch (cols) {
-      case 2:
-        return "grid-cols-2";
-      case 4:
-        return "grid-cols-4";
-      case 3:
-      default:
-        return "grid-cols-3";
-    }
-  };
+  const desktopCols = Number(
+    config.columns || config.brandColumns || styles.columns || 6,
+  );
+  const mobileCols = Number(
+    config.mobileColumns || styles.mobileColumns || 3,
+  );
 
   return (
     <div
@@ -114,4 +98,3 @@ export function BrandShowcaseBlock({ section }: BrandShowcaseBlockProps) {
     </div>
   );
 }
-
