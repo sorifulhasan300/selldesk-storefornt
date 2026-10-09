@@ -22,6 +22,8 @@ export interface StoreSlider {
   order?: number;
 }
 
+import { HomePageSection } from "./section";
+
 export interface StoreDeliveryCharge {
   insideCity: number;
   outsideCity: number;
@@ -31,13 +33,24 @@ export interface StoreDeliveryCharge {
 
 export interface StorefrontBootstrap {
   store: StoreConfig;
-  sliders: StoreSlider[];
-  categories: Array<{
+  sliders?: StoreSlider[];
+  categories?: Array<{
     id: string;
     name: string;
     slug: string;
     imageUrl?: string | null;
   }>;
-  featuredProducts: Array<any>;
-  deliveryCharge: StoreDeliveryCharge;
+  featuredProducts?: Array<any>;
+  deliveryCharge?: StoreDeliveryCharge;
+  homePage?: {
+    sections: HomePageSection[];
+  };
+  sections?: HomePageSection[];
+  config?: {
+    homePage?: {
+      sections: HomePageSection[];
+    };
+    [key: string]: any;
+  };
+  business?: any;
 }

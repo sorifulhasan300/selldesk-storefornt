@@ -1,19 +1,21 @@
-import Link from "next/link";
 import { StorefrontService } from "@/services/storefront.service";
-import { Product } from "@/types";
-import { HeroSlider } from "@/components/home/hero-slider";
-import { CategoryGrid } from "@/components/home/category-grid";
-import { ProductCard } from "@/components/catalog/product-card";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { Product, HomePageSection } from "@/types";
+import { StoreHomePageClient } from "@/components/home/StoreHomePageClient";
 
 interface StoreHomePageProps {
   params: Promise<{ storeSlug: string }>;
+  searchParams?: Promise<{ preview?: string; [key: string]: string | string[] | undefined }>;
 }
 
-export default async function StoreHomePage({ params }: StoreHomePageProps) {
+export default async function StoreHomePage({
+  params,
+  searchParams,
+}: StoreHomePageProps) {
   const { storeSlug } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const isPreview = resolvedSearchParams.preview === "true";
 
-  let bootstrap;
+  let bootstrap: any;
   let products: Product[] = [];
 
   try {
@@ -31,6 +33,7 @@ export default async function StoreHomePage({ params }: StoreHomePageProps) {
           .replace(/-/g, " ")
           .replace(/\b\w/g, (c) => c.toUpperCase()),
         currency: "USD",
+        themeColor: "#2563eb",
       },
       sliders: [
         {
@@ -135,70 +138,68 @@ export default async function StoreHomePage({ params }: StoreHomePageProps) {
     ];
   }
 
-  const { sliders, categories, store } = bootstrap;
+  const { store, sliders = [], categories = [] } = bootstrap;
+
+  // Extract server-fetched sections from bootstrap response
+  const rawSections: HomePageSection[] =
+    bootstrap.config?.homePage?.sections ||
+    bootstrap.homePage?.sections ||
+    bootstrap.sections ||
+    [];
+
+  // Fallback scaffold sections if store has not configured dynamic sections yet
+  const initialSections: HomePageSection[] =
+    rawSections.length > 0
+      ? rawSections
+      : [
+          {
+            id: "sec-hero-default",
+            type: "heroSlider",
+            title: "Elevate Your Shopping Experience",
+            subtitle:
+              "Explore curated collections delivered directly to your doorstep.",
+            isActive: true,
+            data: sliders,
+          },
+          {
+            id: "sec-category-default",
+            type: "category",
+            title: "Shop By Category",
+            subtitle: "Browse our curated departments",
+            isActive: true,
+            data: categories,
+            config: {
+              columns: 6,
+              mobileColumns: 2,
+              showName: true,
+              viewType: "grid",
+            },
+          },
+          {
+            id: "sec-products-default",
+            type: "products",
+            title: "Trending Now",
+            subtitle: "Most popular selections this week",
+            isActive: true,
+            data: products,
+            config: {
+              columns: 4,
+              mobileColumns: 2,
+              showViewAll: true,
+              viewType: "grid",
+            },
+          },
+        ];
 
   return (
-    <div className="space-y-14">
-      {/* 1. Dynamic Hero Banner Slider */}
-      {sliders?.length > 0 && <HeroSlider sliders={sliders} />}
-
-      {/* 2. Featured Categories */}
-      {categories?.length > 0 && (
-        <section>
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                Shop By Category
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-                Browse our curated departments
-              </p>
-            </div>
-            <Link
-              href="/products"
-              className="text-xs sm:text-sm font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 hover:underline"
-            >
-              All Categories <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-          <CategoryGrid categories={categories} />
-        </section>
-      )}
-
-      {/* 3. Trending Products Grid */}
-      <section>
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-2">
-            <div className="p-2 bg-amber-100 text-amber-700 rounded-xl">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div>
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                Trending Now
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-                Most popular selections this week
-              </p>
-            </div>
-          </div>
-          <Link
-            href="/products"
-            className="text-xs sm:text-sm font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 hover:underline"
-          >
-            Explore Catalog <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {products.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              currency={store.currency}
-            />
-          ))}
-        </div>
-      </section>
-    </div>
+    <StoreHomePageClient
+      initialSections={initialSections}
+      store={store}
+      currency={store.currency || "USD"}
+      products={products}
+      categories={categories}
+      sliders={sliders}
+      isPreview={isPreview}
+    />
   );
 }
