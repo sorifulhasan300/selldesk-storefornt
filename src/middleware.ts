@@ -46,7 +46,7 @@ export function middleware(req: NextRequest) {
       // Strip '/store/[slug]' from the path for the internal rewrite
       const remainingPath = "/" + parts.slice(3).join("/");
       const rewriteUrl = new URL(
-        `/_tenant/${storeSlug}${remainingPath}`,
+        `/store/${storeSlug}${remainingPath}`,
         req.url,
       );
       rewriteUrl.search = url.search;
@@ -86,8 +86,8 @@ export function middleware(req: NextRequest) {
     return NextResponse.rewrite(new URL("/not-found", req.url));
   }
 
-  // 5. Internal rewrite to dynamic route segment: /_tenant/[storeSlug]/*
-  const rewriteUrl = new URL(`/_tenant/${storeSlug}${url.pathname}`, req.url);
+  // 5. Internal rewrite to dynamic route segment: /store/[storeSlug]/*
+  const rewriteUrl = new URL(`/store/${storeSlug}${url.pathname}`, req.url);
   rewriteUrl.search = url.search;
 
   const requestHeaders = new Headers(req.headers);
