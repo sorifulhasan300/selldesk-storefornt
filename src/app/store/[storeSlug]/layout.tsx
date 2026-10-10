@@ -9,7 +9,7 @@ import { Metadata } from "next";
 
 interface TenantLayoutProps {
   children: ReactNode;
-  params: Promise<{ storeSlug: string }>;
+  params: Promise<any>;
 }
 
 export async function generateMetadata({
@@ -54,7 +54,7 @@ export default async function TenantLayout({
         id: "mock-store-id",
         name: storeSlug
           .replace(/-/g, " ")
-          .replace(/\b\w/g, (c) => c.toUpperCase()),
+          .replace(/\b\w/g, (c: string) => c.toUpperCase()),
         subDomain: storeSlug,
         currency: "USD",
         themeColor: "#2563eb",

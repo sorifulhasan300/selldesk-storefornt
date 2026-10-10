@@ -35,14 +35,27 @@ export function buildSectionStyleVariables(
   const mMb = parsePx(styles.mobileMarginBottom, dMb > 0 ? Math.min(dMb, 16) : 0);
 
   const isGradient =
-    styles.backgroundType === "gradient" && styles.backgroundGradient;
-  const background = isGradient
-    ? styles.backgroundGradient
-    : styles.backgroundColor || undefined;
-  const backgroundImage =
-    !isGradient && styles.backgroundImage
-      ? `url(${styles.backgroundImage})`
-      : undefined;
+    styles.backgroundType === "gradient" && !!styles.backgroundGradient;
+
+  let backgroundColor: string | undefined = undefined;
+  let backgroundImage: string | undefined = undefined;
+  let backgroundSize: string | undefined = undefined;
+  let backgroundPosition: string | undefined = undefined;
+  let backgroundRepeat: string | undefined = undefined;
+
+  if (isGradient) {
+    backgroundImage = styles.backgroundGradient;
+  } else {
+    backgroundColor = styles.backgroundColor || undefined;
+    if (styles.backgroundImage) {
+      backgroundImage = styles.backgroundImage.startsWith("url(")
+        ? styles.backgroundImage
+        : `url(${styles.backgroundImage})`;
+      backgroundSize = "cover";
+      backgroundPosition = "center";
+      backgroundRepeat = "no-repeat";
+    }
+  }
 
   const borderColor = styles.borderColor || undefined;
   const borderStyle = styles.borderStyle || (borderColor ? "solid" : undefined);
@@ -68,10 +81,11 @@ export function buildSectionStyleVariables(
     "--mt-desktop": `${dMt}px`,
     "--mb-desktop": `${dMb}px`,
 
-    background,
+    backgroundColor,
     backgroundImage,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
+    backgroundSize,
+    backgroundPosition,
+    backgroundRepeat,
 
     borderColor,
     borderStyle,
