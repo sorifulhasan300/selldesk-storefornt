@@ -42,11 +42,11 @@ If you modify any file listed in Section 1, mentally verify each of G1 to G14 st
 
 | Concern | File |
 |---------|------|
-| Cart state, persistence | `src/store/use-cart-store.ts` |
-| Store-scoped hook | `src/hooks/use-cart.ts` |
-| Cart drawer / add-to-cart UI | cart drawer + product components |
-| Checkout form, zone, totals | `src/components/checkout/checkout-form.tsx` |
-| API calls (coupon, checkout) | `StorefrontService` |
+| Cart state, persistence | `src/features/cart/store/use-cart-store.ts` (`@/features/cart`) |
+| Store-scoped hook | `src/features/cart/hooks/use-cart.ts` (`@/features/cart`) |
+| Cart drawer / add-to-cart UI | `src/features/cart/components/cart-drawer.tsx` |
+| Checkout form, zone, totals | `src/features/checkout/components/checkout-form.tsx` (`@/features/checkout`) |
+| API calls (coupon, checkout) | `src/features/checkout/services/checkout.service.ts` |
 | Order confirmation page | `/store/[storeSlug]/orders/[orderNumber]` |
 
 ---
@@ -66,7 +66,7 @@ Shoppers may visit Store A then Store B. Cart items from one store must **never*
 `initStore(slug)` must not run before the persisted state has rehydrated, otherwise it sees `storeSlug === ""` and wipes a valid cart. In Next.js, also avoid SSR/client mismatch by not rendering cart counts until hydrated.
 
 ```typescript
-// src/store/use-cart-store.ts (essentials)
+// src/features/cart/store/use-cart-store.ts (essentials)
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
@@ -98,7 +98,7 @@ export const useCartStore = create<CartState>()(
 All client components use `useCart(storeSlug)`. Use **selectors** so components do not re-render on every unrelated store change, and keep the effect dependency list stable (the whole store object changes identity on every update and causes effect churn).
 
 ```typescript
-// src/hooks/use-cart.ts
+// src/features/cart/hooks/use-cart.ts
 export function useCart(storeSlug: string) {
   const initStore = useCartStore((s) => s.initStore);
   const hasHydrated = useCartStore((s) => s.hasHydrated);

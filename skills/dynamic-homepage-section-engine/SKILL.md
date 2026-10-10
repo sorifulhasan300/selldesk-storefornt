@@ -30,13 +30,13 @@ H14 Server and client render the same first output. Anything that differs (previ
 
 1. File Map
    Concern File
-   Page entry (server) StoreHomePage
-   Client shell + preview sync StoreHomePageClient, useLivePreviewSync.ts
-   Renderer / wrapper / header DynamicSectionRenderer.tsx, DynamicSectionBlock.tsx, DynamicSectionHeader.tsx
-   Blocks HeroSliderBlock, BannerGridBlock, CategoryGridBlock, ProductShowcaseBlock, VideoReelsBlock, CustomerReviewsBlock, BrandShowcaseBlock
-   Spacing/style helpers section-styles.utils.ts
-   Grid helpers grid-layout.utils.ts
-   Security helpers safe-url.ts, section-schema.ts
+   Page entry (server) src/app/store/[storeSlug]/page.tsx
+   Client shell + preview sync src/features/home/components/StoreHomePageClient.tsx, src/features/home/preview/use-live-preview-sync.ts
+   Renderer / wrapper / header src/features/home/components/ (DynamicSectionRenderer.tsx, DynamicSectionBlock.tsx, DynamicSectionHeader.tsx)
+   Blocks src/features/home/sections/ (HeroSliderBlock, BannerGridBlock, CategoryGridBlock, ProductShowcaseBlock, VideoReelsBlock, CustomerReviewsBlock, BrandShowcaseBlock)
+   Spacing/style helpers src/features/home/utils/section-styles.utils.ts
+   Grid helpers src/features/home/utils/grid-layout.utils.ts
+   Data / service / public API src/features/home/services/home.service.ts, index.ts, server.ts
 2. Pipeline
    Server: StoreHomePage (fetch bootstrap + catalog, validate sections with schema)
    |

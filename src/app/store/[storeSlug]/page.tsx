@@ -1,15 +1,22 @@
-import { StorefrontService } from "@/services/storefront.service";
-import { Product, StorefrontBootstrap, HomePageSection } from "@/types";
-import { StoreHomePageClient } from "@/components/home/StoreHomePageClient";
+import { getBootstrap } from "@/features/tenant/server";
+import { getProducts } from "@/features/catalog/server";
 import {
-  getMockBootstrap,
-  MOCK_FALLBACK_PRODUCTS,
+  StoreHomePageClient,
   getDefaultHomePageSections,
-} from "@/constants/mock-storefront.constants";
+} from "@/features/home";
+import type { HomePageSection } from "@/shared/types";
+
+export const dynamicParams = true;
+export function generateStaticParams() {
+  return [];
+}
 
 interface StoreHomePageProps {
   params: Promise<{ storeSlug: string }>;
-  searchParams?: Promise<{ preview?: string; [key: string]: string | string[] | undefined }>;
+  searchParams?: Promise<{
+    preview?: string;
+    [key: string]: string | string[] | undefined;
+  }>;
 }
 
 export default async function StoreHomePage({
@@ -20,41 +27,20 @@ export default async function StoreHomePage({
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const isPreview = resolvedSearchParams.preview === "true";
 
-  let bootstrap: StorefrontBootstrap;
-  let products: Product[] = [];
+  const [bootstrap, pData] = await Promise.all([
+    getBootstrap(storeSlug),
+    getProducts(storeSlug, { limit: 8 }),
+  ]);
 
-  try {
-    const [bData, pData] = await Promise.all([
-      StorefrontService.getBootstrap(storeSlug),
-      StorefrontService.getProducts(storeSlug, { limit: 8 }),
-    ]);
-    bootstrap = bData;
-    products = pData.items || [];
-  } catch {
-    bootstrap = getMockBootstrap(storeSlug);
-    products = MOCK_FALLBACK_PRODUCTS;
-  }
+  const store = bootstrap.store;
+  const products = pData.items || [];
+  const sliders = bootstrap.sliders || [];
+  const categories = bootstrap.categories || [];
 
-  const fallbackStore = {
-    id: "mock-store-id",
-    name: storeSlug
-      .replace(/-/g, " ")
-      .replace(/\b\w/g, (c: string) => c.toUpperCase()),
-    subDomain: storeSlug,
-    currency: "USD",
-    themeColor: "#2563eb",
-    description: "Official customer storefront powered by SellDesk.",
-  };
-
-  const store = bootstrap?.store || fallbackStore;
-  const sliders = bootstrap?.sliders || [];
-  const categories = bootstrap?.categories || [];
-
-  // Extract server-fetched sections from bootstrap response
   const rawSections: HomePageSection[] =
-    bootstrap?.config?.homePage?.sections ||
-    bootstrap?.homePage?.sections ||
-    bootstrap?.sections ||
+    bootstrap.config?.homePage?.sections ||
+    bootstrap.homePage?.sections ||
+    bootstrap.sections ||
     [];
 
   const initialSections: HomePageSection[] =

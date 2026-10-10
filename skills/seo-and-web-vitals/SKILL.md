@@ -31,7 +31,7 @@ S14 robots.txt and sitemap.xml are tenant-aware (resolved by host) and list only
    PDP metadata + product schema src/app/store/[storeSlug]/products/[slug]/page.tsx
    Listing/category/search metadata corresponding page.tsx files
    Robots / sitemap src/app/robots.ts, src/app/sitemap.ts
-   SEO helpers src/lib/seo/ (store-url.ts, metadata.ts, json-ld.tsx, fetchers.ts)
+   SEO helpers src/shared/seo/ (store-url.ts, metadata.ts, json-ld.tsx) & features/*/server.ts
    Image config next.config.ts
 2. Shared Helpers
    2.1 Public origin (multi-tenant canonical base)
@@ -39,7 +39,7 @@ S14 robots.txt and sitemap.xml are tenant-aware (resolved by host) and list only
 A store can be reached on {sub}.selldesk.com and on a custom domain. The canonical origin is the custom domain when it is verified, otherwise the subdomain. Do not hardcode the root domain. Field names below are assumptions; match your StoreConfig.
 
 typescript
-// src/lib/seo/store-url.ts
+// src/shared/seo/store-url.ts
 export function getStoreOrigin(store: {
 subDomain: string; customDomain?: string | null; customDomainVerified?: boolean;
 }): string {
@@ -51,7 +51,7 @@ return `https://${store.subDomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`;
 generateMetadata and the page both need the same data. Without memoization the API is called twice per request.
 
 typescript
-// src/lib/seo/fetchers.ts
+// Use feature server functions: e.g. import { getBootstrap } from "@/features/tenant/server";
 import { cache } from "react";
 import { notFound } from "next/navigation";
 

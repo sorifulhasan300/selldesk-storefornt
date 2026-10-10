@@ -1,7 +1,7 @@
-import { StorefrontService } from "@/services/storefront.service";
-import { ProductCard } from "@/components/catalog/product-card";
-import { FilterSidebar } from "@/components/catalog/filter-sidebar";
-import { Product, Category } from "@/types";
+import { getProducts, getCategories } from "@/features/catalog/server";
+import { getBootstrap } from "@/features/tenant/server";
+import { ProductCard, FilterSidebar } from "@/features/catalog";
+import { Product, Category } from "@/shared/types";
 import { Search } from "lucide-react";
 import Link from "next/link";
 
@@ -31,95 +31,24 @@ export default async function CatalogPage({
   const sortBy = sp.sortBy;
   const sortOrder = sp.sortOrder;
 
-  let products: Product[] = [];
-  let categories: Category[] = [];
-  let totalPages = 1;
-  let total = 0;
-  let currency = "USD";
+  const [pData, cData, bData] = await Promise.all([
+    getProducts(storeSlug, {
+      page,
+      limit,
+      categoryId,
+      search,
+      sortBy,
+      sortOrder,
+    }),
+    getCategories(storeSlug),
+    getBootstrap(storeSlug),
+  ]);
 
-  try {
-    const [pData, cData, bData] = await Promise.all([
-      StorefrontService.getProducts(storeSlug, {
-        page,
-        limit,
-        categoryId,
-        search,
-        sortBy,
-        sortOrder,
-      }),
-      StorefrontService.getCategories(storeSlug),
-      StorefrontService.getBootstrap(storeSlug),
-    ]);
-
-    products = pData.items || [];
-    totalPages = pData.totalPages || 1;
-    total = pData.total || 0;
-    categories = cData || [];
-    currency = bData?.store?.currency || "USD";
-  } catch (error) {
-    // Development fallback
-    categories = [
-      {
-        id: "c1",
-        name: "Smart Watches",
-        slug: "smart-watches",
-        productCount: 12,
-      },
-      { id: "c2", name: "Audio & Headphones", slug: "audio", productCount: 8 },
-      {
-        id: "c3",
-        name: "Footwear & Sneakers",
-        slug: "sneakers",
-        productCount: 15,
-      },
-    ];
-    products = [
-      {
-        id: "p1",
-        name: "Minimalist Chrono Watch",
-        slug: "minimalist-chrono-watch",
-        description: "Matte black stainless steel with sapphire crystal glass.",
-        price: 199,
-        salePrice: 159,
-        stock: 14,
-        images: [
-          "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80",
-        ],
-        hasVariants: false,
-        variants: [],
-      },
-      {
-        id: "p2",
-        name: "Wireless ANC Over-Ear Headphones",
-        slug: "wireless-anc-headphones",
-        description: "Studio-grade sound with 40-hour continuous battery life.",
-        price: 299,
-        salePrice: null,
-        stock: 9,
-        images: [
-          "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop&q=80",
-        ],
-        hasVariants: false,
-        variants: [],
-      },
-      {
-        id: "p3",
-        name: "Velocity Nitro Running Shoes",
-        slug: "velocity-nitro-running-shoes",
-        description:
-          "Engineered mesh upper with responsive carbon plate cushioning.",
-        price: 149,
-        salePrice: 129,
-        stock: 22,
-        images: [
-          "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&auto=format&fit=crop&q=80",
-        ],
-        hasVariants: true,
-        variants: [],
-      },
-    ];
-    total = products.length;
-  }
+  const products: Product[] = pData.items || [];
+  const totalPages = pData.totalPages || 1;
+  const total = pData.total || 0;
+  const categories: Category[] = cData || [];
+  const currency = bData?.store?.currency || "USD";
 
   return (
     <div className="space-y-6">
@@ -198,19 +127,19 @@ export default async function CatalogPage({
             <div className="flex justify-center items-center gap-2 pt-6">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                 (pageNum) => {
-                  const params = new URLSearchParams();
-                  if (categoryId) params.set("categoryId", categoryId);
-                  if (search) params.set("search", search);
-                  if (sortBy) params.set("sortBy", sortBy);
-                  if (sortOrder) params.set("sortOrder", sortOrder);
-                  params.set("page", String(pageNum));
+                  const queryParams = new URLSearchParams();
+                  if (categoryId) queryParams.set("categoryId", categoryId);
+                  if (search) queryParams.set("search", search);
+                  if (sortBy) queryParams.set("sortBy", sortBy);
+                  if (sortOrder) queryParams.set("sortOrder", sortOrder);
+                  queryParams.set("page", String(pageNum));
 
                   const isCurrent = pageNum === page;
 
                   return (
                     <Link
                       key={pageNum}
-                      href={`/products?${params.toString()}`}
+                      href={`/products?${queryParams.toString()}`}
                       className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold transition-all ${
                         isCurrent
                           ? "bg-slate-900 text-white shadow-xs"

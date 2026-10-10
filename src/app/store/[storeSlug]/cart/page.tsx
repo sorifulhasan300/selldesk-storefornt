@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useCart } from "@/hooks/use-cart";
-import { formatCurrency } from "@/lib/utils";
+import { useCart } from "@/features/cart";
+import { formatCurrency } from "@/shared/lib/utils";
 import { Trash2, Plus, Minus, ArrowRight, ShoppingBag } from "lucide-react";
 
 export default function CartPage() {
@@ -20,7 +20,7 @@ export default function CartPage() {
           Your Cart is Empty
         </h1>
         <p className="text-sm text-slate-500 mt-2">
-          Looks like you haven't added any items to your shopping bag yet.
+          Looks like you haven&apos;t added any items to your shopping bag yet.
         </p>
         <Link
           href="/products"
@@ -43,7 +43,7 @@ export default function CartPage() {
         </div>
         <button
           onClick={clearCart}
-          className="text-xs font-semibold text-rose-600 hover:text-rose-700"
+          className="text-xs font-semibold text-rose-600 hover:text-rose-700 cursor-pointer"
         >
           Clear Cart
         </button>
@@ -85,7 +85,7 @@ export default function CartPage() {
                 <div className="flex items-center border border-slate-200 rounded-xl bg-slate-50">
                   <button
                     onClick={() => updateQuantity(item.id, -1)}
-                    className="p-2 hover:bg-slate-200/60 rounded-l-xl text-slate-600"
+                    className="p-2 hover:bg-slate-200/60 rounded-l-xl text-slate-600 cursor-pointer"
                   >
                     <Minus className="w-3.5 h-3.5" />
                   </button>
@@ -94,7 +94,7 @@ export default function CartPage() {
                   </span>
                   <button
                     onClick={() => updateQuantity(item.id, 1)}
-                    className="p-2 hover:bg-slate-200/60 rounded-r-xl text-slate-600"
+                    className="p-2 hover:bg-slate-200/60 rounded-r-xl text-slate-600 cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
                   </button>
@@ -106,7 +106,7 @@ export default function CartPage() {
 
                 <button
                   onClick={() => removeItem(item.id)}
-                  className="text-slate-400 hover:text-rose-600 p-1"
+                  className="text-slate-400 hover:text-rose-600 p-1 cursor-pointer"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>

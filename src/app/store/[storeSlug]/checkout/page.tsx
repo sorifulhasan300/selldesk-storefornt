@@ -1,5 +1,5 @@
-import { StorefrontService } from "@/services/storefront.service";
-import { CheckoutForm } from "@/components/checkout/checkout-form";
+import { getBootstrap } from "@/features/tenant/server";
+import { CheckoutForm } from "@/features/checkout";
 
 interface CheckoutPageProps {
   params: Promise<{ storeSlug: string }>;
@@ -12,15 +12,15 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
   let currency = "USD";
 
   try {
-    const bootstrap = await StorefrontService.getBootstrap(storeSlug);
+    const bootstrap = await getBootstrap(storeSlug);
     if (bootstrap.deliveryCharge) {
       deliveryCharge = bootstrap.deliveryCharge;
     }
     if (bootstrap.store?.currency) {
       currency = bootstrap.store.currency;
     }
-  } catch (error) {
-    // Development fallback
+  } catch {
+    // Falls back to safe default charges
   }
 
   return (

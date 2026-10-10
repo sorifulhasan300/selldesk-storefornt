@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
-import { StorefrontService } from "@/services/storefront.service";
-import { Product } from "@/types";
-import { ProductGallery } from "@/components/product/product-gallery";
-import { AddToCartCTA } from "@/components/product/add-to-cart-cta";
+import { getProductBySlug } from "@/features/product/server";
+import { getBootstrap } from "@/features/tenant/server";
+import { ProductGallery, AddToCartCTA } from "@/features/product";
+import { Product } from "@/shared/types";
 import { Metadata } from "next";
 import Link from "next/link";
 import { ChevronRight, ShieldCheck, Truck, RefreshCcw } from "lucide-react";
@@ -16,7 +16,7 @@ export async function generateMetadata({
 }: PDPProps): Promise<Metadata> {
   const { storeSlug, slug } = await params;
   try {
-    const product = await StorefrontService.getProductBySlug(storeSlug, slug);
+    const product = await getProductBySlug(storeSlug, slug);
     return {
       title: product.name,
       description: product.description?.slice(0, 160) || product.name,
@@ -39,47 +39,13 @@ export default async function ProductDetailPage({ params }: PDPProps) {
 
   try {
     const [pData, bData] = await Promise.all([
-      StorefrontService.getProductBySlug(storeSlug, slug),
-      StorefrontService.getBootstrap(storeSlug),
+      getProductBySlug(storeSlug, slug),
+      getBootstrap(storeSlug),
     ]);
     product = pData;
     currency = bData?.store?.currency || "USD";
-  } catch (error) {
-    // Development fallback mock
-    product = {
-      id: "mock-product-id",
-      name: slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
-      slug,
-      description:
-        "Engineered with premium materials for longevity and effortless performance. Features high-grade finishing, modern aesthetics, and standard manufacturer warranty.",
-      price: 199,
-      salePrice: 159,
-      stock: 12,
-      images: [
-        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80",
-        "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&auto=format&fit=crop&q=80",
-      ],
-      hasVariants: true,
-      variants: [
-        {
-          id: "v1",
-          sku: "CHRONO-BLK",
-          price: 199,
-          salePrice: 159,
-          stock: 8,
-          attributes: { Color: "Matte Black", Size: "Standard" },
-        },
-        {
-          id: "v2",
-          sku: "CHRONO-SLV",
-          price: 219,
-          salePrice: 179,
-          stock: 4,
-          attributes: { Color: "Brushed Silver", Size: "Standard" },
-        },
-      ],
-      category: { id: "c1", name: "Featured Accessories", slug: "accessories" },
-    };
+  } catch {
+    notFound();
   }
 
   // Schema.org JSON-LD Structured Data
@@ -101,11 +67,13 @@ export default async function ProductDetailPage({ params }: PDPProps) {
     },
   };
 
+  const safeJsonLdString = JSON.stringify(jsonLd).replace(/</g, "\\u003c");
+
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLdString }}
       />
 
       {/* Breadcrumbs */}

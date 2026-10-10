@@ -1,49 +1,63 @@
-import { NextRequest, NextResponse } from "next/server";
+import { createHash, timingSafeEqual } from "node:crypto";
 import { revalidateTag } from "next/cache";
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { tags } from "@/shared/api/tags";
+
+const Body = z.object({
+  storeSlug: z.string().regex(/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/),
+  scope: z
+    .enum(["all", "bootstrap", "sections", "products", "categories", "product"])
+    .default("all"),
+  productSlug: z.string().max(200).optional(),
+});
+
+const safeEqual = (a: string, b: string) => {
+  if (!a || !b) return false;
+  return timingSafeEqual(
+    createHash("sha256").update(a).digest(),
+    createHash("sha256").update(b).digest(),
+  );
+};
 
 export async function POST(req: NextRequest) {
-  const secret = req.headers.get("x-revalidate-secret");
-  const expectedSecret =
-    process.env.REVALIDATION_SECRET || "selldesk_secure_isr_secret_2026";
-
-  if (secret !== expectedSecret) {
+  const expected =
+    process.env.REVALIDATE_SECRET || process.env.REVALIDATION_SECRET;
+  if (!expected) {
     return NextResponse.json(
-      { message: "Invalid secret token" },
-      { status: 401 },
-    );
+      { message: "Server misconfigured" },
+      { status: 500 },
+    ); // fail closed
   }
 
-  try {
-    const body = await req.json();
-    const { tag, storeSlug } = body;
+  const secret = req.headers.get("x-revalidate-secret") ?? "";
+  if (!safeEqual(secret, expected)) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
 
-    if (tag) {
-      (revalidateTag as any)(tag);
-      return NextResponse.json({
-        revalidated: true,
-        tag,
-        timestamp: Date.now(),
-      });
-    }
+  const parsed = Body.safeParse(await req.json().catch(() => null));
+  if (!parsed.success) {
+    return NextResponse.json({ message: "Invalid body" }, { status: 400 });
+  }
 
-    if (storeSlug) {
-      (revalidateTag as any)(`store:${storeSlug}:bootstrap`);
-      (revalidateTag as any)(`store:${storeSlug}:products`);
-      return NextResponse.json({
-        revalidated: true,
-        storeSlug,
-        timestamp: Date.now(),
-      });
-    }
+  const { storeSlug, scope, productSlug } = parsed.data;
 
+  const tag =
+    scope === "all"
+      ? tags.tenant(storeSlug)
+      : scope === "product" && productSlug
+      ? tags.product(storeSlug, productSlug)
+      : scope !== "product"
+      ? tags[scope](storeSlug)
+      : null;
+
+  if (!tag) {
     return NextResponse.json(
-      { message: "Missing tag or storeSlug in request body" },
+      { message: "productSlug required" },
       { status: 400 },
     );
-  } catch (error: any) {
-    return NextResponse.json(
-      { message: "Error revalidating", error: error.message },
-      { status: 500 },
-    );
   }
+
+  revalidateTag(tag, "max");
+  return NextResponse.json({ revalidated: true, tag });
 }

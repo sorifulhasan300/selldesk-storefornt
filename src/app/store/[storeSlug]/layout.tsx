@@ -1,15 +1,12 @@
 import { ReactNode } from "react";
-import { notFound } from "next/navigation";
-import { StorefrontService } from "@/services/storefront.service";
-import { StorefrontBootstrap } from "@/types";
-import { StoreHeader } from "@/components/layout/store-header";
-import { StoreFooter } from "@/components/layout/store-footer";
-import { CartDrawer } from "@/components/layout/cart-drawer";
 import { Metadata } from "next";
+import { getBootstrap } from "@/features/tenant/server";
+import { StoreHeader, StoreFooter } from "@/features/shell";
+import { CartDrawer } from "@/features/cart";
 
 interface TenantLayoutProps {
   children: ReactNode;
-  params: Promise<any>;
+  params: Promise<{ storeSlug: string }>;
 }
 
 export async function generateMetadata({
@@ -17,7 +14,7 @@ export async function generateMetadata({
 }: TenantLayoutProps): Promise<Metadata> {
   const { storeSlug } = await params;
   try {
-    const data = await StorefrontService.getBootstrap(storeSlug);
+    const data = await getBootstrap(storeSlug);
     const store = data?.store;
     const storeName = store?.name || storeSlug;
     return {
@@ -45,56 +42,8 @@ export default async function TenantLayout({
   params,
 }: TenantLayoutProps) {
   const { storeSlug } = await params;
-
-  let bootstrap: StorefrontBootstrap;
-  try {
-    bootstrap = await StorefrontService.getBootstrap(storeSlug);
-  } catch (error) {
-    // If backend returns 404 or connection fails in development, provide fallback scaffold
-    bootstrap = {
-      store: {
-        id: "mock-store-id",
-        name: storeSlug
-          .replace(/-/g, " ")
-          .replace(/\b\w/g, (c: string) => c.toUpperCase()),
-        subDomain: storeSlug,
-        currency: "USD",
-        themeColor: "#2563eb",
-        description: "Official customer storefront powered by SellDesk.",
-      },
-      sliders: [
-        {
-          id: "s1",
-          title: "New Season Arrivals",
-          subtitle:
-            "Explore our handpicked curation of premium products with fast delivery.",
-          imageUrl:
-            "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600&auto=format&fit=crop&q=80",
-          linkUrl: "/products",
-        },
-      ],
-      categories: [
-        { id: "c1", name: "Electronics", slug: "electronics" },
-        { id: "c2", name: "Fashion", slug: "fashion" },
-        { id: "c3", name: "Home & Living", slug: "home-living" },
-      ],
-      featuredProducts: [],
-      deliveryCharge: { insideCity: 60, outsideCity: 120 },
-    };
-  }
-
-  const fallbackStore = {
-    id: "mock-store-id",
-    name: storeSlug
-      .replace(/-/g, " ")
-      .replace(/\b\w/g, (c: string) => c.toUpperCase()),
-    subDomain: storeSlug,
-    currency: "USD",
-    themeColor: "#2563eb",
-    description: "Official customer storefront powered by SellDesk.",
-  };
-
-  const store = bootstrap?.store || fallbackStore;
+  const bootstrap = await getBootstrap(storeSlug);
+  const store = bootstrap.store;
 
   return (
     <div
@@ -105,7 +54,7 @@ export default async function TenantLayout({
         } as React.CSSProperties
       }
     >
-      <StoreHeader store={store} categories={bootstrap?.categories} />
+      <StoreHeader store={store} categories={bootstrap.categories} />
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
         {children}
       </main>
