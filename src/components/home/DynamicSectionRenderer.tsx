@@ -20,6 +20,9 @@ interface DynamicSectionRendererProps {
   fallbackProducts?: Product[];
   fallbackCategories?: unknown[];
   fallbackSliders?: unknown[];
+  isPreview?: boolean;
+  selectedSectionId?: string | null;
+  onAction?: (actionType: string, sectionId: string) => void;
 }
 
 function resolveSectionBlock(
@@ -86,6 +89,9 @@ export function DynamicSectionRenderer({
   fallbackProducts = [],
   fallbackCategories = [],
   fallbackSliders = [],
+  isPreview = false,
+  selectedSectionId,
+  onAction,
 }: DynamicSectionRendererProps) {
   const activeSections =
     Array.isArray(sections) && sections.length > 0
@@ -114,11 +120,22 @@ export function DynamicSectionRenderer({
         const uniqueKey =
           section.id || `${section.type || section.key || "sec"}-${idx}`;
 
+        const isFirst = idx === 0;
+        const isLast = idx === displaySections.length - 1;
+        const isSelected = Boolean(
+          selectedSectionId && section.id === selectedSectionId,
+        );
+
         return (
           <DynamicSectionBlock
             key={uniqueKey}
             section={section}
             currency={currency}
+            isPreview={isPreview}
+            isSelected={isSelected}
+            isFirst={isFirst}
+            isLast={isLast}
+            onAction={onAction}
           >
             {blockContent}
           </DynamicSectionBlock>

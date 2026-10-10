@@ -23,11 +23,16 @@ export function StoreHomePageClient({
   sliders = [],
   isPreview = false,
 }: StoreHomePageClientProps) {
-  const { sections } = useLivePreviewSync(initialSections, isPreview);
+  const {
+    sections,
+    isPreview: isPreviewActive,
+    selectedSectionId,
+    sendBuilderAction,
+  } = useLivePreviewSync(initialSections, isPreview);
 
   return (
     <div className="w-full">
-      {isPreview && (
+      {isPreviewActive && (
         <div className="mb-6 px-4 py-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold flex items-center justify-between shadow-2xs">
           <div className="flex items-center gap-2">
             <span className="relative flex h-2 w-2">
@@ -48,6 +53,9 @@ export function StoreHomePageClient({
         fallbackProducts={products}
         fallbackCategories={categories}
         fallbackSliders={sliders}
+        isPreview={isPreviewActive}
+        selectedSectionId={selectedSectionId}
+        onAction={sendBuilderAction}
       />
     </div>
   );

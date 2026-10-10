@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { HomePageSection } from "@/types";
 
 /**
@@ -17,15 +17,45 @@ export function useLivePreviewSync(
   isPreview: boolean = false,
 ) {
   const [sections, setSections] = useState<HomePageSection[]>(initialSections);
+  const [isPreviewActive, setIsPreviewActive] = useState<boolean>(isPreview);
+  const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
 
   // Sync if initial server props update
   useEffect(() => {
     setSections(initialSections);
   }, [initialSections]);
 
+  // Determine if running inside builder or ?preview=true URL param
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      const hasPreview = urlParams.get("preview") === "true";
+      const isInIframe = window.parent && window.parent !== window;
+      if (hasPreview || isInIframe) {
+        setIsPreviewActive(true);
+      }
+    }
+  }, []);
+
+  // Dispatch live builder action (e.g. SELECT, DUPLICATE, MOVE, REMOVE) to parent admin
+  const sendBuilderAction = useCallback(
+    (actionType: string, sectionId: string) => {
+      if (typeof window !== "undefined" && window.parent) {
+        window.parent.postMessage(
+          {
+            type: actionType,
+            sectionId,
+          },
+          "*",
+        );
+      }
+    },
+    [],
+  );
+
   // Listen for live iframe preview sync messages
   useEffect(() => {
-    if (!isPreview || typeof window === "undefined") return;
+    if (!isPreviewActive || typeof window === "undefined") return;
 
     const handleMessage = (event: MessageEvent) => {
       try {
@@ -52,20 +82,8 @@ export function useLivePreviewSync(
         }
 
         if (type === "SELECT_SECTION") {
-          const sectionId = event.data.sectionId || payload?.sectionId;
-
-          // Remove any previous active highlights
-          document
-            .querySelectorAll("[data-selldesk-selected='true']")
-            .forEach((node) => {
-              if (node instanceof HTMLElement) {
-                node.removeAttribute("data-selldesk-selected");
-                node.style.outline = "";
-                node.style.outlineOffset = "";
-                node.style.boxShadow = "";
-                node.style.borderRadius = "";
-              }
-            });
+          const sectionId = event.data.sectionId || payload?.sectionId || null;
+          setSelectedSectionId(sectionId);
 
           if (sectionId) {
             const target =
@@ -74,14 +92,6 @@ export function useLivePreviewSync(
 
             if (target instanceof HTMLElement) {
               target.scrollIntoView({ behavior: "smooth", block: "center" });
-              target.setAttribute("data-selldesk-selected", "true");
-              // Highlight with primary brand border ring (#7C5CFC)
-              target.style.outline = "3px solid #7C5CFC";
-              target.style.outlineOffset = "4px";
-              target.style.borderRadius = "12px";
-              target.style.boxShadow = "0 0 0 6px rgba(124, 92, 252, 0.2)";
-              target.style.transition =
-                "outline 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease";
             }
           }
         }
@@ -100,12 +110,15 @@ export function useLivePreviewSync(
     return () => {
       window.removeEventListener("message", handleMessage);
     };
-  }, [isPreview]);
+  }, [isPreviewActive]);
 
   return {
     sections,
     setSections,
-    isPreview,
+    isPreview: isPreviewActive,
+    selectedSectionId,
+    sendBuilderAction,
   };
 }
 
+export default useLivePreviewSync;
