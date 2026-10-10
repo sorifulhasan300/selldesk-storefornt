@@ -18,17 +18,19 @@ export async function generateMetadata({
   const { storeSlug } = await params;
   try {
     const data = await StorefrontService.getBootstrap(storeSlug);
+    const store = data?.store;
+    const storeName = store?.name || storeSlug;
     return {
       title: {
-        template: `%s | ${data.store.name}`,
-        default: data.store.name,
+        template: `%s | ${storeName}`,
+        default: storeName,
       },
-      description: data.store.description || `Welcome to ${data.store.name}`,
+      description: store?.description || `Welcome to ${storeName}`,
       openGraph: {
-        title: data.store.name,
+        title: storeName,
         description:
-          data.store.description || `Official store for ${data.store.name}`,
-        images: data.store.logoUrl ? [data.store.logoUrl] : [],
+          store?.description || `Official store for ${storeName}`,
+        images: store?.logoUrl ? [store.logoUrl] : [],
       },
     };
   } catch {
@@ -81,23 +83,34 @@ export default async function TenantLayout({
     };
   }
 
-  const { store } = bootstrap;
+  const fallbackStore = {
+    id: "mock-store-id",
+    name: storeSlug
+      .replace(/-/g, " ")
+      .replace(/\b\w/g, (c: string) => c.toUpperCase()),
+    subDomain: storeSlug,
+    currency: "USD",
+    themeColor: "#2563eb",
+    description: "Official customer storefront powered by SellDesk.",
+  };
+
+  const store = bootstrap?.store || fallbackStore;
 
   return (
     <div
       className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-blue-500 selection:text-white"
       style={
         {
-          "--primary-brand": store.themeColor || "#2563eb",
+          "--primary-brand": store?.themeColor || "#2563eb",
         } as React.CSSProperties
       }
     >
-      <StoreHeader store={store} categories={bootstrap.categories} />
+      <StoreHeader store={store} categories={bootstrap?.categories} />
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
         {children}
       </main>
       <StoreFooter store={store} />
-      <CartDrawer currency={store.currency || "USD"} />
+      <CartDrawer currency={store?.currency || "USD"} />
     </div>
   );
 }

@@ -35,13 +35,26 @@ export default async function StoreHomePage({
     products = MOCK_FALLBACK_PRODUCTS;
   }
 
-  const { store, sliders = [], categories = [] } = bootstrap;
+  const fallbackStore = {
+    id: "mock-store-id",
+    name: storeSlug
+      .replace(/-/g, " ")
+      .replace(/\b\w/g, (c: string) => c.toUpperCase()),
+    subDomain: storeSlug,
+    currency: "USD",
+    themeColor: "#2563eb",
+    description: "Official customer storefront powered by SellDesk.",
+  };
+
+  const store = bootstrap?.store || fallbackStore;
+  const sliders = bootstrap?.sliders || [];
+  const categories = bootstrap?.categories || [];
 
   // Extract server-fetched sections from bootstrap response
   const rawSections: HomePageSection[] =
-    bootstrap.config?.homePage?.sections ||
-    bootstrap.homePage?.sections ||
-    bootstrap.sections ||
+    bootstrap?.config?.homePage?.sections ||
+    bootstrap?.homePage?.sections ||
+    bootstrap?.sections ||
     [];
 
   const initialSections: HomePageSection[] =
@@ -53,7 +66,7 @@ export default async function StoreHomePage({
     <StoreHomePageClient
       initialSections={initialSections}
       store={store}
-      currency={store.currency || "USD"}
+      currency={store?.currency || "USD"}
       products={products}
       categories={categories}
       sliders={sliders}
