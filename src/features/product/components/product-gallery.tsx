@@ -32,6 +32,7 @@ export function ProductGallery({ images, title }: ProductGalleryProps) {
                 src={img}
                 alt={`${title} thumbnail ${idx + 1}`}
                 fill
+                sizes="72px"
                 className="object-cover"
               />
             </button>
@@ -46,8 +47,9 @@ export function ProductGallery({ images, title }: ProductGalleryProps) {
             src={displayImages[selected]}
             alt={title}
             fill
-            priority
-            sizes="(max-width: 768px) 100vw, 50vw"
+            preload
+            fetchPriority="high"
+            sizes="(max-width: 1024px) 100vw, 600px"
             className="object-cover object-center"
           />
         ) : (
@@ -57,4 +59,3 @@ export function ProductGallery({ images, title }: ProductGalleryProps) {
     </div>
   );
 }
-

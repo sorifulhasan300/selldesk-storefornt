@@ -36,9 +36,10 @@ export function HeroSlideItem({
           src={imageUrl}
           alt={title}
           fill
-          priority={priority}
+          preload={priority}
+          fetchPriority={priority ? "high" : undefined}
           className="object-cover object-center brightness-90"
-          sizes="(max-width: 768px) 100vw, 1200px"
+          sizes="100vw"
         />
       ) : (
         <div className="absolute inset-0 bg-slate-800" />
@@ -70,4 +71,3 @@ export function HeroSlideItem({
     </div>
   );
 }
-
