@@ -4,3 +4,5 @@ export { StoreFooter } from "./components/store-footer";
 export type { StoreFooterProps } from "./components/store-footer";
 export { AnnouncementBar } from "./components/announcement-bar";
 export type { AnnouncementBarProps } from "./components/announcement-bar";
+export { BottomNavigation } from "./components/bottom-navigation";
+export type { BottomNavigationProps } from "./components/bottom-navigation";

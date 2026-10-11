@@ -6,7 +6,9 @@ import {
   StoreHeader,
   StoreFooter,
   AnnouncementBar,
+  BottomNavigation,
 } from "@/features/shell";
+
 import { CartDrawer } from "@/features/cart";
 
 interface TenantLayoutProps {
@@ -72,7 +74,9 @@ export default async function TenantLayout({
   const headerConfig = config?.header;
   const navbarConfig = config?.navbar;
   const footerConfig = config?.footer;
+  const bottomNavConfig = config?.bottomNav;
   const colorConfig = config?.color;
+
 
   const rawConfig =
     bootstrap?.config && typeof bootstrap.config === "object"
@@ -135,7 +139,7 @@ export default async function TenantLayout({
         header={headerConfig}
         navbar={navbarConfig}
       />
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 pb-20 lg:pb-6">
         {children}
       </main>
       <StoreFooter
@@ -153,7 +157,9 @@ export default async function TenantLayout({
         }}
       />
       <CartDrawer currency={store?.currency || "USD"} storeSlug={storeSlug} />
+      <BottomNavigation config={bottomNavConfig} storeSlug={storeSlug} />
     </div>
+
   );
 }
 

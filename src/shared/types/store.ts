@@ -77,6 +77,35 @@ export interface StorefrontFooterConfig {
   columns?: StorefrontFooterColumnConfig[];
 }
 
+export type BottomNavIconName =
+  | "home"
+  | "grid"
+  | "grid-2x2"
+  | "layout-grid"
+  | "shopping-bag"
+  | "shopping-cart"
+  | "user"
+  | "heart"
+  | "search"
+  | "tag"
+  | "package"
+  | "star";
+
+export interface StorefrontBottomNavItemConfig {
+  /** Display label shown below the icon */
+  label: string;
+  /** Lucide icon name (kebab-case) */
+  iconName: BottomNavIconName;
+  /** Navigation URL; omit or set to "cart" to open the cart drawer instead */
+  href?: string;
+  /** When true this item opens the cart drawer rather than navigating */
+  openCart?: boolean;
+}
+
+export interface StorefrontBottomNavConfig {
+  items: StorefrontBottomNavItemConfig[];
+}
+
 export interface StorefrontConfig {
   seo?: {
     metaTitle?: string;
@@ -101,6 +130,7 @@ export interface StorefrontConfig {
   navbar?: StorefrontNavbarConfig;
   topbar?: StorefrontTopbarConfig;
   footer?: StorefrontFooterConfig;
+  bottomNav?: StorefrontBottomNavConfig;
   homePage?: {
     sections: HomePageSection[];
   };

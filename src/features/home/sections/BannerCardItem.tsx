@@ -36,7 +36,7 @@ export function BannerCardItem({ banner, className }: BannerCardItemProps) {
           <span className="inline-block px-3 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-[11px] font-bold uppercase tracking-wider text-white border border-white/10">
             Special Promotion
           </span>
-          <h3 className="text-xl sm:text-2xl font-black tracking-tight leading-tight text-white group-hover:text-blue-200 transition-colors">
+          <h3 className="text-xl sm:text-2xl font-black tracking-tight leading-tight text-white group-hover:text-[var(--store-primary)] transition-colors">
             {title}
           </h3>
           {subtitle && (
