@@ -120,9 +120,17 @@ export function DynamicSectionRenderer({
   selectedSectionId,
   onAction,
 }: DynamicSectionRendererProps) {
+  const seenSectionIds = new Set<string>();
   const activeSections =
     Array.isArray(sections) && sections.length > 0
-      ? sections.filter((s) => s.isActive !== false)
+      ? sections.filter((s) => {
+          if (s.isActive === false) return false;
+          if (s.id) {
+            if (seenSectionIds.has(s.id)) return false;
+            seenSectionIds.add(s.id);
+          }
+          return true;
+        })
       : [];
 
   const displaySections: HomePageSection[] =

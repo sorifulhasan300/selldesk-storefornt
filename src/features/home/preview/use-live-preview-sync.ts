@@ -83,7 +83,14 @@ export function useLivePreviewSync(
           }
 
           if (updatedSections) {
-            setSections(updatedSections);
+            const seen = new Set<string>();
+            const deduplicated = updatedSections.filter((s) => {
+              if (!s.id) return true;
+              if (seen.has(s.id)) return false;
+              seen.add(s.id);
+              return true;
+            });
+            setSections(deduplicated);
           }
         }
 
