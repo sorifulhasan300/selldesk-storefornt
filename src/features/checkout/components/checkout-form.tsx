@@ -9,6 +9,7 @@ import { CheckoutCustomerFields } from "./checkout-customer-fields";
 import { CheckoutDeliveryZone } from "./checkout-delivery-zone";
 import { CheckoutPaymentMethods } from "./checkout-payment-methods";
 import { CheckoutOrderSummary } from "./checkout-order-summary";
+import { Button } from "@/shared/ui/button";
 
 interface CheckoutFormProps {
   storeSlug: string;
@@ -64,7 +65,7 @@ export function CheckoutForm({
         </p>
         <Link
           href="/products"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--store-primary)] text-white font-bold text-sm rounded-xl hover:opacity-90 transition-opacity"
+          className="inline-flex items-center gap-2 rounded-xl bg-(--store-primary) px-6 py-3 text-sm font-bold text-white transition-opacity hover:opacity-90"
         >
           <span>Explore Products</span>
           <ArrowRight className="w-4 h-4" />
@@ -106,10 +107,11 @@ export function CheckoutForm({
           disabled={loading}
         />
 
-        <button
+        <Button
           type="submit"
+          size="lg"
           disabled={loading}
-          className="w-full py-4 bg-[var(--store-primary)] hover:opacity-90 text-white font-bold text-base rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+          className="h-12 w-full rounded-2xl text-base font-bold shadow-md"
         >
           {loading ? (
             <>
@@ -119,7 +121,7 @@ export function CheckoutForm({
           ) : (
             <span>Confirm Order ({formatCurrency(total, currency)})</span>
           )}
-        </button>
+        </Button>
       </form>
 
       {/* Order Summary */}

@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { CheckCircle2, ArrowRight, Package, Truck } from "lucide-react";
+import { Badge } from "@/shared/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Separator } from "@/shared/ui/separator";
 
 interface OrderConfirmationProps {
   params: Promise<{ storeSlug: string; orderNumber: string }>;
@@ -17,9 +20,9 @@ export default async function OrderConfirmationPage({
       </div>
 
       <div className="space-y-2">
-        <span className="text-xs uppercase font-extrabold tracking-wider text-emerald-600">
+        <Badge variant="secondary" className="bg-emerald-50 text-emerald-700">
           Order Confirmed
-        </span>
+        </Badge>
         <h1 className="text-3xl font-black text-slate-900">
           Thank you for your order!
         </h1>
@@ -29,39 +32,44 @@ export default async function OrderConfirmationPage({
         </p>
       </div>
 
-      <div className="bg-white border border-slate-200/80 rounded-2xl p-6 text-left space-y-4 shadow-xs">
-        <div className="flex justify-between items-center pb-3 border-b border-slate-100">
-          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-            Order Reference
-          </span>
-          <span className="font-mono font-bold text-slate-900 text-sm">
-            #{orderNumber}
-          </span>
-        </div>
-
-        <div className="flex items-start gap-3">
-          <Truck className="w-5 h-5 text-[var(--store-primary)] shrink-0 mt-0.5" />
-          <div className="text-xs text-slate-600">
-            <p className="font-bold text-slate-800">
-              Estimated Delivery: 2-3 Business Days
-            </p>
-            <p className="text-slate-400 mt-0.5">
-              You will receive an SMS confirmation once the rider is dispatched.
-            </p>
+      <Card className="text-left">
+        <CardHeader className="pb-4">
+          <CardTitle>Order Details</CardTitle>
+        </CardHeader>
+        <Separator />
+        <CardContent className="space-y-4 pt-6">
+          <div className="flex items-center justify-between pb-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              Order Reference
+            </span>
+            <span className="font-mono text-sm font-bold text-slate-900">
+              #{orderNumber}
+            </span>
           </div>
-        </div>
-
-        <div className="flex items-start gap-3">
-          <Package className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-          <div className="text-xs text-slate-600">
-            <p className="font-bold text-slate-800">Payment on Delivery</p>
-            <p className="text-slate-400 mt-0.5">
-              Please have the exact cash amount or mobile payment ready upon
-              receipt.
-            </p>
+          <div className="flex items-start gap-3">
+            <Truck className="mt-0.5 h-5 w-5 shrink-0 text-(--store-primary)" />
+            <div className="text-xs text-slate-600">
+              <p className="font-bold text-slate-800">
+                Estimated Delivery: 2-3 Business Days
+              </p>
+              <p className="mt-0.5 text-slate-400">
+                You will receive an SMS confirmation once the rider is dispatched.
+              </p>
+            </div>
           </div>
-        </div>
-      </div>
+
+          <div className="flex items-start gap-3">
+            <Package className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
+            <div className="text-xs text-slate-600">
+              <p className="font-bold text-slate-800">Payment on Delivery</p>
+              <p className="mt-0.5 text-slate-400">
+                Please have the exact cash amount or mobile payment ready upon
+                receipt.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="pt-4 flex flex-col sm:flex-row gap-3">
         <Link

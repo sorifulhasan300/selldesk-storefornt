@@ -1,6 +1,7 @@
 "use client";
 
 import { formatCurrency, cn } from "@/shared/lib/utils";
+import { Card } from "@/shared/ui/card";
 
 interface CheckoutDeliveryZoneProps {
   cityZone: "inside" | "outside" | null;
@@ -22,7 +23,7 @@ export function CheckoutDeliveryZone({
   disabled,
 }: CheckoutDeliveryZoneProps) {
   return (
-    <div className="bg-white border border-slate-200/80 rounded-2xl p-6 space-y-4 shadow-xs">
+    <Card className="space-y-4 p-6">
       <div>
         <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
           Delivery Area / Zone *
@@ -34,23 +35,25 @@ export function CheckoutDeliveryZone({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <label
+          htmlFor="delivery-zone-inside"
           className={cn(
-            "border rounded-xl p-4 flex items-center justify-between cursor-pointer transition-all",
+            "flex cursor-pointer items-center justify-between rounded-xl border p-4 transition-all focus-within:ring-2 focus-within:ring-(--store-primary)/30",
             cityZone === "inside"
-              ? "border-[var(--store-primary)] bg-[var(--store-primary)]/10 ring-1 ring-[var(--store-primary)]"
+              ? "border-(--store-primary) bg-(--store-primary)/10 ring-1 ring-(--store-primary)"
               : "border-slate-200 hover:border-slate-300",
             disabled && "opacity-50 cursor-not-allowed",
           )}
         >
           <div className="flex items-center gap-2.5">
             <input
+              id="delivery-zone-inside"
               type="radio"
               name="delivery-zone"
               value="inside"
               disabled={disabled}
               checked={cityZone === "inside"}
               onChange={() => onZoneSelect("inside")}
-              className="accent-[var(--store-primary)] text-[var(--store-primary)] cursor-pointer"
+              className="sr-only"
             />
             <span className="text-sm font-semibold text-slate-800">
               Inside City
@@ -62,23 +65,25 @@ export function CheckoutDeliveryZone({
         </label>
 
         <label
+          htmlFor="delivery-zone-outside"
           className={cn(
-            "border rounded-xl p-4 flex items-center justify-between cursor-pointer transition-all",
+            "flex cursor-pointer items-center justify-between rounded-xl border p-4 transition-all focus-within:ring-2 focus-within:ring-(--store-primary)/30",
             cityZone === "outside"
-              ? "border-[var(--store-primary)] bg-[var(--store-primary)]/10 ring-1 ring-[var(--store-primary)]"
+              ? "border-(--store-primary) bg-(--store-primary)/10 ring-1 ring-(--store-primary)"
               : "border-slate-200 hover:border-slate-300",
             disabled && "opacity-50 cursor-not-allowed",
           )}
         >
           <div className="flex items-center gap-2.5">
             <input
+              id="delivery-zone-outside"
               type="radio"
               name="delivery-zone"
               value="outside"
               disabled={disabled}
               checked={cityZone === "outside"}
               onChange={() => onZoneSelect("outside")}
-              className="accent-[var(--store-primary)] text-[var(--store-primary)] cursor-pointer"
+              className="sr-only"
             />
             <span className="text-sm font-semibold text-slate-800">
               Outside City
@@ -93,7 +98,6 @@ export function CheckoutDeliveryZone({
       {errorMessage && (
         <p className="text-xs text-rose-600 font-semibold">{errorMessage}</p>
       )}
-    </div>
+    </Card>
   );
 }
-
