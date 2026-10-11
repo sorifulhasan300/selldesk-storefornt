@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import type {
   StoreConfig,
   StorefrontHeaderConfig,
@@ -10,6 +11,14 @@ import type {
 import { useCart } from "@/features/cart";
 import { ShoppingBag, Search, Menu, X } from "lucide-react";
 import { useState, useMemo } from "react";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+} from "@/shared/ui/sheet";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -111,18 +120,24 @@ interface MobileDrawerProps {
 
 function MobileDrawer({ links, onClose }: MobileDrawerProps) {
   return (
-    <div className="lg:hidden border-t border-slate-200 bg-white px-4 py-6 space-y-4">
-      {links.map((link) => (
-        <Link
-          key={`${link.url}-${link.title}`}
-          href={link.url}
-          onClick={onClose}
-          className="block text-base font-semibold text-slate-800 hover:text-[var(--store-primary)]"
-        >
-          {link.title}
-        </Link>
-      ))}
-    </div>
+    <SheetContent side="left" className="gap-6">
+      <SheetTitle className="sr-only">Store navigation</SheetTitle>
+      <SheetDescription className="sr-only">
+        Browse store pages.
+      </SheetDescription>
+      <nav aria-label="Store navigation" className="space-y-4 pt-8">
+        {links.map((link) => (
+          <Link
+            key={`${link.url}-${link.title}`}
+            href={link.url}
+            onClick={onClose}
+            className="block text-base font-semibold text-slate-800 hover:text-[var(--store-primary)]"
+          >
+            {link.title}
+          </Link>
+        ))}
+      </nav>
+    </SheetContent>
   );
 }
 
@@ -131,34 +146,43 @@ interface ActionIconsProps {
   cartEnabled: boolean;
   itemCount: number;
   onCartClick: () => void;
+  onSearchClick: () => void;
 }
 
-function ActionIcons({ searchEnabled, cartEnabled, itemCount, onCartClick }: ActionIconsProps) {
+function ActionIcons({
+  searchEnabled,
+  cartEnabled,
+  itemCount,
+  onCartClick,
+  onSearchClick,
+}: ActionIconsProps) {
   return (
     <div className="flex items-center gap-3">
       {searchEnabled && (
-        <Link
-          href="/products"
-          className="p-2 text-slate-600 hover:text-[var(--store-primary)] hover:bg-[var(--store-primary)]/10 rounded-xl transition-colors"
-          title="Search Products"
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onSearchClick}
+          aria-label="Search Products"
         >
           <Search className="w-5 h-5" />
-        </Link>
+        </Button>
       )}
 
       {cartEnabled && (
-        <button
+        <Button
+          size="icon"
           onClick={onCartClick}
-          className="relative p-2.5 bg-[var(--store-primary)] hover:opacity-90 text-white rounded-xl transition-all shadow-xs cursor-pointer"
+          className="relative shadow-xs"
           aria-label="View Shopping Cart"
         >
           <ShoppingBag className="w-5 h-5" />
           {itemCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-[var(--store-primary)] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-sm ring-2 ring-white border border-white/30">
+            <Badge className="absolute -top-1 -right-1 size-5 justify-center border border-white/30 p-0 text-[11px] shadow-sm ring-2 ring-white">
               {itemCount}
-            </span>
+            </Badge>
           )}
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -177,6 +201,7 @@ export function StoreHeader({
 }: StoreHeaderProps) {
   const { itemCount, toggleDrawer } = useCart(store.subDomain);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const router = useRouter();
 
   const resolvedHeader = header ?? config?.header;
   const resolvedNavbar = navbar ?? config?.navbar;
@@ -204,44 +229,57 @@ export function StoreHeader({
   const cartEnabled = resolvedHeader?.cartEnabled ?? true;
 
   return (
-    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
-        {/* Mobile menu trigger — only show when there are nav links */}
-        {sortedNavLinks.length > 0 && (
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 text-slate-700 hover:text-[var(--store-primary)] transition-colors"
-            aria-label="Toggle Navigation"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        )}
+    <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+      <>
+        <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
+            {/* Mobile menu trigger — only show when there are nav links */}
+            {sortedNavLinks.length > 0 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="lg:hidden"
+                aria-label="Toggle Navigation"
+              >
+                {mobileMenuOpen ? (
+                  <X className="w-6 h-6" />
+                ) : (
+                  <Menu className="w-6 h-6" />
+                )}
+              </Button>
+            )}
 
-        {/* Brand Logo / Name */}
-        <Link href="/" className="flex items-center gap-3">
-          <LogoSlot store={store} config={resolvedHeader} />
-          <span className="font-bold text-lg text-slate-900 tracking-tight hidden sm:inline">
-            {store.name}
-          </span>
-        </Link>
+            {/* Brand Logo / Name */}
+            <Link href="/" className="flex items-center gap-3">
+              <LogoSlot store={store} config={resolvedHeader} />
+              <span className="font-bold text-lg text-slate-900 tracking-tight hidden sm:inline">
+                {store.name}
+              </span>
+            </Link>
 
-        {/* Desktop Navigation */}
-        <DesktopNav links={sortedNavLinks} />
+            {/* Desktop Navigation */}
+            <DesktopNav links={sortedNavLinks} />
 
-        {/* Action icons */}
-        <ActionIcons
-          searchEnabled={searchEnabled}
-          cartEnabled={cartEnabled}
-          itemCount={itemCount}
-          onCartClick={() => toggleDrawer(true)}
-        />
-      </div>
+            {/* Action icons */}
+            <ActionIcons
+              searchEnabled={searchEnabled}
+              cartEnabled={cartEnabled}
+              itemCount={itemCount}
+              onCartClick={() => toggleDrawer(true)}
+              onSearchClick={() => router.push("/products")}
+            />
+          </div>
 
-      {/* Mobile Drawer */}
-      {mobileMenuOpen && sortedNavLinks.length > 0 && (
-        <MobileDrawer links={sortedNavLinks} onClose={() => setMobileMenuOpen(false)} />
-      )}
-    </header>
+          {/* Mobile Drawer */}
+          {sortedNavLinks.length > 0 && (
+            <MobileDrawer
+              links={sortedNavLinks}
+              onClose={() => setMobileMenuOpen(false)}
+            />
+          )}
+        </header>
+      </>
+    </Sheet>
   );
 }
-

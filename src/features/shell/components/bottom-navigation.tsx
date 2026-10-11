@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Home,
   Grid,
@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import { useCart } from "@/features/cart";
 import { cn } from "@/shared/lib/utils";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
 import type {
   StorefrontBottomNavConfig,
   StorefrontBottomNavItemConfig,
@@ -68,8 +70,8 @@ interface NavItemProps {
 }
 
 function BottomNavItem({ item, storeSlug }: NavItemProps) {
-  const itemCount = useCart(storeSlug).itemCount;
-  const toggleDrawer = useCart(storeSlug).toggleDrawer;
+  const { itemCount, toggleDrawer } = useCart(storeSlug);
+  const router = useRouter();
 
   const Icon = ICON_MAP[item.iconName] ?? Home;
   const isCart = item.openCart === true;
@@ -79,9 +81,9 @@ function BottomNavItem({ item, storeSlug }: NavItemProps) {
       <span className="relative">
         <Icon className="w-6 h-6" aria-hidden="true" />
         {isCart && itemCount > 0 && (
-          <span className="absolute -top-1.5 -right-1.5 bg-[var(--store-primary)] text-white text-[10px] font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-0.5 ring-2 ring-white">
+          <Badge className="absolute -top-1.5 -right-1.5 h-[18px] min-w-[18px] justify-center p-0 text-[10px] font-bold ring-2 ring-white">
             {itemCount > 99 ? "99+" : itemCount}
-          </span>
+          </Badge>
         )}
       </span>
       <span className="text-[10px] font-medium leading-none truncate max-w-[56px]">
@@ -90,29 +92,20 @@ function BottomNavItem({ item, storeSlug }: NavItemProps) {
     </span>
   );
 
-  const baseClass = cn(
-    "flex-1 flex items-center justify-center py-2 text-slate-500",
-    "hover:text-[var(--store-primary)] transition-colors",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--store-primary)] rounded-sm",
-  );
-
-  if (isCart) {
-    return (
-      <button
-        type="button"
-        onClick={() => toggleDrawer(true)}
-        className={baseClass}
-        aria-label="Open cart"
-      >
-        {inner}
-      </button>
-    );
-  }
-
   return (
-    <Link href={item.href ?? "/"} className={baseClass}>
+    <Button
+      variant="ghost"
+      className={cn(
+        "h-auto min-w-0 flex-1 shrink rounded-none py-2 text-slate-500",
+        "hover:text-[var(--store-primary)]",
+      )}
+      onClick={() =>
+        isCart ? toggleDrawer(true) : router.push(item.href ?? "/")
+      }
+      aria-label={isCart ? "Open cart" : item.label}
+    >
       {inner}
-    </Link>
+    </Button>
   );
 }
 
@@ -154,4 +147,3 @@ export function BottomNavigation({ config, storeSlug }: BottomNavigationProps) {
     </nav>
   );
 }
-
