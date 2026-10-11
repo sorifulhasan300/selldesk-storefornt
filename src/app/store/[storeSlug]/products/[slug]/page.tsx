@@ -1,7 +1,12 @@
 import { notFound } from "next/navigation";
 import { getProductBySlug } from "@/features/product/server";
 import { getBootstrap } from "@/features/tenant/server";
-import { ProductGallery, AddToCartCTA } from "@/features/product";
+import {
+  ProductGallery,
+  AddToCartCTA,
+  MobileStickyBuyBar,
+  ProductPurchaseProvider,
+} from "@/features/product";
 import { Product } from "@/shared/types";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -87,7 +92,7 @@ export default async function ProductDetailPage({ params }: PDPProps) {
       </nav>
 
       {/* PDP Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 pb-12">
+      <div className="grid grid-cols-1 gap-10 pb-32 lg:grid-cols-2 lg:gap-14 lg:pb-12">
         {/* Left: Gallery */}
         <ProductGallery images={product.images} title={product.name} />
 
@@ -110,7 +115,10 @@ export default async function ProductDetailPage({ params }: PDPProps) {
           </div>
 
           {/* Add to Cart & Variant Selection */}
-          <AddToCartCTA product={product} currency={currency} />
+          <ProductPurchaseProvider product={product} currency={currency}>
+            <AddToCartCTA />
+            <MobileStickyBuyBar />
+          </ProductPurchaseProvider>
 
           {/* Trust Guarantees */}
           <div className="grid grid-cols-3 gap-3 pt-6 border-t border-slate-100 text-center">

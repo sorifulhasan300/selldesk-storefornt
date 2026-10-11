@@ -1,51 +1,36 @@
 "use client";
 
 import { useState } from "react";
-import { Product, ProductVariant } from "@/shared/types";
-import { useCartStore } from "@/features/cart";
+import { toast } from "sonner";
+import { useProductPurchase } from "./product-purchase-provider";
 import { formatCurrency } from "@/shared/lib/utils";
 import { ShoppingBag, Check, Plus, Minus, AlertCircle } from "lucide-react";
 
-interface AddToCartCTAProps {
-  product: Product;
-  currency?: string;
-}
-
-export function AddToCartCTA({ product, currency = "USD" }: AddToCartCTAProps) {
-  const addItem = useCartStore((s) => s.addItem);
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
-    product.variants?.[0] || null,
-  );
-  const [quantity, setQuantity] = useState(1);
+export function AddToCartCTA() {
+  const {
+    product,
+    currency,
+    selectedVariant,
+    setSelectedVariant,
+    quantity,
+    setQuantity,
+    currentPrice,
+    currentStock,
+    isOutOfStock,
+    addToCart,
+  } = useProductPurchase();
   const [isAdded, setIsAdded] = useState(false);
 
-  const currentPrice = selectedVariant
-    ? (selectedVariant.salePrice ?? selectedVariant.price)
-    : (product.salePrice ?? product.price);
-
-  const currentStock = selectedVariant ? selectedVariant.stock : product.stock;
-  const isOutOfStock = currentStock <= 0;
-
   const handleAddToCart = () => {
-    if (isOutOfStock) return;
-
-    const variantTitle = selectedVariant?.attributes
-      ? Object.entries(selectedVariant.attributes)
-          .map(([k, v]) => `${k}: ${v}`)
-          .join(", ")
-      : undefined;
-
-    addItem({
-      id: `${product.id}-${selectedVariant?.id || "base"}`,
-      productId: product.id,
-      variantId: selectedVariant?.id,
-      name: product.name,
-      price: currentPrice,
-      quantity,
-      image: product.images?.[0] || "",
-      variantTitle,
-      maxStock: currentStock,
-    });
+    const result = addToCart();
+    if (!result.ok) {
+      toast.error(
+        result.reason === "OUT_OF_STOCK"
+          ? "This product is out of stock"
+          : "Maximum available quantity is already in your cart",
+      );
+      return;
+    }
 
     setIsAdded(true);
     setTimeout(() => setIsAdded(false), 2000);
@@ -161,4 +146,3 @@ export function AddToCartCTA({ product, currency = "USD" }: AddToCartCTAProps) {
     </div>
   );
 }
-

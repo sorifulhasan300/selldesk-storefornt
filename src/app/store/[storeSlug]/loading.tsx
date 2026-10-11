@@ -1,25 +1,33 @@
 export default function TenantLoading() {
   return (
-    <div className="space-y-12 animate-pulse py-4">
-      {/* Banner Skeleton */}
-      <div className="w-full h-[280px] sm:h-[380px] lg:h-[480px] bg-slate-200 rounded-3xl" />
+    <div
+      aria-busy="true"
+      aria-label="Loading store content"
+      className="space-y-12 py-4"
+    >
+      <div className="skeleton-shimmer h-[280px] w-full rounded-3xl sm:h-[380px] lg:h-[480px]" />
 
-      {/* Category Grid Skeleton */}
       <div className="space-y-4">
-        <div className="h-6 w-48 bg-slate-200 rounded-md" />
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-28 bg-slate-200 rounded-2xl" />
+        <div className="skeleton-shimmer h-6 w-48 rounded-md" />
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6">
+          {Array.from({ length: 6 }, (_, index) => (
+            <div
+              key={index}
+              className="skeleton-shimmer h-28 rounded-2xl"
+            />
           ))}
         </div>
       </div>
 
-      {/* Product Grid Skeleton */}
       <div className="space-y-4">
-        <div className="h-6 w-48 bg-slate-200 rounded-md" />
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {[...Array(8)].map((_, i) => (
-            <div key={i} className="aspect-square bg-slate-200 rounded-2xl" />
+        <div className="skeleton-shimmer h-6 w-48 rounded-md" />
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+          {Array.from({ length: 8 }, (_, index) => (
+            <div key={index} className="space-y-3">
+              <div className="skeleton-shimmer aspect-square rounded-2xl" />
+              <div className="skeleton-shimmer h-4 w-4/5 rounded" />
+              <div className="skeleton-shimmer h-4 w-2/5 rounded" />
+            </div>
           ))}
         </div>
       </div>
