@@ -1,9 +1,4 @@
-import { tenantService } from "@/features/tenant/server";
-import {
-  catalogService,
-  type CatalogQueryOptions,
-} from "@/features/catalog/server";
-import { productService } from "@/features/product/server";
+import { createApiClient } from "@/shared/api/client";
 import { checkoutService } from "@/features/checkout";
 import {
   StorefrontBootstrap,
@@ -15,24 +10,45 @@ import {
   CheckoutResponse,
 } from "@/shared/types";
 
+export interface CatalogQueryOptions {
+  page?: number;
+  limit?: number;
+  search?: string;
+  categoryId?: string;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+}
+
 export const StorefrontService = {
   async getBootstrap(storeSlug: string): Promise<StorefrontBootstrap> {
-    return tenantService.getBootstrap(storeSlug);
+    const client = createApiClient(storeSlug);
+    const res = await client.get<StorefrontBootstrap>("/storefront/init");
+    return res as unknown as StorefrontBootstrap;
   },
 
   async getProducts(
     storeSlug: string,
     params: CatalogQueryOptions = {},
   ): Promise<ProductListResponse> {
-    return catalogService.getProducts(storeSlug, params);
+    const client = createApiClient(storeSlug);
+    const res = await client.get<ProductListResponse>("/storefront/products", {
+      params,
+    });
+    return res as unknown as ProductListResponse;
   },
 
   async getProductBySlug(storeSlug: string, slug: string): Promise<Product> {
-    return productService.getBySlug(storeSlug, slug);
+    const client = createApiClient(storeSlug);
+    const res = await client.get<Product>(
+      `/storefront/products/${encodeURIComponent(slug)}`,
+    );
+    return res as unknown as Product;
   },
 
   async getCategories(storeSlug: string): Promise<Category[]> {
-    return catalogService.getCategories(storeSlug);
+    const client = createApiClient(storeSlug);
+    const res = await client.get<Category[]>("/storefront/categories");
+    return res as unknown as Category[];
   },
 
   async validateCoupon(
@@ -46,8 +62,9 @@ export const StorefrontService = {
   async checkout(
     storeSlug: string,
     dto: CheckoutDto,
+    options?: { idempotencyKey?: string },
   ): Promise<CheckoutResponse> {
-    return checkoutService.checkout(storeSlug, dto);
+    return checkoutService.checkout(storeSlug, dto, options);
   },
 };
 

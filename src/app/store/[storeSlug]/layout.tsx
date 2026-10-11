@@ -111,7 +111,7 @@ export default async function TenantLayout({
         {children}
       </main>
       <StoreFooter store={store} />
-      <CartDrawer currency={store?.currency || "USD"} />
+      <CartDrawer currency={store?.currency || "USD"} storeSlug={storeSlug} />
     </div>
   );
 }
