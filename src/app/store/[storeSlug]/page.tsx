@@ -28,7 +28,7 @@ export default async function StoreHomePage({
   const isPreview = resolvedSearchParams.preview === "true";
 
   const [bootstrap, pData] = await Promise.all([
-    getBootstrap(storeSlug),
+    getBootstrap(storeSlug, isPreview),
     getProducts(storeSlug, { limit: 8 }),
   ]);
 

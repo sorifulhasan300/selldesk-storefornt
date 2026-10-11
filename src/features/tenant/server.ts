@@ -4,9 +4,12 @@ import { tenantService } from "./services/tenant.service";
 import { isNotFoundError } from "@/shared/api/api-error";
 import type { StorefrontBootstrap } from "@/shared/types";
 
-export async function getBootstrap(storeSlug: string): Promise<StorefrontBootstrap> {
+export async function getBootstrap(
+  storeSlug: string,
+  isPreview = false,
+): Promise<StorefrontBootstrap> {
   try {
-    return await tenantService.getBootstrap(storeSlug);
+    return await tenantService.getBootstrap(storeSlug, isPreview);
   } catch (error) {
     if (isNotFoundError(error)) {
       notFound();
