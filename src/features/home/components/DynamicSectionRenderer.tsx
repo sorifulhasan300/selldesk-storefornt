@@ -29,6 +29,8 @@ function resolveSectionBlock(
   section: HomePageSection,
   currency: string,
   fallbackProducts: Product[],
+  fallbackSliders: unknown[],
+  isPreview: boolean,
 ): React.ReactNode {
   const rawType = (section.type || section.key || "")
     .trim()
@@ -37,7 +39,14 @@ function resolveSectionBlock(
 
   switch (rawType) {
     case "heroslider":
-      return <HeroSliderBlock section={section} currency={currency} />;
+      return (
+        <HeroSliderBlock
+          section={section}
+          currency={currency}
+          isPreview={isPreview}
+          fallbackSliders={fallbackSliders}
+        />
+      );
 
     case "banners":
     case "banner":
@@ -57,7 +66,14 @@ function resolveSectionBlock(
             section.config?.displayMode !== "grid",
         )
       ) {
-        return <HeroSliderBlock section={section} currency={currency} />;
+        return (
+          <HeroSliderBlock
+            section={section}
+            currency={currency}
+            isPreview={isPreview}
+            fallbackSliders={fallbackSliders}
+          />
+        );
       }
       return <BannerGridBlock section={section} />;
 
@@ -125,6 +141,8 @@ export function DynamicSectionRenderer({
           section,
           currency,
           fallbackProducts,
+          fallbackSliders,
+          isPreview,
         );
         if (!blockContent) return null;
 
