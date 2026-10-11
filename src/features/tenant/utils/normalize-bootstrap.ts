@@ -48,6 +48,7 @@ export function normalizeBootstrap(
     subDomain:
       raw.store?.subDomain ||
       (business.domain ? business.domain.split(".")[0] : storeSlug),
+    domain: raw.store?.domain || business.domain || null,
     currency:
       raw.store?.currency || business.currencyCode || business.currency || "USD",
     logoUrl: raw.store?.logoUrl || business.logo || header.logo || null,
@@ -113,4 +114,3 @@ export function normalizeBootstrap(
     business,
   };
 }
-

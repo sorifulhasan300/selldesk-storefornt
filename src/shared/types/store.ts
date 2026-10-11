@@ -5,6 +5,7 @@ export interface StoreConfig {
   id: string;
   name: string;
   subDomain: string;
+  domain?: string | null;
   currency: string;
   logoUrl?: string | null;
   bannerUrl?: string | null;
@@ -160,5 +161,4 @@ export interface StorefrontBootstrap {
   config?: StorefrontConfig;
   business?: unknown;
 }
-
 

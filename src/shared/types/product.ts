@@ -22,6 +22,7 @@ export interface Category {
   imageUrl?: string | null;
   description?: string | null;
   productCount?: number;
+  updatedAt?: string;
 }
 
 export interface Product {
@@ -34,10 +35,12 @@ export interface Product {
   stock: number;
   images: string[];
   category?: Category | null;
+  brand?: { name: string } | null;
   hasVariants: boolean;
   variants: ProductVariant[];
   sku?: string;
   createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface ProductListResponse {
@@ -47,4 +50,3 @@ export interface ProductListResponse {
   limit: number;
   totalPages: number;
 }
-
