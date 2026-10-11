@@ -33,4 +33,5 @@ export async function getCategories(storeSlug: string): Promise<Category[]> {
 }
 
 export { catalogService };
+export type { CatalogQueryOptions };
 

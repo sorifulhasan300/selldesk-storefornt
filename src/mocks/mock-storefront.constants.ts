@@ -70,7 +70,7 @@ export function getMockBootstrap(storeSlug: string): StorefrontBootstrap {
         .replace(/\b\w/g, (c) => c.toUpperCase()),
       subDomain: storeSlug,
       currency: "USD",
-      themeColor: "#2563eb",
+      themeColor: "#0f172a",
       description: "Official customer storefront powered by SellDesk.",
     },
     sliders: [

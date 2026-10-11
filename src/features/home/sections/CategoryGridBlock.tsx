@@ -123,7 +123,7 @@ export function CategoryGridBlock({ section }: CategoryGridBlockProps) {
               <button
                 type="button"
                 onClick={() => scroll("left")}
-                className="absolute -left-3 sm:-left-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/95 border border-slate-200 shadow-md text-slate-700 hover:text-blue-600 hover:bg-white active:scale-95 transition-all flex items-center justify-center cursor-pointer z-10 touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="absolute -left-3 sm:-left-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/95 border border-slate-200 shadow-md text-slate-700 hover:text-[var(--store-primary)] hover:bg-white active:scale-95 transition-all flex items-center justify-center cursor-pointer z-10 touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--store-primary)]"
                 aria-label="Scroll left"
               >
                 <ChevronLeft className="w-5 h-5" />
@@ -131,7 +131,7 @@ export function CategoryGridBlock({ section }: CategoryGridBlockProps) {
               <button
                 type="button"
                 onClick={() => scroll("right")}
-                className="absolute -right-3 sm:-right-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/95 border border-slate-200 shadow-md text-slate-700 hover:text-blue-600 hover:bg-white active:scale-95 transition-all flex items-center justify-center cursor-pointer z-10 touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="absolute -right-3 sm:-right-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/95 border border-slate-200 shadow-md text-slate-700 hover:text-[var(--store-primary)] hover:bg-white active:scale-95 transition-all flex items-center justify-center cursor-pointer z-10 touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--store-primary)]"
                 aria-label="Scroll right"
               >
                 <ChevronRight className="w-5 h-5" />

@@ -112,7 +112,7 @@ export function ProductCard({
 
           {showName && (
             <Link href={`/products/${product.slug}`}>
-              <h3 className="text-sm font-semibold text-slate-800 line-clamp-2 hover:text-blue-600 transition-colors">
+              <h3 className="text-sm font-semibold text-slate-800 line-clamp-2 hover:text-[var(--store-primary)] transition-colors">
                 {product.name}
               </h3>
             </Link>
@@ -138,7 +138,7 @@ export function ProductCard({
               "p-2 rounded-xl transition-all duration-200 cursor-pointer",
               added
                 ? "bg-emerald-600 text-white"
-                : "bg-slate-900 hover:bg-blue-600 text-white disabled:opacity-30 disabled:cursor-not-allowed",
+                : "bg-slate-900 hover:bg-[var(--store-primary)] text-white disabled:opacity-30 disabled:cursor-not-allowed",
             )}
             title="Add to cart"
           >

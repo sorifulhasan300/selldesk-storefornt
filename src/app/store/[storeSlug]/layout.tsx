@@ -37,6 +37,23 @@ export async function generateMetadata({
   }
 }
 
+const COLOR_REGEX =
+  /^(#[0-9a-f]{3,8}|rgba?\([\d\s.,%]+\)|hsla?\([\d\s.,%]+\)|transparent)$/i;
+
+function safeColor(v: unknown, fallback: string): string {
+  if (typeof v === "string" && COLOR_REGEX.test(v.trim())) {
+    return v.trim();
+  }
+  return fallback;
+}
+
+function safeFont(v: unknown, fallback: string = "inherit"): string {
+  if (typeof v === "string" && /^[a-zA-Z0-9\s, '"-]+$/.test(v.trim())) {
+    return v.trim();
+  }
+  return fallback;
+}
+
 export default async function TenantLayout({
   children,
   params,
@@ -45,12 +62,47 @@ export default async function TenantLayout({
   const bootstrap = await getBootstrap(storeSlug);
   const store = bootstrap.store;
 
+  const rawConfig =
+    bootstrap?.config && typeof bootstrap.config === "object"
+      ? (bootstrap.config as Record<string, unknown>)
+      : {};
+  const rawColor =
+    typeof rawConfig.color === "object" && rawConfig.color !== null
+      ? (rawConfig.color as Record<string, unknown>)
+      : {};
+  const rawTheme =
+    typeof rawConfig.theme === "object" && rawConfig.theme !== null
+      ? (rawConfig.theme as Record<string, unknown>)
+      : {};
+  const storeRecord =
+    store && typeof store === "object"
+      ? (store as unknown as Record<string, unknown>)
+      : {};
+
+  const storePrimary = safeColor(store?.themeColor, "#0f172a");
+  const storeBg = safeColor(
+    storeRecord.bgColor || rawColor.background || rawColor.bg,
+    "#ffffff",
+  );
+  const storeText = safeColor(
+    storeRecord.textColor || rawColor.text,
+    "#0f172a",
+  );
+  const storeFont = safeFont(
+    storeRecord.fontFamily || storeRecord.font || rawTheme.font || rawConfig.font,
+    "inherit",
+  );
+
   return (
     <div
-      className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-blue-500 selection:text-white"
+      className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-[var(--store-primary)] selection:text-white"
       style={
         {
-          "--primary-brand": store?.themeColor || "#2563eb",
+          "--store-primary": storePrimary,
+          "--store-bg": storeBg,
+          "--store-text": storeText,
+          "--store-font": storeFont,
+          "--primary-brand": storePrimary,
         } as React.CSSProperties
       }
     >

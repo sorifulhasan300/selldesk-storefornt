@@ -48,8 +48,8 @@ export function CategoryCardItem({
 
   const containerClasses = cn(
     isCarousel
-      ? "group/item flex-none snap-start bg-white border border-slate-200/80 p-4 flex flex-col items-center text-center shadow-2xs hover:shadow-md hover:border-blue-400 transition-all duration-300"
-      : "group relative w-full bg-white border border-slate-200/80 p-4 flex flex-col items-center text-center shadow-2xs hover:shadow-md hover:border-blue-400 transition-all duration-300",
+      ? "group/item flex-none snap-start bg-white border border-slate-200/80 p-4 flex flex-col items-center text-center shadow-2xs hover:shadow-md hover:border-[var(--store-primary)]/50 transition-all duration-300"
+      : "group relative w-full bg-white border border-slate-200/80 p-4 flex flex-col items-center text-center shadow-2xs hover:shadow-md hover:border-[var(--store-primary)]/50 transition-all duration-300",
     className,
   );
 
@@ -72,7 +72,7 @@ export function CategoryCardItem({
         />
       </div>
       {shouldShowName && (
-        <h3 className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-blue-600 transition-colors line-clamp-1">
+        <h3 className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-[var(--store-primary)] transition-colors line-clamp-1">
           {category.name}
         </h3>
       )}

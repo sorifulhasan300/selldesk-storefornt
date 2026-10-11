@@ -39,15 +39,28 @@ export function HeroSliderBlock({ section }: HeroSliderBlockProps) {
           },
         ];
 
-  const autoPlayInterval =
-    typeof config.autoPlayInterval === "number"
-      ? config.autoPlayInterval
-      : typeof config.autoplayInterval === "number"
-      ? config.autoplayInterval
+  const isAutoplay =
+    config.autoplay !== false && config.autoPlay !== false;
+
+  const rawInterval = config.autoPlayInterval ?? config.autoplayInterval;
+  const parsedInterval =
+    typeof rawInterval === "number"
+      ? rawInterval
+      : typeof rawInterval === "string" && !Number.isNaN(Number(rawInterval))
+      ? Number(rawInterval)
       : 5000;
 
-  const showDots = config.showDots !== false;
-  const showArrows = config.showArrows !== false;
+  const normalizedInterval =
+    parsedInterval > 0 && parsedInterval < 50
+      ? parsedInterval * 1000
+      : parsedInterval;
+
+  const autoPlayInterval = isAutoplay ? normalizedInterval : 0;
+
+  const showDots =
+    config.showDots !== false && config.showPagination !== false;
+  const showArrows =
+    config.showArrows !== false && config.showNavArrows !== false;
 
   const {
     current,
@@ -57,6 +70,7 @@ export function HeroSliderBlock({ section }: HeroSliderBlockProps) {
     prevSlide,
     handleTouchStart,
     handleTouchEnd,
+    handleTouchCancel,
     handleKeyDown,
   } = useHeroSlider({
     slidesCount: slides.length,
@@ -82,6 +96,7 @@ export function HeroSliderBlock({ section }: HeroSliderBlockProps) {
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchCancel}
       onKeyDown={handleKeyDown}
       tabIndex={0}
       role="region"

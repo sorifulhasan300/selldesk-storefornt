@@ -4,10 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { HomePageSection, BannerSlideItem } from "@/shared/types";
 import { ArrowRight } from "lucide-react";
+import { cn } from "@/shared/lib/utils";
 import {
   getDesktopGridClass,
   getMobileGridClass,
 } from "../utils/grid-layout.utils";
+import { useHeroSlider } from "../hooks/useHeroSlider";
+import { HeroSliderControls } from "./HeroSliderControls";
+import { BannerCardItem } from "./BannerCardItem";
 
 interface BannerGridBlockProps {
   section: HomePageSection;
@@ -78,6 +82,53 @@ export function BannerGridBlock({ section }: BannerGridBlockProps) {
       : null;
 
   const banners = raw ? normalizeBanners(raw) : FALLBACK_BANNERS;
+
+  const isCarousel =
+    config.displayType === "carousel" ||
+    config.viewType === "carousel" ||
+    config.layout === "carousel" ||
+    config.displayType === "slider" ||
+    config.viewType === "slider" ||
+    config.isCarousel === true;
+
+  const isAutoplay =
+    config.autoplay !== false && config.autoPlay !== false;
+
+  const rawInterval = config.autoPlayInterval ?? config.autoplayInterval;
+  const parsedInterval =
+    typeof rawInterval === "number"
+      ? rawInterval
+      : typeof rawInterval === "string" && !Number.isNaN(Number(rawInterval))
+      ? Number(rawInterval)
+      : 4000;
+
+  const normalizedInterval =
+    parsedInterval > 0 && parsedInterval < 50
+      ? parsedInterval * 1000
+      : parsedInterval;
+
+  const autoPlayInterval = isAutoplay ? normalizedInterval : 0;
+
+  const showDots =
+    config.showDots !== false && config.showPagination !== false;
+  const showArrows =
+    config.showArrows !== false && config.showNavArrows !== false;
+
+  const {
+    current,
+    setCurrent,
+    setIsPaused,
+    nextSlide,
+    prevSlide,
+    handleTouchStart,
+    handleTouchEnd,
+    handleTouchCancel,
+    handleKeyDown,
+  } = useHeroSlider({
+    slidesCount: banners.length,
+    autoPlayInterval,
+  });
+
   if (banners.length === 0) return null;
 
   const desktopCols = Number(
@@ -89,56 +140,99 @@ export function BannerGridBlock({ section }: BannerGridBlockProps) {
     config.mobileColumns || styles.mobileColumns || 1,
   );
 
+  if (isCarousel) {
+    return (
+      <div
+        className="relative w-full h-[240px] sm:h-[320px] md:h-[380px] rounded-3xl overflow-hidden shadow-xs bg-slate-900 group select-none"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchCancel}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+        role="region"
+        aria-label="Promotional banner carousel"
+      >
+        {banners.map((banner, idx) => {
+          const isCurrent = current === idx;
+          const link = banner.linkUrl || "/products";
+          const title = banner.headline || banner.title;
+          const subtitle = banner.subHeadline || banner.subtitle;
+          const cta = banner.ctaLabel || "Shop Now";
+
+          return (
+            <div
+              key={banner.id || idx}
+              className={cn(
+                "absolute inset-0 transition-opacity duration-700 ease-in-out",
+                isCurrent
+                  ? "opacity-100 z-10"
+                  : "opacity-0 z-0 pointer-events-none",
+              )}
+            >
+              <Link href={link} className="block w-full h-full relative">
+                <Image
+                  src={banner.imageUrl}
+                  alt={banner.altText || title || "Marketing banner"}
+                  fill
+                  sizes="100vw"
+                  priority={idx === 0}
+                  className="object-cover object-center brightness-[0.85]"
+                />
+
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent flex flex-col justify-end p-6 sm:p-10">
+                  <div className="text-white space-y-2 max-w-lg">
+                    <span className="inline-block px-3 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-[11px] font-bold uppercase tracking-wider text-white border border-white/10">
+                      Special Promotion
+                    </span>
+                    <h3 className="text-xl sm:text-3xl font-black tracking-tight leading-tight text-white">
+                      {title}
+                    </h3>
+                    {subtitle && (
+                      <p className="text-xs sm:text-sm text-slate-200 line-clamp-2">
+                        {subtitle}
+                      </p>
+                    )}
+                    <div className="pt-2">
+                      <span className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-white hover:underline">
+                        {cta} <ArrowRight className="w-4 h-4" />
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </div>
+          );
+        })}
+
+        <HeroSliderControls
+          slidesCount={banners.length}
+          current={current}
+          showArrows={showArrows}
+          showDots={showDots}
+          onPrev={prevSlide}
+          onNext={nextSlide}
+          onSelect={setCurrent}
+        />
+      </div>
+    );
+  }
+
   return (
     <div
-      className={`grid ${getMobileGridClass(mobileCols)} ${getDesktopGridClass(
-        desktopCols,
-      )} gap-4 sm:gap-6`}
+      className={cn(
+        "grid",
+        getMobileGridClass(mobileCols),
+        getDesktopGridClass(desktopCols),
+        "gap-4 sm:gap-6",
+      )}
     >
-      {banners.map((banner) => {
-        const link = banner.linkUrl || "/products";
-        const title = banner.headline || banner.title;
-        const subtitle = banner.subHeadline || banner.subtitle;
-        const cta = banner.ctaLabel || "Shop Now";
-
-        return (
-          <Link
-            key={banner.id}
-            href={link}
-            className="group relative h-[220px] sm:h-[280px] md:h-[320px] rounded-3xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 block select-none"
-          >
-            <Image
-              src={banner.imageUrl}
-              alt={banner.altText || title || "Marketing banner"}
-              fill
-              sizes="(max-width: 768px) 100vw, 600px"
-              className="object-cover object-center group-hover:scale-105 transition-transform duration-700 brightness-[0.85]"
-            />
-
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent flex flex-col justify-end p-6 sm:p-8">
-              <div className="text-white space-y-2 max-w-md">
-                <span className="inline-block px-3 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-[11px] font-bold uppercase tracking-wider text-white border border-white/10">
-                  Special Promotion
-                </span>
-                <h3 className="text-xl sm:text-2xl font-black tracking-tight leading-tight text-white group-hover:text-blue-200 transition-colors">
-                  {title}
-                </h3>
-                {subtitle && (
-                  <p className="text-xs sm:text-sm text-slate-200 line-clamp-2">
-                    {subtitle}
-                  </p>
-                )}
-                <div className="pt-2">
-                  <span className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-white group-hover:translate-x-1 transition-transform">
-                    {cta} <ArrowRight className="w-4 h-4" />
-                  </span>
-                </div>
-              </div>
-            </div>
-          </Link>
-        );
-      })}
+      {banners.map((banner) => (
+        <BannerCardItem key={banner.id} banner={banner} />
+      ))}
     </div>
   );
 }
+
 

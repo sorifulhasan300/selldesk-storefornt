@@ -64,7 +64,7 @@ export function CartDrawer({ currency = "USD" }: CartDrawerProps) {
                 </p>
                 <button
                   onClick={() => toggleDrawer(false)}
-                  className="mt-6 px-6 py-2.5 bg-blue-600 text-white font-semibold rounded-xl text-sm hover:bg-blue-700 transition-colors"
+                  className="mt-6 px-6 py-2.5 bg-[var(--store-primary)] text-white font-semibold rounded-xl text-sm hover:opacity-90 transition-opacity"
                 >
                   Start Shopping
                 </button>
@@ -146,7 +146,7 @@ export function CartDrawer({ currency = "USD" }: CartDrawerProps) {
                 <Link
                   href="/checkout"
                   onClick={() => toggleDrawer(false)}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-xs transition-colors"
+                  className="w-full bg-[var(--store-primary)] hover:opacity-90 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-xs transition-opacity"
                 >
                   <span>Checkout Now</span>
                   <ArrowRight className="w-4 h-4" />

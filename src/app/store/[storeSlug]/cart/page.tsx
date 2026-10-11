@@ -24,7 +24,7 @@ export default function CartPage() {
         </p>
         <Link
           href="/products"
-          className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold text-sm rounded-xl hover:bg-blue-700 transition-colors"
+          className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-[var(--store-primary)] hover:opacity-90 text-white font-bold text-sm rounded-xl transition-opacity"
         >
           Explore Catalog <ArrowRight className="w-4 h-4" />
         </Link>
@@ -139,12 +139,12 @@ export default function CartPage() {
 
             <div className="pt-3 border-t border-slate-100 flex justify-between text-base font-extrabold text-slate-900">
               <span>Subtotal</span>
-              <span className="text-blue-600">{formatCurrency(subtotal)}</span>
+              <span className="text-[var(--store-primary)]">{formatCurrency(subtotal)}</span>
             </div>
 
             <Link
               href="/checkout"
-              className="w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 shadow-xs transition-colors"
+              className="w-full py-3.5 px-4 bg-[var(--store-primary)] hover:opacity-90 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 shadow-xs transition-opacity"
             >
               <span>Proceed to Checkout</span>
               <ArrowRight className="w-4 h-4" />

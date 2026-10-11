@@ -8,11 +8,18 @@ export const checkoutService = {
     cartTotal: number,
   ): Promise<CouponDiscount> {
     const client = createApiClient(storeSlug);
-    const res = await client.post("/storefront/cart/validate-coupon", {
-      code,
-      cartTotal,
-    });
-    return (res as any).data ?? res;
+    const res = await client.post<CouponDiscount>(
+      "/storefront/cart/validate-coupon",
+      {
+        code,
+        cartTotal,
+      },
+    );
+    const payload = res as unknown;
+    if (payload && typeof payload === "object" && "data" in payload) {
+      return (payload as { data: CouponDiscount }).data;
+    }
+    return payload as CouponDiscount;
   },
 
   async checkout(
@@ -20,8 +27,12 @@ export const checkoutService = {
     dto: CheckoutDto,
   ): Promise<CheckoutResponse> {
     const client = createApiClient(storeSlug);
-    const res = await client.post("/orders/checkout", dto);
-    return (res as any).data ?? res;
+    const res = await client.post<CheckoutResponse>("/orders/checkout", dto);
+    const payload = res as unknown;
+    if (payload && typeof payload === "object" && "data" in payload) {
+      return (payload as { data: CheckoutResponse }).data;
+    }
+    return payload as CheckoutResponse;
   },
 };
 

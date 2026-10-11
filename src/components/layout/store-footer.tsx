@@ -156,3 +156,5 @@ export function StoreFooter({ store }: StoreFooterProps) {
   );
 }
 
+export default StoreFooter;
+

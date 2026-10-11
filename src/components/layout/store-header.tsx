@@ -138,3 +138,5 @@ export function StoreHeader({ store, categories = [] }: StoreHeaderProps) {
   );
 }
 
+export default StoreHeader;
+

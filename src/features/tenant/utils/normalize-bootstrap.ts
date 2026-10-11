@@ -1,5 +1,15 @@
 import { StorefrontBootstrap, StoreConfig } from "@/shared/types";
 
+const COLOR_REGEX =
+  /^(#[0-9a-f]{3,8}|rgba?\([\d\s.,%]+\)|hsla?\([\d\s.,%]+\)|transparent)$/i;
+
+function safeColor(v: unknown, fallback: string = "#0f172a"): string {
+  if (typeof v === "string" && COLOR_REGEX.test(v.trim())) {
+    return v.trim();
+  }
+  return fallback;
+}
+
 export function normalizeBootstrap(
   raw: any,
   storeSlug: string,
@@ -11,7 +21,7 @@ export function normalizeBootstrap(
         name: storeSlug,
         subDomain: storeSlug,
         currency: "USD",
-        themeColor: "#2563eb",
+        themeColor: "#0f172a",
       },
     };
   }
@@ -45,8 +55,10 @@ export function normalizeBootstrap(
       raw.store?.contactEmail || contact.email || raw.user?.email || null,
     contactPhone:
       raw.store?.contactPhone || contact.phone || raw.user?.phone || null,
-    themeColor:
-      raw.store?.themeColor || color.primary || color.theme || "#2563eb",
+    themeColor: safeColor(
+      raw.store?.themeColor || color.primary || color.theme,
+      "#0f172a",
+    ),
     description:
       raw.store?.description ||
       config.seo?.metaDescription ||

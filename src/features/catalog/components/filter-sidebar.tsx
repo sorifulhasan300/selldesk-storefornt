@@ -73,7 +73,7 @@ export function FilterSidebar({
             onClick={() => handleCategorySelect(undefined)}
             className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${
               !activeCategoryId
-                ? "bg-blue-50 text-blue-600 font-semibold"
+                ? "bg-[var(--store-primary)]/10 text-[var(--store-primary)] font-semibold"
                 : "text-slate-600 hover:bg-slate-50"
             }`}
           >
@@ -85,7 +85,7 @@ export function FilterSidebar({
               onClick={() => handleCategorySelect(cat.id)}
               className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors flex justify-between items-center ${
                 activeCategoryId === cat.id
-                  ? "bg-blue-50 text-blue-600 font-semibold"
+                  ? "bg-[var(--store-primary)]/10 text-[var(--store-primary)] font-semibold"
                   : "text-slate-600 hover:bg-slate-50"
               }`}
             >
@@ -108,7 +108,7 @@ export function FilterSidebar({
         <select
           value={sortBy || "createdAt:desc"}
           onChange={(e) => handleSortChange(e.target.value)}
-          className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+          className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-[var(--store-primary)]/20"
         >
           <option value="createdAt:desc">Newest First</option>
           <option value="price:asc">Price: Low to High</option>

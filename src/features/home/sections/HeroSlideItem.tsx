@@ -58,7 +58,7 @@ export function HeroSlideItem({
           <div>
             <Link
               href={link}
-              className="inline-flex items-center justify-center mt-2 px-6 py-3 bg-white text-slate-900 font-bold text-xs sm:text-sm rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-md active:scale-95"
+              className="inline-flex items-center justify-center mt-2 px-6 py-3 bg-white text-slate-900 font-bold text-xs sm:text-sm rounded-xl hover:bg-[var(--store-primary)] hover:text-white transition-all shadow-md active:scale-95"
             >
               {ctaText}
             </Link>

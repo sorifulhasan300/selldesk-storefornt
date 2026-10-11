@@ -219,7 +219,7 @@ export function DynamicSectionHeader({ section }: DynamicSectionHeaderProps) {
       {showViewAll && viewAllUrl && titleAlign !== "center" && (
         <Link
           href={viewAllUrl}
-          className="hidden sm:inline-flex items-center gap-1 text-xs sm:text-sm font-bold text-blue-600 hover:text-blue-700 hover:underline shrink-0"
+          className="hidden sm:inline-flex items-center gap-1 text-xs sm:text-sm font-bold text-[var(--store-primary)] hover:opacity-80 hover:underline shrink-0"
         >
           <span>View All</span>
           <ArrowRight className="w-4 h-4" />

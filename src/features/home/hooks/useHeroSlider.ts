@@ -31,11 +31,15 @@ export function useHeroSlider({
     return () => clearInterval(interval);
   }, [slidesCount, isPaused, autoPlayInterval, nextSlide]);
 
+  const validCurrent = current >= slidesCount && slidesCount > 0 ? 0 : current;
+
   const handleTouchStart = (e: React.TouchEvent) => {
+    setIsPaused(true);
     touchStartX.current = e.touches[0].clientX;
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
+    setIsPaused(false);
     if (touchStartX.current === null) return;
     const diff = touchStartX.current - e.changedTouches[0].clientX;
     if (Math.abs(diff) > 50) {
@@ -45,20 +49,28 @@ export function useHeroSlider({
     touchStartX.current = null;
   };
 
+  const handleTouchCancel = () => {
+    setIsPaused(false);
+    touchStartX.current = null;
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowLeft") prevSlide();
     if (e.key === "ArrowRight") nextSlide();
   };
 
   return {
-    current,
+    current: validCurrent,
     setCurrent,
+    isPaused,
     setIsPaused,
     nextSlide,
     prevSlide,
     handleTouchStart,
     handleTouchEnd,
+    handleTouchCancel,
     handleKeyDown,
   };
 }
+
 

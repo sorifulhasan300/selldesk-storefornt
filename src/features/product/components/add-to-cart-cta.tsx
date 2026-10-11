@@ -146,7 +146,7 @@ export function AddToCartCTA({ product, currency = "USD" }: AddToCartCTAProps) {
           className={`flex-1 py-3.5 px-6 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer ${
             isAdded
               ? "bg-emerald-600 text-white"
-              : "bg-blue-600 hover:bg-blue-700 text-white disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed"
+              : "bg-[var(--store-primary)] hover:opacity-90 text-white disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed"
           }`}
         >
           {isAdded ? (

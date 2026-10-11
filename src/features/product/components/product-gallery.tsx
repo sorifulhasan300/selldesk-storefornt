@@ -25,7 +25,7 @@ export function ProductGallery({ images, title }: ProductGalleryProps) {
               onClick={() => setSelected(idx)}
               className={`relative w-18 h-18 rounded-xl overflow-hidden border-2 transition-all ${
                 selected === idx
-                  ? "border-blue-600 ring-2 ring-blue-500/20"
+                  ? "border-[var(--store-primary)] ring-2 ring-[var(--store-primary)]/20"
                   : "border-slate-200 hover:border-slate-300"
               }`}
             >

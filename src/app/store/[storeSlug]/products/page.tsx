@@ -77,7 +77,7 @@ export default async function CatalogPage({
             name="search"
             defaultValue={search || ""}
             placeholder="Search catalog..."
-            className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-xs bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+            className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-xs bg-white focus:outline-none focus:ring-2 focus:ring-[var(--store-primary)]/20"
           />
         </form>
       </div>
@@ -105,7 +105,7 @@ export default async function CatalogPage({
               </p>
               <Link
                 href="/products"
-                className="mt-4 inline-block px-5 py-2 bg-blue-600 text-white font-semibold text-xs rounded-xl"
+                className="mt-4 inline-block px-5 py-2 bg-[var(--store-primary)] hover:opacity-90 text-white font-semibold text-xs rounded-xl transition-opacity"
               >
                 Clear All Filters
               </Link>

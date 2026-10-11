@@ -65,15 +65,15 @@ export function ProductShowcaseBlock({
     config.showName !== undefined
       ? Boolean(config.showName)
       : config.showProductName !== undefined
-      ? Boolean(config.showProductName)
-      : true;
+        ? Boolean(config.showProductName)
+        : true;
 
   const showCategoryName =
     config.showCategoryName !== undefined
       ? Boolean(config.showCategoryName)
       : config.showCategory !== undefined
-      ? Boolean(config.showCategory)
-      : true;
+        ? Boolean(config.showCategory)
+        : true;
 
   const showArrows =
     config.showArrows !== false && config.showNavArrows !== false;
@@ -81,10 +81,7 @@ export function ProductShowcaseBlock({
   const desktopCols = Number(
     config.columns || config.productColumns || styles.columns || 4,
   );
-  const mobileCols = Number(
-    config.mobileColumns || styles.mobileColumns || 2,
-  );
-
+  const mobileCols = Number(config.mobileColumns || styles.mobileColumns || 2);
 
   const viewAllLink =
     typeof config.categoryId === "string"
@@ -97,7 +94,7 @@ export function ProductShowcaseBlock({
         <div className="flex justify-end mb-4 sm:hidden">
           <Link
             href={viewAllLink}
-            className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 hover:underline"
+            className="text-xs font-bold text-[var(--store-primary)] hover:opacity-80 flex items-center gap-1 hover:underline"
           >
             <span>Explore all</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -134,7 +131,7 @@ export function ProductShowcaseBlock({
               <button
                 type="button"
                 onClick={() => scroll("left")}
-                className="absolute -left-3 sm:-left-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/95 border border-slate-200 shadow-md text-slate-700 hover:text-blue-600 hover:bg-white active:scale-95 transition-all flex items-center justify-center cursor-pointer z-10 touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="absolute -left-3 sm:-left-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/95 border border-slate-200 shadow-md text-slate-700 hover:text-[var(--store-primary)] hover:bg-white active:scale-95 transition-all flex items-center justify-center cursor-pointer z-10 touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--store-primary)]"
                 aria-label="Scroll left"
               >
                 <ChevronLeft className="w-5 h-5" />
@@ -142,7 +139,7 @@ export function ProductShowcaseBlock({
               <button
                 type="button"
                 onClick={() => scroll("right")}
-                className="absolute -right-3 sm:-right-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/95 border border-slate-200 shadow-md text-slate-700 hover:text-blue-600 hover:bg-white active:scale-95 transition-all flex items-center justify-center cursor-pointer z-10 touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="absolute -right-3 sm:-right-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/95 border border-slate-200 shadow-md text-slate-700 hover:text-[var(--store-primary)] hover:bg-white active:scale-95 transition-all flex items-center justify-center cursor-pointer z-10 touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--store-primary)]"
                 aria-label="Scroll right"
               >
                 <ChevronRight className="w-5 h-5" />
@@ -174,4 +171,3 @@ export function ProductShowcaseBlock({
     </div>
   );
 }
-

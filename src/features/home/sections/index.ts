@@ -1,3 +1,4 @@
+export * from "./BannerCardItem";
 export * from "./BannerGridBlock";
 export * from "./BrandShowcaseBlock";
 export * from "./CategoryGridBlock";

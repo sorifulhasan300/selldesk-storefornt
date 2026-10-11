@@ -78,13 +78,13 @@ export default async function ProductDetailPage({ params }: PDPProps) {
 
       {/* Breadcrumbs */}
       <nav className="flex items-center gap-1.5 text-xs text-slate-400 mb-6">
-        <Link href="/" className="hover:text-blue-600 transition-colors">
+        <Link href="/" className="hover:text-[var(--store-primary)] transition-colors">
           Home
         </Link>
         <ChevronRight className="w-3.5 h-3.5" />
         <Link
           href="/products"
-          className="hover:text-blue-600 transition-colors"
+          className="hover:text-[var(--store-primary)] transition-colors"
         >
           Products
         </Link>
@@ -103,7 +103,7 @@ export default async function ProductDetailPage({ params }: PDPProps) {
         <div className="space-y-6">
           <div>
             {product.category && (
-              <span className="text-xs uppercase font-extrabold tracking-wider text-blue-600">
+              <span className="text-xs uppercase font-extrabold tracking-wider text-[var(--store-primary)]">
                 {product.category.name}
               </span>
             )}
@@ -123,7 +123,7 @@ export default async function ProductDetailPage({ params }: PDPProps) {
           {/* Trust Guarantees */}
           <div className="grid grid-cols-3 gap-3 pt-6 border-t border-slate-100 text-center">
             <div className="p-3 rounded-xl bg-white border border-slate-100 flex flex-col items-center">
-              <Truck className="w-5 h-5 text-blue-600 mb-1" />
+              <Truck className="w-5 h-5 text-[var(--store-primary)] mb-1" />
               <span className="text-[11px] font-bold text-slate-800">
                 Fast Delivery
               </span>

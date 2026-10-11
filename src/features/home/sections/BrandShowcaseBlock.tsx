@@ -71,7 +71,7 @@ export function BrandShowcaseBlock({ section }: BrandShowcaseBlockProps) {
         <Link
           key={brand.id || brand._id}
           href={`/products?brand=${brand.slug || brand.id}`}
-          className="group bg-white border border-slate-200/80 rounded-2xl p-4 flex flex-col items-center justify-center text-center shadow-2xs hover:shadow-md hover:border-blue-400 transition-all duration-300 min-h-[90px] sm:min-h-[110px]"
+          className="group bg-white border border-slate-200/80 rounded-2xl p-4 flex flex-col items-center justify-center text-center shadow-2xs hover:shadow-md hover:border-[var(--store-primary)]/50 transition-all duration-300 min-h-[90px] sm:min-h-[110px]"
         >
           {brand.logo ? (
             <div className="relative w-16 h-8 sm:w-20 sm:h-10 grayscale group-hover:grayscale-0 transition-all">
@@ -85,10 +85,10 @@ export function BrandShowcaseBlock({ section }: BrandShowcaseBlockProps) {
             </div>
           ) : (
             <div className="flex flex-col items-center gap-1">
-              <div className="w-9 h-9 rounded-xl bg-slate-100 group-hover:bg-blue-50 text-slate-700 group-hover:text-blue-600 font-black text-sm flex items-center justify-center transition-colors">
+              <div className="w-9 h-9 rounded-xl bg-slate-100 group-hover:bg-[var(--store-primary)]/10 text-slate-700 group-hover:text-[var(--store-primary)] font-black text-sm flex items-center justify-center transition-colors">
                 {brand.name.charAt(0).toUpperCase()}
               </div>
-              <span className="text-xs font-bold text-slate-800 group-hover:text-blue-600 transition-colors truncate max-w-[100px]">
+              <span className="text-xs font-bold text-slate-800 group-hover:text-[var(--store-primary)] transition-colors truncate max-w-[100px]">
                 {brand.name}
               </span>
             </div>

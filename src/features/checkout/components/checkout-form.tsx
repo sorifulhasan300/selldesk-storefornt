@@ -117,7 +117,7 @@ export function CheckoutForm({
         {/* Contact & Delivery Details */}
         <div className="bg-white border border-slate-200/80 rounded-2xl p-6 space-y-5">
           <h2 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
-            <Truck className="w-5 h-5 text-blue-600" /> Shipping & Customer
+            <Truck className="w-5 h-5 text-[var(--store-primary)]" /> Shipping & Customer
             Details
           </h2>
 
@@ -159,7 +159,7 @@ export function CheckoutForm({
               <label
                 className={`border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all ${
                   city === "inside"
-                    ? "border-blue-600 bg-blue-50/50 ring-1 ring-blue-500"
+                    ? "border-[var(--store-primary)] bg-[var(--store-primary)]/10 ring-1 ring-[var(--store-primary)]"
                     : "border-slate-200 hover:border-slate-300"
                 }`}
               >
@@ -170,7 +170,7 @@ export function CheckoutForm({
                     value="inside"
                     checked={city === "inside"}
                     onChange={() => setCity("inside")}
-                    className="text-blue-600"
+                    className="accent-[var(--store-primary)] text-[var(--store-primary)]"
                   />
                   <span className="text-sm font-semibold text-slate-800">
                     Inside City
@@ -184,7 +184,7 @@ export function CheckoutForm({
               <label
                 className={`border rounded-xl p-3 flex items-center justify-between cursor-pointer transition-all ${
                   city === "outside"
-                    ? "border-blue-600 bg-blue-50/50 ring-1 ring-blue-500"
+                    ? "border-[var(--store-primary)] bg-[var(--store-primary)]/10 ring-1 ring-[var(--store-primary)]"
                     : "border-slate-200 hover:border-slate-300"
                 }`}
               >
@@ -195,7 +195,7 @@ export function CheckoutForm({
                     value="outside"
                     checked={city === "outside"}
                     onChange={() => setCity("outside")}
-                    className="text-blue-600"
+                    className="accent-[var(--store-primary)] text-[var(--store-primary)]"
                   />
                   <span className="text-sm font-semibold text-slate-800">
                     Outside City
@@ -218,7 +218,7 @@ export function CheckoutForm({
               placeholder="House, Road, Area, Landmark"
               value={shippingAddress}
               onChange={(e) => setShippingAddress(e.target.value)}
-              className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--store-primary)]/20"
             />
           </div>
 
@@ -231,7 +231,7 @@ export function CheckoutForm({
               placeholder="Special delivery instructions"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full border border-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              className="w-full border border-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--store-primary)]/20"
             />
           </div>
         </div>
@@ -246,7 +246,7 @@ export function CheckoutForm({
             <label
               className={`border rounded-xl p-4 flex items-center justify-between cursor-pointer transition-all ${
                 paymentMethod === "COD"
-                  ? "border-blue-600 bg-blue-50/40 ring-1 ring-blue-500"
+                  ? "border-[var(--store-primary)] bg-[var(--store-primary)]/10 ring-1 ring-[var(--store-primary)]"
                   : "border-slate-200 hover:border-slate-300"
               }`}
             >
@@ -272,7 +272,7 @@ export function CheckoutForm({
             <label
               className={`border rounded-xl p-4 flex items-center justify-between cursor-pointer transition-all ${
                 paymentMethod === "BKASH"
-                  ? "border-blue-600 bg-blue-50/40 ring-1 ring-blue-500"
+                  ? "border-[var(--store-primary)] bg-[var(--store-primary)]/10 ring-1 ring-[var(--store-primary)]"
                   : "border-slate-200 hover:border-slate-300"
               }`}
             >
@@ -300,7 +300,7 @@ export function CheckoutForm({
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-base rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+          className="w-full py-4 bg-[var(--store-primary)] hover:opacity-90 text-white font-bold text-base rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
         >
           {loading ? (
             <>
@@ -361,7 +361,7 @@ export function CheckoutForm({
                   placeholder="Promo Code"
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value)}
-                  className="w-full border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs uppercase font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs uppercase font-semibold focus:outline-none focus:ring-2 focus:ring-[var(--store-primary)]/20"
                 />
               </div>
               <button
@@ -402,7 +402,7 @@ export function CheckoutForm({
             </div>
             <div className="flex justify-between text-base font-extrabold text-slate-900 pt-2 border-t border-slate-100">
               <span>Total Amount</span>
-              <span className="text-blue-600">
+              <span className="text-[var(--store-primary)]">
                 {formatCurrency(total, currency)}
               </span>
             </div>

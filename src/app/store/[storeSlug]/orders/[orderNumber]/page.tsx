@@ -40,7 +40,7 @@ export default async function OrderConfirmationPage({
         </div>
 
         <div className="flex items-start gap-3">
-          <Truck className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+          <Truck className="w-5 h-5 text-[var(--store-primary)] shrink-0 mt-0.5" />
           <div className="text-xs text-slate-600">
             <p className="font-bold text-slate-800">
               Estimated Delivery: 2-3 Business Days

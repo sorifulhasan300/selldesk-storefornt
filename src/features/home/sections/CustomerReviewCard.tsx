@@ -47,7 +47,7 @@ export function CustomerReviewCard({ review }: CustomerReviewCardProps) {
             />
           </div>
         ) : (
-          <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 font-bold text-sm flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-full bg-[var(--store-primary)]/10 text-[var(--store-primary)] font-bold text-sm flex items-center justify-center shrink-0">
             {(review.name || "C").charAt(0).toUpperCase()}
           </div>
         )}
@@ -57,7 +57,7 @@ export function CustomerReviewCard({ review }: CustomerReviewCardProps) {
             <h4 className="text-xs sm:text-sm font-bold text-slate-900 truncate">
               {review.name}
             </h4>
-            <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+            <CheckCircle2 className="w-3.5 h-3.5 text-[var(--store-primary)] shrink-0" />
           </div>
           <p className="text-[11px] text-slate-400 truncate">
             {review.profession || "Verified Buyer"}

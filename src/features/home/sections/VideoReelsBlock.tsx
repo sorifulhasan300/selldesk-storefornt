@@ -1,10 +1,15 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { HomePageSection, VideoItem } from "@/shared/types";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { VideoReelCard } from "./VideoReelCard";
+import { VideoReelCard, VideoThumbnailShape } from "./VideoReelCard";
 import { VideoReelModal } from "./VideoReelModal";
+import {
+  parsePx,
+  parsePxOrUndef,
+  buildCardVariables,
+} from "../utils/section-styles.utils";
 
 interface VideoReelsBlockProps {
   section: HomePageSection;
@@ -47,73 +52,113 @@ function normalizeVideos(input: unknown): VideoItem[] {
 }
 
 export function VideoReelsBlock({ section }: VideoReelsBlockProps) {
-  const { config = {}, data } = section;
+  const { config = {}, styles = {}, data } = section;
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeModalVideo, setActiveModalVideo] = useState<VideoItem | null>(null);
+  const [isPaused, setIsPaused] = useState(false);
 
   const raw = Array.isArray(data) && data.length > 0 ? data : config.videos;
   const videos = normalizeVideos(raw);
 
-  const thumbnailShape =
-    config.thumbnailShape === "square" ? "square" : "portrait";
-  const isPortrait = thumbnailShape === "portrait";
-  const motion = config.motion === "autoscroll" ? "autoscroll" : "manual";
+  const rawShape = String(config.thumbnailShape || "").toLowerCase().trim();
+  const thumbnailShape: VideoThumbnailShape =
+    rawShape === "landscape"
+      ? "landscape"
+      : rawShape === "square"
+      ? "square"
+      : "portrait";
+
+  const cardWidth = parsePxOrUndef(config.cardWidth);
+  const cardGap = parsePx(config.cardGap ?? styles.cardGap, 16);
+  const cardRadius = parsePxOrUndef(config.cardRadius ?? styles.borderRadius);
+
+  const showArrows =
+    config.showArrows !== false && config.showNavArrows !== false;
+
+  const isAutoscroll =
+    config.motion === "autoscroll" || config.autoplay === true;
+
+  const scrollStep =
+    (cardWidth || (thumbnailShape === "landscape" ? 280 : 220)) + cardGap;
 
   useEffect(() => {
-    if (motion !== "autoscroll" || !scrollRef.current) return;
+    if (!isAutoscroll || isPaused || !scrollRef.current) return;
     const interval = setInterval(() => {
       if (scrollRef.current) {
         const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
         if (scrollLeft + clientWidth >= scrollWidth - 10) {
           scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
         } else {
-          scrollRef.current.scrollBy({ left: 220, behavior: "smooth" });
+          scrollRef.current.scrollBy({ left: scrollStep, behavior: "smooth" });
         }
       }
     }, 4000);
     return () => clearInterval(interval);
-  }, [motion]);
+  }, [isAutoscroll, isPaused, scrollStep]);
 
-  const scroll = (direction: "left" | "right") => {
-    if (!scrollRef.current) return;
-    scrollRef.current.scrollBy({
-      left: direction === "left" ? -300 : 300,
-      behavior: "smooth",
-    });
-  };
+  const scroll = useCallback(
+    (direction: "left" | "right") => {
+      if (!scrollRef.current) return;
+      const containerWidth = scrollRef.current.clientWidth;
+      const scrollAmount = Math.max(
+        scrollStep,
+        Math.floor(containerWidth * 0.75),
+      );
+      scrollRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+    },
+    [scrollStep],
+  );
 
   if (videos.length === 0) return null;
 
   return (
-    <div className="relative group/reels">
+    <div
+      className="relative group/reels"
+      style={buildCardVariables(section)}
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
       <div
         ref={scrollRef}
-        className="flex gap-4 overflow-x-auto scroll-smooth scrollbar-none pb-4 snap-x snap-mandatory"
+        style={{ gap: `${cardGap}px` }}
+        className="flex overflow-x-auto scroll-smooth scrollbar-none pb-4 snap-x snap-mandatory touch-pan-x"
       >
         {videos.map((video) => (
           <VideoReelCard
             key={video.id || video._id}
             video={video}
-            isPortrait={isPortrait}
+            thumbnailShape={thumbnailShape}
+            cardWidth={cardWidth}
+            cardGap={cardGap}
+            cardRadius={cardRadius}
             onClick={() => setActiveModalVideo(video)}
           />
         ))}
       </div>
 
-      <button
-        onClick={() => scroll("left")}
-        className="absolute -left-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white border border-slate-200 shadow-md text-slate-700 hover:text-blue-600 transition-all opacity-0 group-hover/reels:opacity-100 hidden sm:flex items-center justify-center cursor-pointer z-10"
-        aria-label="Scroll left"
-      >
-        <ChevronLeft className="w-5 h-5" />
-      </button>
-      <button
-        onClick={() => scroll("right")}
-        className="absolute -right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white border border-slate-200 shadow-md text-slate-700 hover:text-blue-600 transition-all opacity-0 group-hover/reels:opacity-100 hidden sm:flex items-center justify-center cursor-pointer z-10"
-        aria-label="Scroll right"
-      >
-        <ChevronRight className="w-5 h-5" />
-      </button>
+      {showArrows && (
+        <>
+          <button
+            type="button"
+            onClick={() => scroll("left")}
+            className="absolute -left-3 sm:-left-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/95 border border-slate-200 shadow-md text-slate-700 hover:text-[var(--store-primary)] hover:bg-white active:scale-95 transition-all flex items-center justify-center cursor-pointer z-10 touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--store-primary)]"
+            aria-label="Scroll left"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => scroll("right")}
+            className="absolute -right-3 sm:-right-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/95 border border-slate-200 shadow-md text-slate-700 hover:text-[var(--store-primary)] hover:bg-white active:scale-95 transition-all flex items-center justify-center cursor-pointer z-10 touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--store-primary)]"
+            aria-label="Scroll right"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </>
+      )}
 
       {activeModalVideo && (
         <VideoReelModal
