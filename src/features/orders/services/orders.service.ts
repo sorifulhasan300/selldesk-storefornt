@@ -1,5 +1,6 @@
 import "server-only";
 import { serverFetch } from "@/shared/api/server-fetch";
+import { API_ENDPOINTS } from "@/shared/constants";
 
 export interface OrderDetails {
   id: string;
@@ -23,7 +24,7 @@ export const ordersService = {
     orderNumber: string,
   ): Promise<OrderDetails> {
     return serverFetch<OrderDetails>(
-      `/orders/${encodeURIComponent(orderNumber)}`,
+      API_ENDPOINTS.ORDERS.BY_NUMBER(orderNumber),
       storeSlug,
       {
         noStore: true, // A11: User-specific & PII data is never cached
@@ -31,4 +32,3 @@ export const ordersService = {
     );
   },
 };
-

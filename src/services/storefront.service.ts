@@ -1,4 +1,5 @@
 import { createApiClient } from "@/shared/api/client";
+import { API_ENDPOINTS } from "@/shared/constants";
 import { checkoutService } from "@/features/checkout";
 import {
   StorefrontBootstrap,
@@ -22,7 +23,7 @@ export interface CatalogQueryOptions {
 export const StorefrontService = {
   async getBootstrap(storeSlug: string): Promise<StorefrontBootstrap> {
     const client = createApiClient(storeSlug);
-    const res = await client.get<StorefrontBootstrap>("/storefront/init");
+    const res = await client.get<StorefrontBootstrap>(API_ENDPOINTS.TENANT.INIT);
     return res as unknown as StorefrontBootstrap;
   },
 
@@ -31,23 +32,26 @@ export const StorefrontService = {
     params: CatalogQueryOptions = {},
   ): Promise<ProductListResponse> {
     const client = createApiClient(storeSlug);
-    const res = await client.get<ProductListResponse>("/storefront/products", {
-      params,
-    });
+    const res = await client.get<ProductListResponse>(
+      API_ENDPOINTS.CATALOG.PRODUCTS,
+      {
+        params,
+      },
+    );
     return res as unknown as ProductListResponse;
   },
 
   async getProductBySlug(storeSlug: string, slug: string): Promise<Product> {
     const client = createApiClient(storeSlug);
     const res = await client.get<Product>(
-      `/storefront/products/${encodeURIComponent(slug)}`,
+      API_ENDPOINTS.PRODUCTS.PRODUCT_BY_SLUG(slug),
     );
     return res as unknown as Product;
   },
 
   async getCategories(storeSlug: string): Promise<Category[]> {
     const client = createApiClient(storeSlug);
-    const res = await client.get<Category[]>("/storefront/categories");
+    const res = await client.get<Category[]>(API_ENDPOINTS.CATALOG.CATEGORIES);
     return res as unknown as Category[];
   },
 

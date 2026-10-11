@@ -1,6 +1,7 @@
 import "server-only";
 import { serverFetch } from "@/shared/api/server-fetch";
 import { tags, REVALIDATE } from "@/shared/api/tags";
+import { API_ENDPOINTS } from "@/shared/constants";
 import { StorefrontBootstrap } from "@/shared/types";
 import { normalizeBootstrap } from "../utils/normalize-bootstrap";
 
@@ -19,7 +20,7 @@ export const tenantService = {
     const bypassCache =
       process.env.NODE_ENV === "development" || isPreview === true;
 
-    const raw = await serverFetch<unknown>("/storefront/init", storeSlug,
+    const raw = await serverFetch<unknown>(API_ENDPOINTS.TENANT.INIT, storeSlug,
       bypassCache
         ? { noStore: true }
         : { revalidate: REVALIDATE.bootstrap, tags: [tags.bootstrap(storeSlug)] },
@@ -30,7 +31,7 @@ export const tenantService = {
   async resolveStoreByHost(host: string): Promise<string | null> {
     try {
       const res = await serverFetch<{ slug?: string; storeSlug?: string }>(
-        `/storefront/resolve-host?host=${encodeURIComponent(host)}`,
+        API_ENDPOINTS.TENANT.RESOLVE_HOST(host),
         host,
         {
           revalidate: 300,
@@ -42,4 +43,3 @@ export const tenantService = {
     }
   },
 };
-

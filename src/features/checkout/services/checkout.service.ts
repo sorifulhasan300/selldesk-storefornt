@@ -1,4 +1,5 @@
 import { createApiClient } from "@/shared/api/client";
+import { API_ENDPOINTS } from "@/shared/constants";
 import { CheckoutDto, CheckoutResponse, CouponDiscount } from "@/shared/types";
 
 export interface CheckoutOptions {
@@ -13,7 +14,7 @@ export const checkoutService = {
   ): Promise<CouponDiscount> {
     const client = createApiClient(storeSlug);
     const res = await client.post<CouponDiscount>(
-      "/storefront/cart/validate-coupon",
+      API_ENDPOINTS.CHECKOUT.VALIDATE_COUPON,
       {
         code,
         cartTotal,
@@ -36,9 +37,13 @@ export const checkoutService = {
     if (options?.idempotencyKey) {
       headers["Idempotency-Key"] = options.idempotencyKey;
     }
-    const res = await client.post<CheckoutResponse>("/orders/checkout", dto, {
-      headers: Object.keys(headers).length > 0 ? headers : undefined,
-    });
+    const res = await client.post<CheckoutResponse>(
+      API_ENDPOINTS.CHECKOUT.CREATE_ORDER,
+      dto,
+      {
+        headers: Object.keys(headers).length > 0 ? headers : undefined,
+      },
+    );
     const payload = res as unknown;
     if (payload && typeof payload === "object" && "data" in payload) {
       return (payload as { data: CheckoutResponse }).data;

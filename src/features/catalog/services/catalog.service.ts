@@ -1,6 +1,7 @@
 import "server-only";
 import { serverFetch } from "@/shared/api/server-fetch";
 import { tags, REVALIDATE } from "@/shared/api/tags";
+import { API_ENDPOINTS } from "@/shared/constants";
 import { ProductListResponse, Category } from "@/shared/types";
 
 export interface CatalogQueryOptions {
@@ -27,7 +28,7 @@ export const catalogService = {
 
     const qs = searchParams.toString() ? `?${searchParams.toString()}` : "";
     return serverFetch<ProductListResponse>(
-      `/storefront/products${qs}`,
+      `${API_ENDPOINTS.CATALOG.PRODUCTS}${qs}`,
       storeSlug,
       {
         revalidate: REVALIDATE.products,
@@ -37,10 +38,13 @@ export const catalogService = {
   },
 
   async getCategories(storeSlug: string): Promise<Category[]> {
-    return serverFetch<Category[]>("/storefront/categories", storeSlug, {
-      revalidate: REVALIDATE.categories,
-      tags: [tags.categories(storeSlug)],
-    });
+    return serverFetch<Category[]>(
+      API_ENDPOINTS.CATALOG.CATEGORIES,
+      storeSlug,
+      {
+        revalidate: REVALIDATE.categories,
+        tags: [tags.categories(storeSlug)],
+      },
+    );
   },
 };
-
