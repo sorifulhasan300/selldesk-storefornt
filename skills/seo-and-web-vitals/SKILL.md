@@ -231,6 +231,8 @@ return [
 
 Sitemap URLs must equal the canonical URLs exactly (same origin, no internal prefix, no tracking params).
 
+Always maintain the dynamic `app/sitemap.ts` and tenant-aware `app/robots.ts` as storefront routes and catalog behavior evolve. Sitemap entries must remain limited to public, active content and match the clean canonical URLs.
+
 5. Structured Data (JSON-LD)
    5.1 Safe renderer (S2)
 
@@ -248,6 +250,8 @@ return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jso
 5.2 Product schema
 
 Rules: data must match the visible page (S7); image URLs absolute; price is the current selling price as a plain decimal (not a formatted string such as "৳1,200"); description is plain text.
+
+Every product page must emit valid Google-compatible Schema.org JSON-LD `Product` data with an `Offer` (or `AggregateOffer` for variants), including `priceCurrency` and the accurate `InStock` or `OutOfStock` availability. Never invent price or stock values; the structured data must match the visible product state.
 
 tsx
 export function buildProductJsonLd({ product, currency, origin }: Args) {
@@ -310,11 +314,14 @@ Check with Google's Rich Results Test and the Schema Markup Validator. Missing r
 
 next/image refuses unlisted hosts, and a wildcard hosts pattern lets anyone use your image optimizer (cost and abuse). All merchant uploads should be served from the SellDesk media CDN/bucket so one pattern covers them.
 
+The approved primary image CDNs are `res.cloudinary.com` for merchant media and `cdn.selldesk.com` for system fallbacks. Keep the remote host allowlist restricted to these approved hosts (with the required account/path scope where available).
+
 typescript
 // next.config.ts
 images: {
 formats: ["image/avif", "image/webp"],
 remotePatterns: [
+{ protocol: "https", hostname: "res.cloudinary.com", pathname: "/**" },
 { protocol: "https", hostname: "cdn.selldesk.com", pathname: "/\*\*" }, // your real media host
 ],
 // dangerouslyAllowSVG stays off
@@ -347,7 +354,7 @@ Category card (fixed thumb) (max-width: 768px) 33vw, 160px
 Video reel thumbnail (9:16) (max-width: 768px) 50vw, 220px
 PDP main image (max-width: 1024px) 100vw, 600px
 6.4 LCP image (S11)
-Next.js 16 deprecated priority in favor of preload. Use <Image preload ... />; on older versions keep priority.
+For the first visible hero banner/image on every page, `priority={true}` and a responsive, layout-accurate `sizes` attribute are mandatory. Keep exactly one LCP image prioritized: on Next.js versions that support `priority`, use it; if the installed version has deprecated it, use that version's supported preload equivalent while preserving the same single-image and responsive-sizes requirements.
 Preload exactly one image: the first hero slide on the homepage, the main image on a PDP. Never preload card lists or below-the-fold images.
 Render the LCP image in server HTML. A client-only carousel that mounts after hydration delays LCP, so the first slide must be in the initial markup.
 Hero carousel: slides after the first stay lazy.

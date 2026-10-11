@@ -430,6 +430,12 @@ return { sections, selectedId, isPreview: active, sendAction };
 
 Because useSearchParams requires a Suspense boundary in the App Router, reading location.search inside the effect (as above) avoids both the boundary and a server/client mismatch.
 
+10.4 Visual Builder Resilience & Live Sync
+
+In preview mode (`isPreview === true`), a banner or slider with no image must render an editable placeholder card; it must not return `null`. Keep the placeholder selectable/editable so the merchant can configure the missing media in the builder.
+
+Server data fetching for preview and development must use `revalidate: 0` so builder draft changes are reflected immediately. Do not serve cached section data in these modes.
+
 11. Production Performance and Accessibility
     LCP: only the first hero image on the page gets priority/fetchPriority="high". Every other image is lazy. Always set sizes for next/image.
     No layout shift: every media slot has a fixed aspect ratio or explicit dimensions; carousels reserve their height before hydration; skeletons match final dimensions.

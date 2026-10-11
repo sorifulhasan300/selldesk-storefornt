@@ -319,6 +319,12 @@ const { store } = await getBootstrap(storeSlug); // notFound() inside when the s
 
 The original getStoreSlugFromHeaders() called headers() from pages. That opts the whole route into dynamic rendering, so you lose ISR even though the fetches are tagged. Remove it from pages and layouts. The tenant layout validates params.storeSlug with SLUG_RE and calls notFound() for an unknown store.
 
+4.4 Multi-Tenant Routing & Clean URLs
+
+The internal `/store/[storeSlug]` prefix is never part of a shopper-visible browser URL. The root `middleware.ts` (or `proxy.ts` on Next.js 16, following the installed Next.js version) resolves the tenant from the hostname and internally rewrites clean paths to `/store/{storeSlug}/...`.
+
+All internal `<Link>` destinations and canonical URLs use clean paths such as `/products`, `/categories`, and `/checkout`; never include `/store/[storeSlug]` in shopper-facing links. Keep the internal route prefix an implementation detail.
+
 5. API Layer (shared/api)
    5.1 One error type
    typescript
@@ -421,6 +427,10 @@ revalidate: REVALIDATE.product, tags: [tags.product(storeSlug, slug)],
 };
 
 Keep server calls (cached serverFetch) and browser calls (axios) in separate service files or separate exports guarded by the server/client rule in Section 3.
+
+5.6 API Contracts & Endpoint Standards
+
+HARD RULE: hardcoded API path strings are prohibited in every service and component. Import the `API_ENDPOINTS` object from `@/shared/constants/api-endpoints` and use its typed endpoint paths for every API request. Components must call feature services rather than making HTTP requests directly (A7).
 
 6. Revalidation Webhook (app/api/revalidate/route.ts)
    typescript

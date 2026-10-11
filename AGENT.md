@@ -254,5 +254,10 @@ No any, no dead code, no stray logs, no component over 250 lines.
 No hardcoded merchant-controlled dimensions; cn() used for class merging.
 Merchant data is schema-validated and rendered safely (SEC3 to SEC5).
 No secrets, PII or mock data exposed (SEC7, SEC8, SEC11).
+[ ] Zero hardcoded API strings; always use `API_ENDPOINTS`.
+[ ] Images use `next/image` with AVIF/WebP, responsive `sizes`, and priority (or the installed Next.js equivalent) for the single LCP image.
+[ ] Mobile conversion is preserved: PDP sticky CTA bar and shimmer skeletons.
+[ ] Safe JSON-LD structured data and a dynamic sitemap are maintained.
+[ ] `pnpm build` passes cleanly without lint or type errors.
 CI gates (Section 11) pass.
 The final report lists changes, assumptions and anything unverified.
