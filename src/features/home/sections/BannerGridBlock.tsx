@@ -35,16 +35,24 @@ interface RawBannerRecord {
 function normalizeBanners(input: unknown): BannerSlideItem[] {
   if (!Array.isArray(input)) return [];
   return (input as RawBannerRecord[])
-    .filter((b) => Boolean(b.imageUrl))
-    .map((b, i) => ({
-      id: b.id || b._id || `banner-${i}`,
-      imageUrl: b.imageUrl || "",
-      headline: b.headline || b.title || "",
-      subHeadline: b.subHeadline || b.subtitle || "",
-      linkUrl: b.linkUrl || b.redirectUrl || b.ctaUrl || "/products",
-      ctaLabel: b.ctaLabel || "Discover Now",
-      altText: b.altText || b.headline || b.title || "Promotional banner",
-    }));
+    .map((b, i) => {
+      const img =
+        b.imageUrl ||
+        (b as any).url ||
+        (b as any).image?.large ||
+        (b as any).image?.medium ||
+        "";
+      return {
+        id: b.id || b._id || `banner-${i}`,
+        imageUrl: img,
+        headline: b.headline || b.title || "",
+        subHeadline: b.subHeadline || b.subtitle || "",
+        linkUrl: b.linkUrl || b.redirectUrl || b.ctaUrl || "/products",
+        ctaLabel: b.ctaLabel || "Discover Now",
+        altText: b.altText || b.headline || b.title || "Promotional banner",
+      };
+    })
+    .filter((b) => Boolean(b.imageUrl));
 }
 
 export function BannerGridBlock({ section }: BannerGridBlockProps) {
@@ -60,12 +68,15 @@ export function BannerGridBlock({ section }: BannerGridBlockProps) {
   const banners = raw ? normalizeBanners(raw) : [];
 
   const isCarousel =
+    config.displayMode === "carousel" ||
+    config.displayMode === "slider" ||
     config.displayType === "carousel" ||
     config.viewType === "carousel" ||
     config.layout === "carousel" ||
     config.displayType === "slider" ||
     config.viewType === "slider" ||
-    config.isCarousel === true;
+    config.isCarousel === true ||
+    Boolean(config.autoPlayInterval && config.displayMode !== "grid");
 
   const isAutoplay =
     config.autoplay !== false && config.autoPlay !== false;

@@ -44,7 +44,18 @@ function resolveSectionBlock(
       if (
         section.config?.displayType === "slider" ||
         section.config?.viewType === "slider" ||
-        section.title?.toLowerCase().includes("hero")
+        section.config?.displayMode === "slider" ||
+        section.config?.displayMode === "carousel" ||
+        section.config?.displayType === "carousel" ||
+        section.config?.viewType === "carousel" ||
+        section.config?.layout === "carousel" ||
+        section.config?.isCarousel === true ||
+        section.title?.toLowerCase().includes("hero") ||
+        section.title?.toLowerCase().includes("slider") ||
+        Boolean(
+          section.config?.autoPlayInterval &&
+            section.config?.displayMode !== "grid",
+        )
       ) {
         return <HeroSliderBlock section={section} currency={currency} />;
       }

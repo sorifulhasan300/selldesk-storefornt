@@ -13,16 +13,37 @@ interface HeroSliderBlockProps {
 export function HeroSliderBlock({ section }: HeroSliderBlockProps) {
   const { config = {}, styles = {}, data } = section;
 
-  // Extract slides strictly without `any`
-  const rawSlides: BannerSlideItem[] = Array.isArray(data)
-    ? (data as BannerSlideItem[])
-    : Array.isArray(config.banners)
-    ? (config.banners as BannerSlideItem[])
-    : Array.isArray(config.slides)
-    ? (config.slides as BannerSlideItem[])
-    : [];
+  // Extract and normalize slides with robust fallbacks
+  const rawSlides: unknown[] =
+    Array.isArray(data) && data.length > 0
+      ? data
+      : Array.isArray(config.banners) && config.banners.length > 0
+      ? config.banners
+      : Array.isArray(config.slides) && config.slides.length > 0
+      ? config.slides
+      : [];
 
-  const slides: BannerSlideItem[] = rawSlides;
+  const slides: BannerSlideItem[] = (rawSlides as Record<string, unknown>[])
+    .map((s, idx) => {
+      const img =
+        (s.imageUrl as string) ||
+        (s.url as string) ||
+        ((s.image as Record<string, unknown>)?.large as string) ||
+        ((s.image as Record<string, unknown>)?.medium as string) ||
+        "";
+      return {
+        id: (s.id || s._id || `slide-${idx}`) as string,
+        imageUrl: img,
+        headline: (s.headline || s.title || "") as string,
+        subHeadline: (s.subHeadline || s.subtitle || "") as string,
+        linkUrl:
+          (s.ctaUrl || s.linkUrl || s.redirectUrl || "/products") as string,
+        ctaLabel: (s.ctaLabel || "Shop Collection") as string,
+        altText:
+          (s.altText || s.headline || s.title || "Promotional banner") as string,
+      };
+    })
+    .filter((s) => Boolean(s.imageUrl));
 
   const isAutoplay =
     config.autoplay !== false && config.autoPlay !== false;
