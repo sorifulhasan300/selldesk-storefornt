@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { ShoppingBag, Zap } from "lucide-react";
 import { formatCurrency } from "@/shared/lib/utils";
 import { useProductPurchase } from "./product-purchase-provider";
+import { Button } from "@/shared/ui/button";
 
 export function MobileStickyBuyBar() {
   const {
@@ -49,24 +50,27 @@ export function MobileStickyBuyBar() {
           </p>
         </div>
         <div className="flex min-w-0 flex-1 gap-2">
-          <button
+          <Button
             type="button"
             onClick={handlePurchase}
             disabled={isOutOfStock}
-            className="flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-xl border border-[var(--store-primary)] px-2 text-xs font-bold text-[var(--store-primary)] transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-400"
+            variant="outline"
+            size="lg"
+            className="h-11 w-full flex-1 rounded-xl border-[var(--store-primary)] px-2 text-xs font-bold text-[var(--store-primary)] hover:bg-[var(--store-primary)]/10 disabled:border-slate-200 disabled:text-slate-400"
           >
             <ShoppingBag className="h-4 w-4 shrink-0" />
             Add to Cart
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             onClick={handlePurchase}
             disabled={isOutOfStock}
-            className="flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-xl bg-[var(--store-primary)] px-2 text-xs font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+            size="lg"
+            className="h-11 w-full flex-1 rounded-xl px-2 text-xs font-bold disabled:bg-slate-200 disabled:text-slate-400"
           >
             <Zap className="h-4 w-4 shrink-0" />
             Buy Now
-          </button>
+          </Button>
         </div>
       </div>
     </div>

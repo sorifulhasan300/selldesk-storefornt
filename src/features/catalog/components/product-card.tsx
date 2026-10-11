@@ -7,6 +7,8 @@ import { Product } from "@/shared/types";
 import { cn, formatCurrency } from "@/shared/lib/utils";
 import { useCartStore } from "@/features/cart";
 import { ShoppingBag, Check } from "lucide-react";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
 
 export interface ProductCardProps {
   product: Product;
@@ -90,9 +92,12 @@ export function ProductCard({
         )}
 
         {hasDiscount && (
-          <span className="absolute top-2.5 left-2.5 bg-rose-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow-xs">
+          <Badge
+            variant="destructive"
+            className="absolute left-2.5 top-2.5 text-[11px] shadow-xs"
+          >
             Sale
-          </span>
+          </Badge>
         )}
 
         {product.stock <= 0 && (
@@ -133,23 +138,25 @@ export function ProductCard({
             )}
           </div>
 
-          <button
+          <Button
             onClick={handleQuickAdd}
             disabled={product.stock <= 0}
+            size="sm"
             className={cn(
-              "p-2 rounded-xl transition-all duration-200 cursor-pointer",
+              "size-9 rounded-xl p-0 transition-all duration-200",
               added
-                ? "bg-emerald-600 text-white"
-                : "bg-slate-900 hover:bg-[var(--store-primary)] text-white disabled:opacity-30 disabled:cursor-not-allowed",
+                ? "bg-emerald-600 text-white hover:bg-emerald-600"
+                : "bg-slate-900 text-white hover:bg-[var(--store-primary)]",
             )}
             title="Add to cart"
+            aria-label={added ? "Added to cart" : "Add to cart"}
           >
             {added ? (
               <Check className="w-4 h-4" />
             ) : (
               <ShoppingBag className="w-4 h-4" />
             )}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

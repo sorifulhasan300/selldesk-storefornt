@@ -4,6 +4,7 @@ import { ProductCard, FilterSidebar } from "@/features/catalog";
 import { Product, Category } from "@/shared/types";
 import { Search } from "lucide-react";
 import Link from "next/link";
+import { Input } from "@/shared/ui/input";
 
 interface CatalogPageProps {
   params: Promise<{ storeSlug: string }>;
@@ -72,12 +73,14 @@ export default async function CatalogPage({
           {categoryId && (
             <input type="hidden" name="categoryId" value={categoryId} />
           )}
-          <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-          <input
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Input
+            type="search"
             name="search"
-            defaultValue={search || ""}
+            defaultValue={search ?? ""}
             placeholder="Search catalog..."
-            className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-xs bg-white focus:outline-none focus:ring-2 focus:ring-[var(--store-primary)]/20"
+            aria-label="Search catalog"
+            className="h-10 rounded-xl bg-white pl-9 pr-4 text-xs"
           />
         </form>
       </div>

@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { useProductPurchase } from "./product-purchase-provider";
-import { formatCurrency } from "@/shared/lib/utils";
+import { cn, formatCurrency } from "@/shared/lib/utils";
 import { ShoppingBag, Check, Plus, Minus, AlertCircle } from "lucide-react";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
 
 export function AddToCartCTA() {
   const {
@@ -53,9 +55,13 @@ export function AddToCartCTA() {
 
         {/* Stock Badge */}
         {isOutOfStock ? (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-50 text-rose-700 text-xs font-bold rounded-full">
-            <AlertCircle className="w-3.5 h-3.5" /> Out of Stock
-          </span>
+          <Badge
+            variant="secondary"
+            className="gap-1.5 bg-rose-50 text-rose-700"
+          >
+            <AlertCircle className="h-3.5 w-3.5" />
+            Out of Stock
+          </Badge>
         ) : currentStock <= 5 ? (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 text-xs font-bold rounded-full">
             Only {currentStock} left!
@@ -104,33 +110,41 @@ export function AddToCartCTA() {
       {/* Quantity Stepper & Add to Cart button */}
       <div className="flex items-center gap-4 pt-2">
         <div className="flex items-center border border-slate-200 rounded-xl bg-white p-1">
-          <button
+          <Button
             onClick={() => setQuantity((q) => Math.max(1, q - 1))}
             disabled={quantity <= 1 || isOutOfStock}
-            className="p-2 hover:bg-slate-100 rounded-lg text-slate-600 disabled:opacity-40"
+            variant="outline"
+            size="icon"
+            aria-label="Decrease quantity"
+            className="size-9 rounded-lg border-slate-200 text-slate-600 hover:bg-slate-100"
           >
             <Minus className="w-4 h-4" />
-          </button>
+          </Button>
           <span className="w-10 text-center text-sm font-bold text-slate-900">
             {quantity}
           </span>
-          <button
+          <Button
             onClick={() => setQuantity((q) => Math.min(currentStock, q + 1))}
             disabled={quantity >= currentStock || isOutOfStock}
-            className="p-2 hover:bg-slate-100 rounded-lg text-slate-600 disabled:opacity-40"
+            variant="outline"
+            size="icon"
+            aria-label="Increase quantity"
+            className="size-9 rounded-lg border-slate-200 text-slate-600 hover:bg-slate-100"
           >
             <Plus className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
 
-        <button
+        <Button
           onClick={handleAddToCart}
           disabled={isOutOfStock}
-          className={`flex-1 py-3.5 px-6 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer ${
+          size="lg"
+          className={cn(
+            "w-full flex-1 rounded-xl px-6 font-bold shadow-xs",
             isAdded
-              ? "bg-emerald-600 text-white"
-              : "bg-[var(--store-primary)] hover:opacity-90 text-white disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed"
-          }`}
+              ? "bg-emerald-600 text-white hover:bg-emerald-600"
+              : "disabled:bg-slate-200 disabled:text-slate-400",
+          )}
         >
           {isAdded ? (
             <>
@@ -141,7 +155,7 @@ export function AddToCartCTA() {
               <ShoppingBag className="w-5 h-5" /> Add to Shopping Bag
             </>
           )}
-        </button>
+        </Button>
       </div>
     </div>
   );
