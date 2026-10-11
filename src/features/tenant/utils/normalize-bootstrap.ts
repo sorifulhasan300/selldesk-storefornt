@@ -17,11 +17,12 @@ export function normalizeBootstrap(
   if (!raw) {
     return {
       store: {
-        id: "mock-store-id",
+        id: "",
         name: storeSlug,
         subDomain: storeSlug,
         currency: "USD",
         themeColor: "#0f172a",
+        description: null,
       },
     };
   }
@@ -42,7 +43,7 @@ export function normalizeBootstrap(
       .replace(/\b\w/g, (c: string) => c.toUpperCase());
 
   const store: StoreConfig = {
-    id: raw.store?.id || business.id || "mock-store-id",
+    id: raw.store?.id || business.id || "",
     name: cleanName,
     subDomain:
       raw.store?.subDomain ||
@@ -62,7 +63,7 @@ export function normalizeBootstrap(
     description:
       raw.store?.description ||
       config.seo?.metaDescription ||
-      `Official store for ${cleanName}`,
+      null,
     facebookUrl: raw.store?.facebookUrl || socialLinks.facebook || null,
     instagramUrl: raw.store?.instagramUrl || socialLinks.instagram || null,
   };

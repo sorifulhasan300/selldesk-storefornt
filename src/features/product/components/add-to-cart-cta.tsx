@@ -42,9 +42,7 @@ export function AddToCartCTA({ product, currency = "USD" }: AddToCartCTAProps) {
       name: product.name,
       price: currentPrice,
       quantity,
-      image:
-        product.images?.[0] ||
-        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80",
+      image: product.images?.[0] || "",
       variantTitle,
       maxStock: currentStock,
     });

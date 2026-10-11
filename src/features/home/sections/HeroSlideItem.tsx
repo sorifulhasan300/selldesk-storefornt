@@ -17,9 +17,7 @@ export function HeroSlideItem({
   defaultTitle = "Special Collection",
   defaultSubtitle,
 }: HeroSlideItemProps) {
-  const imageUrl =
-    slide.imageUrl ||
-    "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600&auto=format&fit=crop&q=80";
+  const imageUrl = slide.imageUrl || "";
 
   const title = slide.headline || slide.title || defaultTitle;
   const subtitle = slide.subHeadline || slide.subtitle || defaultSubtitle;
@@ -33,14 +31,18 @@ export function HeroSlideItem({
         isCurrent ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
       }`}
     >
-      <Image
-        src={imageUrl}
-        alt={title}
-        fill
-        priority={priority}
-        className="object-cover object-center brightness-90"
-        sizes="(max-width: 768px) 100vw, 1200px"
-      />
+      {imageUrl ? (
+        <Image
+          src={imageUrl}
+          alt={title}
+          fill
+          priority={priority}
+          className="object-cover object-center brightness-90"
+          sizes="(max-width: 768px) 100vw, 1200px"
+        />
+      ) : (
+        <div className="absolute inset-0 bg-slate-800" />
+      )}
 
       <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent flex items-center px-6 sm:px-12 lg:px-20">
         <div className="max-w-xl text-white space-y-4">

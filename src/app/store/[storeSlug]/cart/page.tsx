@@ -18,16 +18,8 @@ export async function generateMetadata({
 
 export default async function CartPage({ params }: CartPageProps) {
   const { storeSlug } = await params;
-  let currency = "USD";
-
-  try {
-    const bootstrap = await getBootstrap(storeSlug);
-    if (bootstrap.store?.currency) {
-      currency = bootstrap.store.currency;
-    }
-  } catch {
-    // Safe fallback to default currency
-  }
+  const bootstrap = await getBootstrap(storeSlug);
+  const currency = bootstrap.store?.currency || "USD";
 
   return (
     <div className="space-y-6">

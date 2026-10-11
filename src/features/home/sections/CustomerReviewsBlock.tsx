@@ -28,20 +28,19 @@ interface RawReviewRecord {
 
 function normalizeReviews(input: unknown): ReviewItem[] {
   if (!Array.isArray(input)) return [];
-  return (input as RawReviewRecord[]).map((r, i) => ({
-    _id: r._id || r.id || `review-${i}`,
-    id: r.id || r._id || `review-${i}`,
-    name: r.name || r.reviewerName || "Verified Customer",
-    profession: r.profession || r.role || "Verified Buyer",
-    rating:
-      typeof r.rating === "number" ? Math.min(5, Math.max(1, r.rating)) : 5,
-    text:
-      r.text ||
-      r.comment ||
-      "Outstanding product quality and lightning-fast delivery!",
-    picture: r.picture || r.avatarUrl,
-    date: r.date,
-  }));
+  return (input as RawReviewRecord[])
+    .filter((r) => Boolean(r.text || r.comment))
+    .map((r, i) => ({
+      _id: r._id || r.id || `review-${i}`,
+      id: r.id || r._id || `review-${i}`,
+      name: r.name || r.reviewerName || "Customer",
+      profession: r.profession || r.role || undefined,
+      rating:
+        typeof r.rating === "number" ? Math.min(5, Math.max(1, r.rating)) : 5,
+      text: r.text || r.comment || "",
+      picture: r.picture || r.avatarUrl,
+      date: r.date,
+    }));
 }
 
 export function CustomerReviewsBlock({ section }: CustomerReviewsBlockProps) {

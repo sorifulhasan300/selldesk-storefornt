@@ -34,19 +34,11 @@ export async function generateMetadata({
 export default async function ProductDetailPage({ params }: PDPProps) {
   const { storeSlug, slug } = await params;
 
-  let product: Product;
-  let currency = "USD";
-
-  try {
-    const [pData, bData] = await Promise.all([
-      getProductBySlug(storeSlug, slug),
-      getBootstrap(storeSlug),
-    ]);
-    product = pData;
-    currency = bData?.store?.currency || "USD";
-  } catch {
-    notFound();
-  }
+  const [product, bData] = await Promise.all([
+    getProductBySlug(storeSlug, slug),
+    getBootstrap(storeSlug),
+  ]);
+  const currency = bData?.store?.currency || "USD";
 
   // Schema.org JSON-LD Structured Data
   const jsonLd = {

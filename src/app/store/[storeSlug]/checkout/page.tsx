@@ -7,21 +7,13 @@ interface CheckoutPageProps {
 
 export default async function CheckoutPage({ params }: CheckoutPageProps) {
   const { storeSlug } = await params;
+  const bootstrap = await getBootstrap(storeSlug);
 
-  let deliveryCharge = { insideCity: 60, outsideCity: 120 };
-  let currency = "USD";
-
-  try {
-    const bootstrap = await getBootstrap(storeSlug);
-    if (bootstrap.deliveryCharge) {
-      deliveryCharge = bootstrap.deliveryCharge;
-    }
-    if (bootstrap.store?.currency) {
-      currency = bootstrap.store.currency;
-    }
-  } catch {
-    // Falls back to safe default charges
-  }
+  const deliveryCharge = bootstrap.deliveryCharge || {
+    insideCity: 60,
+    outsideCity: 120,
+  };
+  const currency = bootstrap.store?.currency || "USD";
 
   return (
     <div className="space-y-6">

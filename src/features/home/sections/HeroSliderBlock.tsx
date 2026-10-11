@@ -22,22 +22,7 @@ export function HeroSliderBlock({ section }: HeroSliderBlockProps) {
     ? (config.slides as BannerSlideItem[])
     : [];
 
-  const slides: BannerSlideItem[] =
-    rawSlides.length > 0
-      ? rawSlides
-      : [
-          {
-            id: "fallback-hero-1",
-            title: section.title || "Discover Our New Collection",
-            subtitle:
-              section.subtitle ||
-              "Explore curated premium items delivered directly to your doorstep.",
-            imageUrl:
-              "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600&auto=format&fit=crop&q=80",
-            linkUrl: "/products",
-            ctaLabel: "Shop Collection",
-          },
-        ];
+  const slides: BannerSlideItem[] = rawSlides;
 
   const isAutoplay =
     config.autoplay !== false && config.autoPlay !== false;

@@ -23,7 +23,7 @@ export const ordersService = {
     orderNumber: string,
   ): Promise<OrderDetails> {
     return serverFetch<OrderDetails>(
-      `/storefront/orders/${encodeURIComponent(orderNumber)}`,
+      `/orders/${encodeURIComponent(orderNumber)}`,
       storeSlug,
       {
         noStore: true, // A11: User-specific & PII data is never cached

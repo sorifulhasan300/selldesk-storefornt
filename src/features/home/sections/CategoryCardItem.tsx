@@ -60,16 +60,22 @@ export function CategoryCardItem({
       style={cardStyle}
     >
       <div
-        className="relative w-16 h-16 sm:w-20 sm:h-20 overflow-hidden bg-slate-100 mb-3 group-hover:scale-105 transition-transform duration-300"
+        className="relative w-16 h-16 sm:w-20 sm:h-20 overflow-hidden bg-slate-100 mb-3 group-hover:scale-105 transition-transform duration-300 flex items-center justify-center"
         style={{ borderRadius: resolvedRadius }}
       >
-        <Image
-          src={category.imageUrl}
-          alt={category.name}
-          fill
-          sizes="(max-width: 768px) 33vw, 160px"
-          className="object-cover"
-        />
+        {category.imageUrl ? (
+          <Image
+            src={category.imageUrl}
+            alt={category.name}
+            fill
+            sizes="(max-width: 768px) 33vw, 160px"
+            className="object-cover"
+          />
+        ) : (
+          <span className="text-xl font-black text-slate-400 group-hover:text-[var(--store-primary)] uppercase">
+            {category.name.charAt(0)}
+          </span>
+        )}
       </div>
       {shouldShowName && (
         <h3 className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-[var(--store-primary)] transition-colors line-clamp-1">

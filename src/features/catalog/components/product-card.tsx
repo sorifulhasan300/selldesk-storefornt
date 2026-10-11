@@ -32,9 +32,7 @@ export function ProductCard({
   const addItem = useCartStore((s) => s.addItem);
   const [added, setAdded] = useState(false);
 
-  const primaryImage =
-    product.images?.[0] ||
-    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80";
+  const primaryImage = product.images?.[0] || null;
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -46,7 +44,7 @@ export function ProductCard({
       name: product.name,
       price: product.salePrice ?? product.price,
       quantity: 1,
-      image: primaryImage,
+      image: primaryImage || "",
       maxStock: product.stock,
     });
 
@@ -77,15 +75,19 @@ export function ProductCard({
     >
       <Link
         href={`/products/${product.slug}`}
-        className="block relative aspect-square overflow-hidden bg-slate-100"
+        className="block relative aspect-square overflow-hidden bg-slate-100 flex items-center justify-center text-slate-300"
       >
-        <Image
-          src={primaryImage}
-          alt={product.name}
-          fill
-          sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-          className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
-        />
+        {primaryImage ? (
+          <Image
+            src={primaryImage}
+            alt={product.name}
+            fill
+            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+            className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+          />
+        ) : (
+          <ShoppingBag className="w-12 h-12 text-slate-300" />
+        )}
 
         {hasDiscount && (
           <span className="absolute top-2.5 left-2.5 bg-rose-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow-xs">

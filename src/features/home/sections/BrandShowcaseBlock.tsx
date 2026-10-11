@@ -21,15 +21,6 @@ interface RawBrandRecord {
   imageUrl?: string | null;
 }
 
-const FALLBACK_BRANDS: BrandItem[] = [
-  { id: "b1", name: "Apple", slug: "apple" },
-  { id: "b2", name: "Sony", slug: "sony" },
-  { id: "b3", name: "Samsung", slug: "samsung" },
-  { id: "b4", name: "Nike", slug: "nike" },
-  { id: "b5", name: "Adidas", slug: "adidas" },
-  { id: "b6", name: "Puma", slug: "puma" },
-];
-
 function normalizeBrands(input: unknown): BrandItem[] {
   if (!Array.isArray(input)) return [];
   return (input as RawBrandRecord[]).map((b, i) => ({
@@ -51,7 +42,7 @@ export function BrandShowcaseBlock({ section }: BrandShowcaseBlockProps) {
       ? config.brands
       : null;
 
-  const brands = raw ? normalizeBrands(raw) : FALLBACK_BRANDS;
+  const brands = raw ? normalizeBrands(raw) : [];
   if (brands.length === 0) return null;
 
   const desktopCols = Number(

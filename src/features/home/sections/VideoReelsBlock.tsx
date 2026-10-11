@@ -45,7 +45,7 @@ function normalizeVideos(input: unknown): VideoItem[] {
       v.thumbnailUrl ||
       (videoId && !videoId.startsWith("vid-")
         ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
-        : "https://images.unsplash.com/photo-1536240478700-b869070f9279?w=600&auto=format&fit=crop&q=80");
+        : "");
 
     return { _id: id, id, url, videoId, caption, thumbnailUrl };
   });

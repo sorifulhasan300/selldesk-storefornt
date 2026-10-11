@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { ShoppingBag } from "lucide-react";
 
 interface ProductGalleryProps {
   images: string[];
@@ -9,9 +10,7 @@ interface ProductGalleryProps {
 }
 
 export function ProductGallery({ images, title }: ProductGalleryProps) {
-  const fallback =
-    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80";
-  const displayImages = images?.length > 0 ? images : [fallback];
+  const displayImages = images?.length > 0 ? images : [];
   const [selected, setSelected] = useState(0);
 
   return (
@@ -41,15 +40,19 @@ export function ProductGallery({ images, title }: ProductGalleryProps) {
       )}
 
       {/* Main Large Image */}
-      <div className="relative w-full aspect-square rounded-3xl overflow-hidden bg-slate-100 border border-slate-200/80 shadow-xs">
-        <Image
-          src={displayImages[selected] || fallback}
-          alt={title}
-          fill
-          priority
-          sizes="(max-width: 768px) 100vw, 50vw"
-          className="object-cover object-center"
-        />
+      <div className="relative w-full aspect-square rounded-3xl overflow-hidden bg-slate-100 border border-slate-200/80 shadow-xs flex items-center justify-center text-slate-300">
+        {displayImages[selected] ? (
+          <Image
+            src={displayImages[selected]}
+            alt={title}
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-cover object-center"
+          />
+        ) : (
+          <ShoppingBag className="w-20 h-20 text-slate-300" />
+        )}
       </div>
     </div>
   );

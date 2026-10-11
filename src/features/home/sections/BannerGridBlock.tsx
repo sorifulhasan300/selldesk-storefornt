@@ -34,42 +34,18 @@ interface RawBannerRecord {
 
 function normalizeBanners(input: unknown): BannerSlideItem[] {
   if (!Array.isArray(input)) return [];
-  return (input as RawBannerRecord[]).map((b, i) => ({
-    id: b.id || b._id || `banner-${i}`,
-    imageUrl:
-      b.imageUrl ||
-      "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&auto=format&fit=crop&q=80",
-    headline: b.headline || b.title || `Special Offer #${i + 1}`,
-    subHeadline:
-      b.subHeadline ||
-      b.subtitle ||
-      "Exclusive online discounts available for a limited time.",
-    linkUrl: b.linkUrl || b.redirectUrl || b.ctaUrl || "/products",
-    ctaLabel: b.ctaLabel || "Discover Now",
-    altText: b.altText || b.headline || "Promotional banner",
-  }));
+  return (input as RawBannerRecord[])
+    .filter((b) => Boolean(b.imageUrl))
+    .map((b, i) => ({
+      id: b.id || b._id || `banner-${i}`,
+      imageUrl: b.imageUrl || "",
+      headline: b.headline || b.title || "",
+      subHeadline: b.subHeadline || b.subtitle || "",
+      linkUrl: b.linkUrl || b.redirectUrl || b.ctaUrl || "/products",
+      ctaLabel: b.ctaLabel || "Discover Now",
+      altText: b.altText || b.headline || b.title || "Promotional banner",
+    }));
 }
-
-const FALLBACK_BANNERS: BannerSlideItem[] = [
-  {
-    id: "banner-1",
-    imageUrl:
-      "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&auto=format&fit=crop&q=80",
-    headline: "Seasonal Fashion Drops",
-    subHeadline: "Upgrade your wardrobe with handpicked premium apparel.",
-    linkUrl: "/products",
-    ctaLabel: "Shop Fashion",
-  },
-  {
-    id: "banner-2",
-    imageUrl:
-      "https://images.unsplash.com/photo-1550009158-9ebf69173e03?w=800&auto=format&fit=crop&q=80",
-    headline: "Next-Gen Tech Gadgets",
-    subHeadline: "High-performance acoustics and smart lifestyle essentials.",
-    linkUrl: "/products",
-    ctaLabel: "Explore Gadgets",
-  },
-];
 
 export function BannerGridBlock({ section }: BannerGridBlockProps) {
   const { config = {}, styles = {}, data } = section;
@@ -81,7 +57,7 @@ export function BannerGridBlock({ section }: BannerGridBlockProps) {
       ? config.banners
       : null;
 
-  const banners = raw ? normalizeBanners(raw) : FALLBACK_BANNERS;
+  const banners = raw ? normalizeBanners(raw) : [];
 
   const isCarousel =
     config.displayType === "carousel" ||

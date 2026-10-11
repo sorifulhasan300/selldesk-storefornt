@@ -24,9 +24,7 @@ export function VideoReelCard({
   onClick,
   isPortrait,
 }: VideoReelCardProps) {
-  const thumbnail =
-    video.thumbnailUrl ||
-    "https://images.unsplash.com/photo-1536240478700-b869070f9279?w=600&auto=format&fit=crop&q=80";
+  const thumbnail = video.thumbnailUrl || "";
 
   const shape: VideoThumbnailShape =
     thumbnailShape || (isPortrait === false ? "square" : "portrait");
@@ -70,13 +68,17 @@ export function VideoReelCard({
         cardRadius === undefined && "rounded-2xl",
       )}
     >
-      <Image
-        src={thumbnail}
-        alt={video.caption || "Video reel thumbnail"}
-        fill
-        sizes="(max-width: 768px) 70vw, 360px"
-        className="object-cover group-hover/card:scale-105 transition-transform duration-500"
-      />
+      {thumbnail ? (
+        <Image
+          src={thumbnail}
+          alt={video.caption || "Video reel thumbnail"}
+          fill
+          sizes="(max-width: 768px) 70vw, 360px"
+          className="object-cover group-hover/card:scale-105 transition-transform duration-500"
+        />
+      ) : (
+        <div className="absolute inset-0 bg-slate-800" />
+      )}
 
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
 

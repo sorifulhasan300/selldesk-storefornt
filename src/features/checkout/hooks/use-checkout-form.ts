@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useCart } from "@/features/cart";
 import { StoreDeliveryCharge, CheckoutDto } from "@/shared/types";
-import { StorefrontService } from "@/services/storefront.service";
+import { checkoutService } from "../services/checkout.service";
 import { checkoutFormSchema } from "../schemas/checkout.schema";
 import {
   normalizePhone,
@@ -63,7 +63,7 @@ export function useCheckoutForm({
 
     setValidatingCoupon(true);
     try {
-      const result = await StorefrontService.validateCoupon(
+      const result = await checkoutService.validateCoupon(
         storeSlug,
         code,
         subtotal,
@@ -157,7 +157,7 @@ export function useCheckoutForm({
         })),
       };
 
-      const res = await StorefrontService.checkout(storeSlug, payload, {
+      const res = await checkoutService.checkout(storeSlug, payload, {
         idempotencyKey: idemKeyRef.current,
       });
 

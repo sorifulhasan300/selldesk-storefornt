@@ -60,9 +60,7 @@ export function normalizeProductList(
     } else if (p.image?.large || p.image?.medium) {
       images = [p.image.large || p.image.medium || ""];
     } else {
-      images = [
-        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80",
-      ];
+      images = [];
     }
 
     const category =

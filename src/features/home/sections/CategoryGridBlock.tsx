@@ -35,7 +35,7 @@ function normalizeCategories(input: unknown): NormalizedCategory[] {
       cat.imageUrl ||
       cat.image?.large ||
       cat.image?.medium ||
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&auto=format&fit=crop&q=80";
+      "";
     const productCount =
       typeof cat.productCount === "number" ? cat.productCount : undefined;
 
