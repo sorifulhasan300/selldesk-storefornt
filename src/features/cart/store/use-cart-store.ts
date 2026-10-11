@@ -36,6 +36,64 @@ interface CartState {
   getItemCount: () => number;
 }
 
+type PersistedCartState = Pick<CartState, "storeSlug" | "items" | "coupon">;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function isCouponDiscount(value: unknown): value is CouponDiscount {
+  return (
+    isRecord(value) &&
+    typeof value.code === "string" &&
+    (value.type === "PERCENTAGE" || value.type === "FIXED") &&
+    typeof value.amount === "number" &&
+    Number.isFinite(value.amount) &&
+    typeof value.discountCalculated === "number" &&
+    Number.isFinite(value.discountCalculated)
+  );
+}
+
+function migrateCartState(persistedState: unknown): PersistedCartState {
+  if (!isRecord(persistedState)) {
+    return { storeSlug: "", items: [], coupon: null };
+  }
+
+  const items = Array.isArray(persistedState.items)
+    ? persistedState.items.filter(
+        (item): item is CartItem =>
+          isRecord(item) &&
+          typeof item.id === "string" &&
+          typeof item.productId === "string" &&
+          typeof item.name === "string" &&
+          typeof item.price === "number" &&
+          Number.isFinite(item.price) &&
+          item.price >= 0 &&
+          typeof item.quantity === "number" &&
+          Number.isInteger(item.quantity) &&
+          item.quantity > 0 &&
+          typeof item.image === "string" &&
+          typeof item.maxStock === "number" &&
+          Number.isFinite(item.maxStock) &&
+          item.maxStock >= 0 &&
+          (item.variantId === undefined ||
+            typeof item.variantId === "string") &&
+          (item.variantTitle === undefined ||
+            typeof item.variantTitle === "string"),
+      )
+    : [];
+  const coupon = persistedState.coupon;
+
+  return {
+    storeSlug:
+      typeof persistedState.storeSlug === "string"
+        ? persistedState.storeSlug
+        : "",
+    items,
+    coupon: isCouponDiscount(coupon) ? coupon : null,
+  };
+}
+
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
@@ -167,6 +225,7 @@ export const useCartStore = create<CartState>()(
       name: "selldesk_storefront_cart",
       version: 1,
       storage: createJSONStorage(() => localStorage),
+      migrate: (persistedState) => migrateCartState(persistedState),
       partialize: (state) => ({
         storeSlug: state.storeSlug,
         items: state.items,
