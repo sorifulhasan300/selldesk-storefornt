@@ -1,12 +1,36 @@
 import Link from "next/link";
-import { StoreConfig } from "@/shared/types";
-import { Phone, Mail, ShieldCheck, Truck, RefreshCcw } from "lucide-react";
+import type { StoreConfig, StorefrontFooterConfig } from "@/shared/types";
+import { Phone, Mail, MapPin, ShieldCheck, Truck, RefreshCcw } from "lucide-react";
 
-interface StoreFooterProps {
-  store: StoreConfig;
+export interface StoreFooterContactConfig {
+  phone?: string;
+  email?: string;
+  address?: string;
 }
 
-export function StoreFooter({ store }: StoreFooterProps) {
+export interface StoreFooterProps {
+  store: StoreConfig;
+  footer?: StorefrontFooterConfig;
+  config?: {
+    footer?: StorefrontFooterConfig;
+    contact?: StoreFooterContactConfig;
+  };
+}
+
+export function StoreFooter({ store, footer, config }: StoreFooterProps) {
+  // Effective footer: config.footer takes precedence, falls back to direct footer prop
+  const effectiveFooter = config?.footer ?? footer;
+  const hasCustomColumns = Boolean(
+    effectiveFooter?.columns && effectiveFooter.columns.length > 0,
+  );
+
+  // Contact info: config.contact first, then store fields as fallback
+  const contactPhone = config?.contact?.phone ?? store.contactPhone;
+  const contactEmail = config?.contact?.email ?? store.contactEmail;
+  const contactAddress = config?.contact?.address;
+
+  const currentYear = new Date().getFullYear();
+
   return (
     <footer className="bg-white border-t border-slate-200 mt-20">
       {/* Value propositions */}
@@ -62,97 +86,126 @@ export function StoreFooter({ store }: StoreFooterProps) {
               "Your one-stop destination for quality products with exceptional customer service."}
           </p>
           <div className="space-y-2 text-sm text-slate-600 pt-2">
-            {store.contactPhone && (
+            {contactPhone && (
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-slate-400" />
-                <span>{store.contactPhone}</span>
+                <span>{contactPhone}</span>
               </div>
             )}
-            {store.contactEmail && (
+            {contactEmail && (
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-slate-400" />
-                <span>{store.contactEmail}</span>
+                <span>{contactEmail}</span>
+              </div>
+            )}
+            {contactAddress && (
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-slate-400" />
+                <span>{contactAddress}</span>
               </div>
             )}
           </div>
         </div>
 
-        <div>
-          <h4 className="font-bold text-sm text-slate-800 uppercase tracking-wider mb-4">
-            Navigation
-          </h4>
-          <ul className="space-y-2.5 text-sm text-slate-500">
-            <li>
-              <Link href="/" className="hover:text-[var(--store-primary)] transition-colors">
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/products"
-                className="hover:text-[var(--store-primary)] transition-colors"
-              >
-                Catalog
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/cart"
-                className="hover:text-[var(--store-primary)] transition-colors"
-              >
-                Shopping Cart
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/checkout"
-                className="hover:text-[var(--store-primary)] transition-colors"
-              >
-                Checkout
-              </Link>
-            </li>
-          </ul>
-        </div>
+        {hasCustomColumns && effectiveFooter?.columns ? (
+          effectiveFooter.columns.map((column, colIdx) => (
+            <div key={`${column.title}-${colIdx}`}>
+              <h4 className="font-bold text-sm text-slate-800 uppercase tracking-wider mb-4">
+                {column.title}
+              </h4>
+              <ul className="space-y-2.5 text-sm text-slate-500">
+                {column.links.map((link, linkIdx) => (
+                  <li key={`${link.url}-${linkIdx}`}>
+                    <Link
+                      href={link.url}
+                      className="hover:text-[var(--store-primary)] transition-colors"
+                    >
+                      {link.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        ) : (
+          <>
+            <div>
+              <h4 className="font-bold text-sm text-slate-800 uppercase tracking-wider mb-4">
+                Navigation
+              </h4>
+              <ul className="space-y-2.5 text-sm text-slate-500">
+                <li>
+                  <Link href="/" className="hover:text-[var(--store-primary)] transition-colors">
+                    Home
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/products"
+                    className="hover:text-[var(--store-primary)] transition-colors"
+                  >
+                    Catalog
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/cart"
+                    className="hover:text-[var(--store-primary)] transition-colors"
+                  >
+                    Shopping Cart
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/checkout"
+                    className="hover:text-[var(--store-primary)] transition-colors"
+                  >
+                    Checkout
+                  </Link>
+                </li>
+              </ul>
+            </div>
 
-        <div>
-          <h4 className="font-bold text-sm text-slate-800 uppercase tracking-wider mb-4">
-            Customer Care
-          </h4>
-          <ul className="space-y-2.5 text-sm text-slate-500">
-            <li>
-              <span className="hover:text-[var(--store-primary)] cursor-pointer">
-                Privacy Policy
-              </span>
-            </li>
-            <li>
-              <span className="hover:text-[var(--store-primary)] cursor-pointer">
-                Terms of Service
-              </span>
-            </li>
-            <li>
-              <span className="hover:text-[var(--store-primary)] cursor-pointer">
-                Return & Refund
-              </span>
-            </li>
-            <li>
-              <span className="hover:text-[var(--store-primary)] cursor-pointer">
-                Contact Support
-              </span>
-            </li>
-          </ul>
-        </div>
+            <div>
+              <h4 className="font-bold text-sm text-slate-800 uppercase tracking-wider mb-4">
+                Customer Care
+              </h4>
+              <ul className="space-y-2.5 text-sm text-slate-500">
+                <li>
+                  <span className="hover:text-[var(--store-primary)] cursor-pointer">
+                    Privacy Policy
+                  </span>
+                </li>
+                <li>
+                  <span className="hover:text-[var(--store-primary)] cursor-pointer">
+                    Terms of Service
+                  </span>
+                </li>
+                <li>
+                  <span className="hover:text-[var(--store-primary)] cursor-pointer">
+                    Return & Refund
+                  </span>
+                </li>
+                <li>
+                  <span className="hover:text-[var(--store-primary)] cursor-pointer">
+                    Contact Support
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="border-t border-slate-100 py-6 text-center text-xs text-slate-400">
         <p>
-          © {new Date().getFullYear()} {store.name}. Powered by{" "}
-          <span className="font-semibold text-slate-600">
-            SellDesk Commerce Engine
-          </span>
-          .
+          {effectiveFooter?.copyright
+            ? effectiveFooter.copyright
+            : `© ${currentYear} ${store.name}`}
         </p>
       </div>
     </footer>
   );
 }
+
 

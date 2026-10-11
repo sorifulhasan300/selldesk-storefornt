@@ -1,7 +1,12 @@
 import { ReactNode } from "react";
+import React from "react";
 import { Metadata } from "next";
 import { getBootstrap } from "@/features/tenant/server";
-import { StoreHeader, StoreFooter } from "@/features/shell";
+import {
+  StoreHeader,
+  StoreFooter,
+  AnnouncementBar,
+} from "@/features/shell";
 import { CartDrawer } from "@/features/cart";
 
 interface TenantLayoutProps {
@@ -61,14 +66,17 @@ export default async function TenantLayout({
   const { storeSlug } = await params;
   const bootstrap = await getBootstrap(storeSlug);
   const store = bootstrap.store;
+  const config = bootstrap.config;
+
+  const topbarConfig = config?.topbar;
+  const headerConfig = config?.header;
+  const navbarConfig = config?.navbar;
+  const footerConfig = config?.footer;
+  const colorConfig = config?.color;
 
   const rawConfig =
     bootstrap?.config && typeof bootstrap.config === "object"
       ? (bootstrap.config as Record<string, unknown>)
-      : {};
-  const rawColor =
-    typeof rawConfig.color === "object" && rawConfig.color !== null
-      ? (rawConfig.color as Record<string, unknown>)
       : {};
   const rawTheme =
     typeof rawConfig.theme === "object" && rawConfig.theme !== null
@@ -79,15 +87,25 @@ export default async function TenantLayout({
       ? (store as unknown as Record<string, unknown>)
       : {};
 
-  const storePrimary = safeColor(store?.themeColor, "#0f172a");
-  const storeBg = safeColor(
-    storeRecord.bgColor || rawColor.background || rawColor.bg,
-    "#ffffff",
-  );
-  const storeText = safeColor(
-    storeRecord.textColor || rawColor.text,
-    "#0f172a",
-  );
+  const primaryCandidate =
+    colorConfig?.primary ||
+    store?.themeColor ||
+    "#2563eb";
+  const storePrimary = safeColor(primaryCandidate, "#2563eb");
+
+  const bgCandidate =
+    colorConfig?.bg ||
+    (colorConfig as Record<string, unknown> | undefined)?.background as string ||
+    (storeRecord.bgColor as string) ||
+    "#ffffff";
+  const storeBg = safeColor(bgCandidate, "#ffffff");
+
+  const textCandidate =
+    colorConfig?.text ||
+    (storeRecord.textColor as string) ||
+    "#0f172a";
+  const storeText = safeColor(textCandidate, "#0f172a");
+
   const storeFont = safeFont(
     storeRecord.fontFamily || storeRecord.font || rawTheme.font || rawConfig.font,
     "inherit",
@@ -95,7 +113,7 @@ export default async function TenantLayout({
 
   return (
     <div
-      className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-[var(--store-primary)] selection:text-white"
+      className="min-h-screen flex flex-col bg-[var(--store-bg,#ffffff)] text-[var(--store-text,#0f172a)] selection:bg-[var(--store-primary)] selection:text-white"
       style={
         {
           "--store-primary": storePrimary,
@@ -106,12 +124,36 @@ export default async function TenantLayout({
         } as React.CSSProperties
       }
     >
-      <StoreHeader store={store} categories={bootstrap.categories} />
+      <AnnouncementBar
+        announcementText={topbarConfig?.announcementText}
+        phone={topbarConfig?.phone}
+        topbar={topbarConfig}
+      />
+      <StoreHeader
+        store={store}
+        categories={bootstrap.categories}
+        header={headerConfig}
+        navbar={navbarConfig}
+      />
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
         {children}
       </main>
-      <StoreFooter store={store} />
+      <StoreFooter
+        store={store}
+        footer={footerConfig}
+        config={{
+          footer: config?.footer,
+          contact: config?.contact
+            ? {
+                phone: config.contact.phone,
+                email: config.contact.email,
+                address: config.contact.address,
+              }
+            : undefined,
+        }}
+      />
       <CartDrawer currency={store?.currency || "USD"} storeSlug={storeSlug} />
     </div>
   );
 }
+

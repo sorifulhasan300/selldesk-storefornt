@@ -32,6 +32,85 @@ export interface StoreDeliveryCharge {
   freeDeliveryThreshold?: number | null;
 }
 
+export interface StorefrontColorConfig {
+  bg?: string;
+  primary?: string;
+  text?: string;
+}
+
+export interface StorefrontTopbarConfig {
+  announcementText?: string;
+  showSocialLinks?: boolean;
+  phone?: string;
+}
+
+export interface StorefrontHeaderConfig {
+  logo?: string | null;
+  searchEnabled?: boolean;
+  cartEnabled?: boolean;
+  wishListEnabled?: boolean;
+}
+
+export interface StorefrontNavbarLinkConfig {
+  title: string;
+  url: string;
+  order?: number;
+}
+
+export interface StorefrontNavbarConfig {
+  links?: StorefrontNavbarLinkConfig[];
+}
+
+export interface StorefrontFooterLinkConfig {
+  title: string;
+  url: string;
+}
+
+export interface StorefrontFooterColumnConfig {
+  title: string;
+  links: StorefrontFooterLinkConfig[];
+}
+
+export interface StorefrontFooterConfig {
+  copyright?: string;
+  socialLinks?: Record<string, string>;
+  columns?: StorefrontFooterColumnConfig[];
+}
+
+export interface StorefrontConfig {
+  seo?: {
+    metaTitle?: string;
+    metaDescription?: string;
+    ogImage?: string;
+    keywords?: string[];
+  };
+  currency?: {
+    code?: string;
+    symbol?: string;
+    position?: "prefix" | "suffix";
+  };
+  contact?: {
+    phone?: string;
+    whatsapp?: string;
+    messenger?: string;
+    email?: string;
+    address?: string;
+  };
+  color?: StorefrontColorConfig;
+  header?: StorefrontHeaderConfig;
+  navbar?: StorefrontNavbarConfig;
+  topbar?: StorefrontTopbarConfig;
+  footer?: StorefrontFooterConfig;
+  homePage?: {
+    sections: HomePageSection[];
+  };
+  font?: {
+    family?: string;
+    size?: string;
+  };
+  [key: string]: unknown;
+}
+
 export interface StorefrontBootstrap {
   store: StoreConfig;
   sliders?: StoreSlider[];
@@ -48,12 +127,8 @@ export interface StorefrontBootstrap {
     sections: HomePageSection[];
   };
   sections?: HomePageSection[];
-  config?: {
-    homePage?: {
-      sections: HomePageSection[];
-    };
-    [key: string]: unknown;
-  };
+  config?: StorefrontConfig;
   business?: unknown;
 }
+
 
