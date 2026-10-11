@@ -7,7 +7,7 @@ High-performance, multi-tenant Public Shopping Engine for the **SellDesk SaaS Pl
 ## ⚡ Core Architecture
 
 - **Next.js 16 (App Router)** + **React 19**
-- **Dynamic Multi-Tenancy**: Edge Middleware rewrites requests dynamically from subdomains (`mystore.selldesk.test`) or path routes (`/store/mystore`) to internal route segments (`/_tenant/[storeSlug]/*`).
+- **Dynamic Multi-Tenancy**: The proxy resolves tenants from subdomains (`mystore.selldesk.test`) or mapped custom domains, then rewrites clean URLs to internal store routes. Tenant selection is host-only.
 - **Performance & SEO First**: Server Components (RSC), Incremental Static Regeneration (ISR), Google JSON-LD Product Schemas, and automatic Edge caching.
 - **Tenant-Scoped Cart**: Zustand store with LocalStorage persistence namespaced by store slug to avoid cross-tenant contamination.
 - **Isomorphic API Client**: Automatic injection of `x-store-slug` headers pointing to `http://api.selldesk.test:5000/api/v1`.
@@ -91,6 +91,6 @@ pnpm dev
 ### 4. Testing Multi-Tenant Resolution
 
 - **Subdomain Routing**: Open `http://mystore.selldesk.test:3001` or `http://demo.selldesk.test:3001`
-- **Path Routing**: Open `http://selldesk.test:3001/store/mystore` or `http://selldesk.test:3001/store/mystore/products`
+- **Development URL redirect**: Opening `http://selldesk.test:3001/store/mystore/products` redirects to `http://mystore.selldesk.test:3001/products`; normal browsing should use the tenant subdomain.
 - **Product Details (PDP)**: Open `http://mystore.selldesk.test:3001/products/minimalist-chrono-watch`
 - **Checkout Flow**: Open `http://mystore.selldesk.test:3001/checkout`

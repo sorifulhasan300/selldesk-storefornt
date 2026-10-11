@@ -104,14 +104,19 @@ export async function proxy(req: NextRequest) {
   if (!host) return notFound();
 
   const pathname = req.nextUrl.pathname;
-  if (IS_PROD && pathname.startsWith("/store/")) return notFound();
+  const isDirectStorePath = pathname.startsWith("/store/");
+  if (IS_PROD && isDirectStorePath) return notFound();
 
-  if (!IS_PROD && pathname.startsWith("/store/")) {
-    const pathSlug = pathname.split("/")[2];
-    if (!pathSlug || !SLUG_REGEX.test(pathSlug)) return notFound();
-    return NextResponse.next({
-      request: { headers: withTenantHeaders(req, pathSlug, host) },
-    });
+  let requestedStoreSlug: string | null = null;
+  if (!IS_PROD && isDirectStorePath) {
+    requestedStoreSlug = pathname.split("/")[2] ?? null;
+    if (
+      !requestedStoreSlug ||
+      !SLUG_REGEX.test(requestedStoreSlug) ||
+      RESERVED_SUBDOMAINS.has(requestedStoreSlug)
+    ) {
+      return notFound();
+    }
   }
 
   let slug: string | null = null;
@@ -133,6 +138,22 @@ export async function proxy(req: NextRequest) {
     const resolvedSlug = await resolveCustomDomain(host);
     if (resolvedSlug instanceof NextResponse) return resolvedSlug;
     slug = resolvedSlug;
+  }
+
+  if (!IS_PROD && requestedStoreSlug) {
+    const cleanPath =
+      pathname.slice(`/store/${requestedStoreSlug}`.length) || "/";
+    const url = req.nextUrl.clone();
+
+    if (!slug && (host === ROOT_DOMAIN || host === "localhost")) {
+      url.hostname = `${requestedStoreSlug}.${ROOT_DOMAIN}`;
+      url.pathname = cleanPath;
+      return NextResponse.redirect(url);
+    }
+
+    if (slug !== requestedStoreSlug) return notFound();
+    url.pathname = cleanPath;
+    return NextResponse.redirect(url);
   }
 
   if (!slug) return notFound();
