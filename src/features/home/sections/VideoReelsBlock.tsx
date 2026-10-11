@@ -5,6 +5,7 @@ import { HomePageSection, VideoItem } from "@/shared/types";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { VideoReelCard, VideoThumbnailShape } from "./VideoReelCard";
 import { VideoReelModal } from "./VideoReelModal";
+import { SectionEmptyPlaceholder } from "./SectionEmptyPlaceholder";
 import {
   parsePx,
   parsePxOrUndef,
@@ -13,6 +14,7 @@ import {
 
 interface VideoReelsBlockProps {
   section: HomePageSection;
+  isPreview?: boolean;
 }
 
 function extractVideoId(url?: string): string | null {
@@ -51,7 +53,10 @@ function normalizeVideos(input: unknown): VideoItem[] {
   });
 }
 
-export function VideoReelsBlock({ section }: VideoReelsBlockProps) {
+export function VideoReelsBlock({
+  section,
+  isPreview = false,
+}: VideoReelsBlockProps) {
   const { config = {}, styles = {}, data } = section;
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeModalVideo, setActiveModalVideo] = useState<VideoItem | null>(null);
@@ -76,7 +81,8 @@ export function VideoReelsBlock({ section }: VideoReelsBlockProps) {
     config.showArrows !== false && config.showNavArrows !== false;
 
   const isAutoscroll =
-    config.motion === "autoscroll" || config.autoplay === true;
+    !isPreview &&
+    (config.motion === "autoscroll" || config.autoplay === true);
 
   const scrollStep =
     (cardWidth || (thumbnailShape === "landscape" ? 280 : 220)) + cardGap;
@@ -112,7 +118,11 @@ export function VideoReelsBlock({ section }: VideoReelsBlockProps) {
     [scrollStep],
   );
 
-  if (videos.length === 0) return null;
+  if (videos.length === 0) {
+    return isPreview ? (
+      <SectionEmptyPlaceholder itemType="Video" />
+    ) : null;
+  }
 
   return (
     <div
@@ -169,4 +179,3 @@ export function VideoReelsBlock({ section }: VideoReelsBlockProps) {
     </div>
   );
 }
-

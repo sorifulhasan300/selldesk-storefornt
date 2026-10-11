@@ -10,9 +10,11 @@ import {
   getDesktopGridClass,
   getMobileGridClass,
 } from "../utils/grid-layout.utils";
+import { SectionEmptyPlaceholder } from "./SectionEmptyPlaceholder";
 
 interface CategoryGridBlockProps {
   section: HomePageSection;
+  isPreview?: boolean;
 }
 
 interface RawCategoryRecord {
@@ -43,7 +45,10 @@ function normalizeCategories(input: unknown): NormalizedCategory[] {
   });
 }
 
-export function CategoryGridBlock({ section }: CategoryGridBlockProps) {
+export function CategoryGridBlock({
+  section,
+  isPreview = false,
+}: CategoryGridBlockProps) {
   const { config = {}, styles = {}, data } = section;
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -70,7 +75,11 @@ export function CategoryGridBlock({ section }: CategoryGridBlockProps) {
   const raw = Array.isArray(data) ? data : config.categories;
   const categories = normalizeCategories(raw);
 
-  if (categories.length === 0) return null;
+  if (categories.length === 0) {
+    return isPreview ? (
+      <SectionEmptyPlaceholder itemType="Category" />
+    ) : null;
+  }
 
   const viewType =
     config.viewType === "carousel" ||
@@ -161,4 +170,3 @@ export function CategoryGridBlock({ section }: CategoryGridBlockProps) {
     </div>
   );
 }
-

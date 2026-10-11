@@ -12,17 +12,20 @@ import {
   getDesktopGridClass,
   getMobileGridClass,
 } from "../utils/grid-layout.utils";
+import { SectionEmptyPlaceholder } from "./SectionEmptyPlaceholder";
 
 interface ProductShowcaseBlockProps {
   section: HomePageSection;
   currency?: string;
   fallbackProducts?: Product[];
+  isPreview?: boolean;
 }
 
 export function ProductShowcaseBlock({
   section,
   currency = "USD",
   fallbackProducts = [],
+  isPreview = false,
 }: ProductShowcaseBlockProps) {
   const { config = {}, styles = {}, data } = section;
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -50,7 +53,11 @@ export function ProductShowcaseBlock({
   const raw = Array.isArray(data) && data.length > 0 ? data : config.products;
   const products = normalizeProductList(raw, fallbackProducts);
 
-  if (products.length === 0) return null;
+  if (products.length === 0) {
+    return isPreview ? (
+      <SectionEmptyPlaceholder itemType="Product" />
+    ) : null;
+  }
 
   const viewType =
     config.viewType === "carousel" ||

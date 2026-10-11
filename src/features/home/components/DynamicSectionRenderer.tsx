@@ -75,11 +75,11 @@ function resolveSectionBlock(
           />
         );
       }
-      return <BannerGridBlock section={section} />;
+      return <BannerGridBlock section={section} isPreview={isPreview} />;
 
     case "category":
     case "categories":
-      return <CategoryGridBlock section={section} />;
+      return <CategoryGridBlock section={section} isPreview={isPreview} />;
 
     case "products":
     case "product":
@@ -88,22 +88,23 @@ function resolveSectionBlock(
           section={section}
           currency={currency}
           fallbackProducts={fallbackProducts}
+          isPreview={isPreview}
         />
       );
 
     case "videos":
     case "video":
-      return <VideoReelsBlock section={section} />;
+      return <VideoReelsBlock section={section} isPreview={isPreview} />;
 
     case "customerreviews":
     case "customerreview":
     case "reviews":
     case "testimonials":
-      return <CustomerReviewsBlock section={section} />;
+      return <CustomerReviewsBlock section={section} isPreview={isPreview} />;
 
     case "brands":
     case "brand":
-      return <BrandShowcaseBlock section={section} />;
+      return <BrandShowcaseBlock section={section} isPreview={isPreview} />;
 
     default:
       return null;
@@ -125,7 +126,7 @@ export function DynamicSectionRenderer({
     Array.isArray(sections) && sections.length > 0
       ? sections.filter((s) => {
           if (s.isActive === false) return false;
-          if (s.id) {
+          if (!isPreview && s.id) {
             if (seenSectionIds.has(s.id)) return false;
             seenSectionIds.add(s.id);
           }
@@ -154,8 +155,7 @@ export function DynamicSectionRenderer({
         );
         if (!blockContent) return null;
 
-        const uniqueKey =
-          section.id || `${section.type || section.key || "sec"}-${idx}`;
+        const uniqueKey = `${section.id || section.type || section.key || "sec"}-${idx}`;
 
         const isFirst = idx === 0;
         const isLast = idx === displaySections.length - 1;
@@ -181,4 +181,3 @@ export function DynamicSectionRenderer({
     </div>
   );
 }
-

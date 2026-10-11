@@ -12,9 +12,11 @@ import {
 import { useHeroSlider } from "../hooks/useHeroSlider";
 import { HeroSliderControls } from "./HeroSliderControls";
 import { BannerCardItem } from "./BannerCardItem";
+import { SectionEmptyPlaceholder } from "./SectionEmptyPlaceholder";
 
 interface BannerGridBlockProps {
   section: HomePageSection;
+  isPreview?: boolean;
 }
 
 interface RawBannerRecord {
@@ -55,7 +57,10 @@ function normalizeBanners(input: unknown): BannerSlideItem[] {
     .filter((b) => Boolean(b.imageUrl));
 }
 
-export function BannerGridBlock({ section }: BannerGridBlockProps) {
+export function BannerGridBlock({
+  section,
+  isPreview = false,
+}: BannerGridBlockProps) {
   const { config = {}, styles = {}, data } = section;
 
   const raw =
@@ -94,7 +99,7 @@ export function BannerGridBlock({ section }: BannerGridBlockProps) {
       ? parsedInterval * 1000
       : parsedInterval;
 
-  const autoPlayInterval = isAutoplay ? normalizedInterval : 0;
+  const autoPlayInterval = isAutoplay && !isPreview ? normalizedInterval : 0;
 
   const showDots =
     config.showDots !== false && config.showPagination !== false;
@@ -116,7 +121,11 @@ export function BannerGridBlock({ section }: BannerGridBlockProps) {
     autoPlayInterval,
   });
 
-  if (banners.length === 0) return null;
+  if (banners.length === 0) {
+    return isPreview ? (
+      <SectionEmptyPlaceholder itemType="Banner" />
+    ) : null;
+  }
 
   const desktopCols = Number(
     config.columns ||
@@ -221,5 +230,3 @@ export function BannerGridBlock({ section }: BannerGridBlockProps) {
     </div>
   );
 }
-
-

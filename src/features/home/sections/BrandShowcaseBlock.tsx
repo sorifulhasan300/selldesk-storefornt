@@ -7,9 +7,11 @@ import {
   getDesktopGridClass,
   getMobileGridClass,
 } from "../utils/grid-layout.utils";
+import { SectionEmptyPlaceholder } from "./SectionEmptyPlaceholder";
 
 interface BrandShowcaseBlockProps {
   section: HomePageSection;
+  isPreview?: boolean;
 }
 
 interface RawBrandRecord {
@@ -32,7 +34,10 @@ function normalizeBrands(input: unknown): BrandItem[] {
   }));
 }
 
-export function BrandShowcaseBlock({ section }: BrandShowcaseBlockProps) {
+export function BrandShowcaseBlock({
+  section,
+  isPreview = false,
+}: BrandShowcaseBlockProps) {
   const { config = {}, styles = {}, data } = section;
 
   const raw =
@@ -43,7 +48,11 @@ export function BrandShowcaseBlock({ section }: BrandShowcaseBlockProps) {
       : null;
 
   const brands = raw ? normalizeBrands(raw) : [];
-  if (brands.length === 0) return null;
+  if (brands.length === 0) {
+    return isPreview ? (
+      <SectionEmptyPlaceholder itemType="Brand" />
+    ) : null;
+  }
 
   const desktopCols = Number(
     config.columns || config.brandColumns || styles.columns || 6,
@@ -89,4 +98,3 @@ export function BrandShowcaseBlock({ section }: BrandShowcaseBlockProps) {
     </div>
   );
 }
-

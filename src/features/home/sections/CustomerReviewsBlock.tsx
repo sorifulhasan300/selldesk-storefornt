@@ -6,9 +6,11 @@ import {
   getDesktopGridClass,
   getMobileGridClass,
 } from "../utils/grid-layout.utils";
+import { SectionEmptyPlaceholder } from "./SectionEmptyPlaceholder";
 
 interface CustomerReviewsBlockProps {
   section: HomePageSection;
+  isPreview?: boolean;
 }
 
 interface RawReviewRecord {
@@ -43,7 +45,10 @@ function normalizeReviews(input: unknown): ReviewItem[] {
     }));
 }
 
-export function CustomerReviewsBlock({ section }: CustomerReviewsBlockProps) {
+export function CustomerReviewsBlock({
+  section,
+  isPreview = false,
+}: CustomerReviewsBlockProps) {
   const { config = {}, styles = {}, data } = section;
 
   const raw =
@@ -54,7 +59,11 @@ export function CustomerReviewsBlock({ section }: CustomerReviewsBlockProps) {
       : config.reviewItems;
 
   const reviews = normalizeReviews(raw);
-  if (reviews.length === 0) return null;
+  if (reviews.length === 0) {
+    return isPreview ? (
+      <SectionEmptyPlaceholder itemType="Review" />
+    ) : null;
+  }
 
   const desktopCols = Number(config.columns || styles.columns || 3);
   const mobileCols = Number(config.mobileColumns || styles.mobileColumns || 1);
@@ -74,4 +83,3 @@ export function CustomerReviewsBlock({ section }: CustomerReviewsBlockProps) {
     </div>
   );
 }
-
