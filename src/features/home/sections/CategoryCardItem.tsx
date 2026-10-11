@@ -1,5 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
+import React from "react";
+import { cn } from "@/shared/lib/utils";
 
 export interface NormalizedCategory {
   id: string;
@@ -9,27 +11,58 @@ export interface NormalizedCategory {
   productCount?: number;
 }
 
-interface CategoryCardItemProps {
+export interface CategoryCardItemProps {
   category: NormalizedCategory;
   showName?: boolean;
+  showCategoryName?: boolean;
   isCarousel?: boolean;
+  cardWidth?: number | string;
+  cardRadius?: number | string;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 export function CategoryCardItem({
   category,
   showName = true,
+  showCategoryName,
   isCarousel = false,
+  cardWidth = 160,
+  cardRadius = 16,
+  className,
+  style,
 }: CategoryCardItemProps) {
-  const containerClasses = isCarousel
-    ? "group/item flex-none w-[140px] sm:w-[160px] snap-start bg-white border border-slate-200/80 rounded-2xl p-4 flex flex-col items-center text-center shadow-2xs hover:shadow-md hover:border-blue-400 transition-all duration-300"
-    : "group relative bg-white border border-slate-200/80 rounded-2xl p-4 flex flex-col items-center text-center shadow-2xs hover:shadow-md hover:border-blue-400 transition-all duration-300";
+  const shouldShowName =
+    showCategoryName !== undefined ? showCategoryName : showName;
+
+  const resolvedRadius =
+    typeof cardRadius === "number" ? `${cardRadius}px` : cardRadius;
+  const resolvedWidth =
+    typeof cardWidth === "number" ? `${cardWidth}px` : cardWidth;
+
+  const cardStyle: React.CSSProperties = {
+    borderRadius: resolvedRadius,
+    ...(isCarousel ? { width: resolvedWidth } : {}),
+    ...style,
+  };
+
+  const containerClasses = cn(
+    isCarousel
+      ? "group/item flex-none snap-start bg-white border border-slate-200/80 p-4 flex flex-col items-center text-center shadow-2xs hover:shadow-md hover:border-blue-400 transition-all duration-300"
+      : "group relative w-full bg-white border border-slate-200/80 p-4 flex flex-col items-center text-center shadow-2xs hover:shadow-md hover:border-blue-400 transition-all duration-300",
+    className,
+  );
 
   return (
     <Link
       href={`/products?categoryId=${category.id}`}
       className={containerClasses}
+      style={cardStyle}
     >
-      <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-slate-100 mb-3 group-hover:scale-105 transition-transform duration-300">
+      <div
+        className="relative w-16 h-16 sm:w-20 sm:h-20 overflow-hidden bg-slate-100 mb-3 group-hover:scale-105 transition-transform duration-300"
+        style={{ borderRadius: resolvedRadius }}
+      >
         <Image
           src={category.imageUrl}
           alt={category.name}
@@ -38,7 +71,7 @@ export function CategoryCardItem({
           className="object-cover"
         />
       </div>
-      {showName && (
+      {shouldShowName && (
         <h3 className="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-blue-600 transition-colors line-clamp-1">
           {category.name}
         </h3>
@@ -51,4 +84,5 @@ export function CategoryCardItem({
     </Link>
   );
 }
+
 

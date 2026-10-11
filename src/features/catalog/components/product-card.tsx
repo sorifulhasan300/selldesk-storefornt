@@ -2,18 +2,33 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import React, { useState } from "react";
 import { Product } from "@/shared/types";
-import { formatCurrency } from "@/shared/lib/utils";
+import { cn, formatCurrency } from "@/shared/lib/utils";
 import { useCartStore } from "@/features/cart";
 import { ShoppingBag, Check } from "lucide-react";
-import { useState } from "react";
 
-interface ProductCardProps {
+export interface ProductCardProps {
   product: Product;
   currency?: string;
+  cardWidth?: number | string;
+  cardRadius?: number | string;
+  showName?: boolean;
+  showCategoryName?: boolean;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
-export function ProductCard({ product, currency = "USD" }: ProductCardProps) {
+export function ProductCard({
+  product,
+  currency = "USD",
+  cardWidth,
+  cardRadius = 16,
+  showName = true,
+  showCategoryName = true,
+  className,
+  style,
+}: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem);
   const [added, setAdded] = useState(false);
 
@@ -41,8 +56,25 @@ export function ProductCard({ product, currency = "USD" }: ProductCardProps) {
 
   const hasDiscount = product.salePrice && product.salePrice < product.price;
 
+  const resolvedRadius =
+    typeof cardRadius === "number" ? `${cardRadius}px` : cardRadius;
+  const resolvedWidth =
+    typeof cardWidth === "number" ? `${cardWidth}px` : cardWidth;
+
+  const cardStyle: React.CSSProperties = {
+    borderRadius: resolvedRadius,
+    ...(resolvedWidth ? { width: resolvedWidth } : {}),
+    ...style,
+  };
+
   return (
-    <div className="group relative bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+    <div
+      className={cn(
+        "group relative w-full bg-white border border-slate-200/80 overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between",
+        className,
+      )}
+      style={cardStyle}
+    >
       <Link
         href={`/products/${product.slug}`}
         className="block relative aspect-square overflow-hidden bg-slate-100"
@@ -72,17 +104,19 @@ export function ProductCard({ product, currency = "USD" }: ProductCardProps) {
 
       <div className="p-4 flex flex-col flex-1 justify-between">
         <div>
-          {product.category && (
+          {showCategoryName && product.category && (
             <p className="text-[11px] uppercase tracking-wider font-semibold text-slate-400 mb-1">
               {product.category.name}
             </p>
           )}
 
-          <Link href={`/products/${product.slug}`}>
-            <h3 className="text-sm font-semibold text-slate-800 line-clamp-2 hover:text-blue-600 transition-colors">
-              {product.name}
-            </h3>
-          </Link>
+          {showName && (
+            <Link href={`/products/${product.slug}`}>
+              <h3 className="text-sm font-semibold text-slate-800 line-clamp-2 hover:text-blue-600 transition-colors">
+                {product.name}
+              </h3>
+            </Link>
+          )}
         </div>
 
         <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between">
@@ -100,11 +134,12 @@ export function ProductCard({ product, currency = "USD" }: ProductCardProps) {
           <button
             onClick={handleQuickAdd}
             disabled={product.stock <= 0}
-            className={`p-2 rounded-xl transition-all duration-200 cursor-pointer ${
+            className={cn(
+              "p-2 rounded-xl transition-all duration-200 cursor-pointer",
               added
                 ? "bg-emerald-600 text-white"
-                : "bg-slate-900 hover:bg-blue-600 text-white disabled:opacity-30 disabled:cursor-not-allowed"
-            }`}
+                : "bg-slate-900 hover:bg-blue-600 text-white disabled:opacity-30 disabled:cursor-not-allowed",
+            )}
             title="Add to cart"
           >
             {added ? (
