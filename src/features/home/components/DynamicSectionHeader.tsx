@@ -95,6 +95,13 @@ function safeHref(v: unknown): string | null {
 export function DynamicSectionHeader({ section }: DynamicSectionHeaderProps) {
   const styles: SectionStyles = section.styles || {};
   const config = section.config || {};
+  const typeStr = (section.type || section.key || "")
+    .toLowerCase()
+    .replace(/[-_]/g, "");
+
+  if (typeStr === "banners" || typeStr === "banner") {
+    return null;
+  }
 
   const rawTitle =
     typeof section.title === "string"
@@ -124,9 +131,6 @@ export function DynamicSectionHeader({ section }: DynamicSectionHeaderProps) {
     return null;
   }
 
-  const typeStr = (section.type || section.key || "")
-    .toLowerCase()
-    .replace(/[-_]/g, "");
   const isSlider =
     config.displayType === "slider" || config.viewType === "slider";
   const isHero =
@@ -228,4 +232,3 @@ export function DynamicSectionHeader({ section }: DynamicSectionHeaderProps) {
     </div>
   );
 }
-
