@@ -349,7 +349,7 @@ Ordering: each SYNC carries an increasing seq. Ignore a message whose seq is not
 Handshake reliability: the parent may not be listening yet when the child first sends READY. The child retries READY (for example every 500ms, up to 10 times) until it receives its first trusted SYNC.
 Click handling in preview: a capture-phase listener calls preventDefault() on links and buttons inside sections (so the iframe never navigates away), and a click on a section sends SELECT_SECTION. Autoplay in sliders and video is paused in preview.
 Server headers: storefront responses set Content-Security-Policy: frame-ancestors 'self' <builder origins> (use 'none' outside builder routes). Frames from other origins must not be able to embed the storefront.
-Allowlist source: NEXT_PUBLIC_BUILDER_ORIGINS (comma-separated exact origins, no wildcards).
+Allowlist source: the exact local development origins `http://app.selldesk.test:3000` and `http://localhost:3000`, plus `NEXT_PUBLIC_BUILDER_ORIGINS` (comma-separated exact production origins; no wildcards).
 10.3 Secure implementation
 typescript
 // useLivePreviewSync.ts

@@ -56,7 +56,6 @@ export default async function StoreHomePage({
       products={products}
       categories={categories}
       sliders={sliders}
-      isPreview={isPreview}
     />
   );
 }

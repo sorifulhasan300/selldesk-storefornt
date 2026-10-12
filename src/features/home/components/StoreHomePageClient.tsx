@@ -11,7 +11,6 @@ interface StoreHomePageClientProps {
   products?: Product[];
   categories?: unknown[];
   sliders?: unknown[];
-  isPreview?: boolean;
 }
 
 export function StoreHomePageClient({
@@ -21,14 +20,13 @@ export function StoreHomePageClient({
   products = [],
   categories = [],
   sliders = [],
-  isPreview = false,
 }: StoreHomePageClientProps) {
   const {
     sections,
     isPreview: isPreviewActive,
     selectedSectionId,
     sendBuilderAction,
-  } = useLivePreviewSync(initialSections, isPreview);
+  } = useLivePreviewSync(initialSections);
 
   return (
     <div className="w-full">

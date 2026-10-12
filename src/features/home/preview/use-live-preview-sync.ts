@@ -12,20 +12,28 @@ const PREVIEW_READY_MESSAGE = {
   type: "SELLDESK_PREVIEW_READY",
 } as const;
 
-const BUILDER_ORIGINS = (process.env.NEXT_PUBLIC_BUILDER_ORIGINS ?? "")
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter((origin) => {
-    try {
-      const url = new URL(origin);
-      return (
-        (url.protocol === "https:" || url.protocol === "http:") &&
-        url.origin === origin
-      );
-    } catch {
-      return false;
-    }
-  });
+const LOCAL_BUILDER_ORIGINS = [
+  "http://app.selldesk.test:3000",
+  "http://localhost:3000",
+];
+
+const BUILDER_ORIGINS = [
+  ...LOCAL_BUILDER_ORIGINS,
+  ...(process.env.NEXT_PUBLIC_BUILDER_ORIGINS ?? "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter((origin) => {
+      try {
+        const url = new URL(origin);
+        return (
+          (url.protocol === "https:" || url.protocol === "http:") &&
+          url.origin === origin
+        );
+      } catch {
+        return false;
+      }
+    }),
+];
 
 const SectionSchema = z
   .object({
@@ -118,13 +126,13 @@ const ACTION_TYPES = new Set([
  */
 export function useLivePreviewSync(
   initialSections: HomePageSection[] = [],
-  isPreview: boolean = false,
 ) {
   const [sections, setSections] = useState<HomePageSection[]>(initialSections);
   const [prevInitialSections, setPrevInitialSections] = useState(initialSections);
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
   const [hasTrustedParent, setHasTrustedParent] = useState(false);
   const parentOrigin = useRef<string | null>(null);
+  const hasTrustedParentRef = useRef(false);
   const lastSeq = useRef(-1);
 
   if (prevInitialSections !== initialSections) {
@@ -135,44 +143,52 @@ export function useLivePreviewSync(
   const isClientPreview = useSyncExternalStore(
     emptySubscribe,
     () => {
-      if (typeof window === "undefined" || BUILDER_ORIGINS.length === 0) {
-        return false;
-      }
-      const hasPreview =
-        new URLSearchParams(window.location.search).get("preview") === "true";
-      return hasPreview && window.parent !== window;
+      if (typeof window === "undefined") return false;
+      return (
+        new URLSearchParams(window.location.search).get("preview") === "true" ||
+        window.parent !== window
+      );
     },
     () => false,
   );
-  const isPreviewRequested = isPreview && isClientPreview;
+  const isPreviewRequested = isClientPreview;
   const isPreviewActive = isPreviewRequested && hasTrustedParent;
 
   const sendBuilderAction = useCallback(
     (actionType: string, sectionId: string) => {
-      const origin = parentOrigin.current;
       if (
-        !origin ||
         !ACTION_TYPES.has(actionType) ||
         typeof window === "undefined" ||
         window.parent === window
       ) {
         return;
       }
-      window.parent.postMessage(
-        {
-          source: "selldesk",
-          version: 1,
-          type: actionType,
-          sectionId,
-        },
-        origin,
-      );
+
+      const message = {
+        source: "selldesk",
+        version: 1,
+        type: actionType,
+        sectionId,
+      };
+      const targetOrigins = parentOrigin.current
+        ? [parentOrigin.current]
+        : BUILDER_ORIGINS;
+
+      targetOrigins.forEach((origin) => {
+        window.parent.postMessage(message, origin);
+      });
     },
     [],
   );
 
   useEffect(() => {
-    if (!isPreviewRequested || typeof window === "undefined") return;
+    if (
+      !isPreviewRequested ||
+      typeof window === "undefined" ||
+      window.parent === window
+    ) {
+      return;
+    }
 
     const handleMessage = (event: MessageEvent<unknown>) => {
       if (
@@ -187,6 +203,7 @@ export function useLivePreviewSync(
         if (sync.seq <= lastSeq.current) return;
         lastSeq.current = sync.seq;
         parentOrigin.current = event.origin;
+        hasTrustedParentRef.current = true;
         setHasTrustedParent(true);
         setSections(sync.sections);
         return;
@@ -196,6 +213,7 @@ export function useLivePreviewSync(
       if (!sectionId) return;
 
       parentOrigin.current = event.origin;
+      hasTrustedParentRef.current = true;
       setHasTrustedParent(true);
       setSelectedSectionId(sectionId);
       document
@@ -207,24 +225,27 @@ export function useLivePreviewSync(
 
     window.addEventListener("message", handleMessage);
 
-    let tries = 0;
+    let readyInterval: number | null = null;
     const sendReady = () => {
-      if (lastSeq.current >= 0 || tries >= 10) {
-        clearInterval(readyInterval);
+      if (hasTrustedParentRef.current) {
+        if (readyInterval !== null) {
+          window.clearInterval(readyInterval);
+          readyInterval = null;
+        }
         return;
       }
-      tries += 1;
+
       BUILDER_ORIGINS.forEach((origin) => {
         window.parent.postMessage(PREVIEW_READY_MESSAGE, origin);
       });
     };
 
-    const readyInterval = window.setInterval(sendReady, 500);
+    readyInterval = window.setInterval(sendReady, 500);
     sendReady();
 
     return () => {
       window.removeEventListener("message", handleMessage);
-      window.clearInterval(readyInterval);
+      if (readyInterval !== null) window.clearInterval(readyInterval);
     };
   }, [isPreviewRequested]);
 
