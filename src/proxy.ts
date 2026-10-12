@@ -42,6 +42,24 @@ function normalizeHost(raw: string | null): string | null {
   return host;
 }
 
+function getDevelopmentPreviewSlug(req: NextRequest, host: string): string | null {
+  if (
+    IS_PROD ||
+    req.nextUrl.searchParams.get("preview") !== "true" ||
+    (host !== "localhost" && host !== "127.0.0.1" && host !== ROOT_DOMAIN)
+  ) {
+    return null;
+  }
+
+  const previewHost = normalizeHost(req.nextUrl.searchParams.get("host"));
+  if (!previewHost?.endsWith(`.${ROOT_DOMAIN}`)) return null;
+
+  const label = previewHost.slice(0, -(ROOT_DOMAIN.length + 1));
+  return SLUG_REGEX.test(label) && !RESERVED_SUBDOMAINS.has(label)
+    ? label
+    : null;
+}
+
 function withTenantHeaders(req: NextRequest, slug: string, host: string) {
   const headers = new Headers(req.headers);
   headers.delete("x-store-slug");
@@ -135,11 +153,17 @@ export async function proxy(req: NextRequest) {
     if (SLUG_REGEX.test(label) && !RESERVED_SUBDOMAINS.has(label)) {
       slug = label;
     }
-  } else if (host !== ROOT_DOMAIN && host !== "localhost") {
+  } else if (
+    host !== ROOT_DOMAIN &&
+    host !== "localhost" &&
+    host !== "127.0.0.1"
+  ) {
     const resolvedSlug = await resolveCustomDomain(host);
     if (resolvedSlug instanceof NextResponse) return resolvedSlug;
     slug = resolvedSlug;
   }
+
+  if (!slug) slug = getDevelopmentPreviewSlug(req, host);
 
   if (!IS_PROD && requestedStoreSlug) {
     const cleanPath =
@@ -160,18 +184,25 @@ export async function proxy(req: NextRequest) {
   if (!slug) return notFound();
 
   const url = req.nextUrl.clone();
+  url.searchParams.delete("host");
   url.pathname = `/store/${slug}${pathname === "/" ? "" : pathname}`;
   const response = NextResponse.rewrite(url, {
     request: { headers: withTenantHeaders(req, slug, host) },
   });
-  const frameAncestors =
-    req.nextUrl.searchParams.get("preview") === "true"
-      ? ["'self'", ...BUILDER_ORIGINS].join(" ")
-      : "'none'";
+  const isBuilderPreview =
+    req.nextUrl.searchParams.get("preview") === "true";
+  const frameAncestors = isBuilderPreview
+    ? ["'self'", ...BUILDER_ORIGINS].join(" ")
+    : "'none'";
   response.headers.set(
     "Content-Security-Policy",
     `frame-ancestors ${frameAncestors}`,
   );
+  if (isBuilderPreview) {
+    response.headers.delete("X-Frame-Options");
+  } else {
+    response.headers.set("X-Frame-Options", "DENY");
+  }
   return response;
 }
 

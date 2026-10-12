@@ -1,17 +1,22 @@
 "use client";
 
-import { useLivePreviewSync } from "../preview/use-live-preview-sync";
+import dynamic from "next/dynamic";
 import { DynamicSectionRenderer } from "./DynamicSectionRenderer";
-import { HomePageSection, Product, StoreConfig } from "@/shared/types";
+import type { HomePageSection, Product, StoreConfig } from "@/shared/types";
 
-interface StoreHomePageClientProps {
+export interface StoreHomePageClientProps {
   initialSections: HomePageSection[];
   store: StoreConfig;
   currency?: string;
   products?: Product[];
   categories?: unknown[];
   sliders?: unknown[];
+  isPreview?: boolean;
 }
+
+const StoreHomePagePreview = dynamic(
+  () => import("./StoreHomePagePreview"),
+);
 
 export function StoreHomePageClient({
   initialSections,
@@ -20,25 +25,30 @@ export function StoreHomePageClient({
   products = [],
   categories = [],
   sliders = [],
+  isPreview = false,
 }: StoreHomePageClientProps) {
-  const {
-    sections,
-    isPreview: isPreviewActive,
-    selectedSectionId,
-    sendBuilderAction,
-  } = useLivePreviewSync(initialSections);
+  const resolvedCurrency = currency || store?.currency || "USD";
+
+  if (isPreview) {
+    return (
+      <StoreHomePagePreview
+        initialSections={initialSections}
+        currency={resolvedCurrency}
+        products={products}
+        categories={categories}
+        sliders={sliders}
+      />
+    );
+  }
 
   return (
     <div className="w-full">
       <DynamicSectionRenderer
-        sections={sections}
-        currency={currency || store?.currency || "USD"}
+        sections={initialSections}
+        currency={resolvedCurrency}
         fallbackProducts={products}
         fallbackCategories={categories}
         fallbackSliders={sliders}
-        isPreview={isPreviewActive}
-        selectedSectionId={selectedSectionId}
-        onAction={sendBuilderAction}
       />
     </div>
   );

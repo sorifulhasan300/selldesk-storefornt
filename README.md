@@ -78,8 +78,13 @@ Verify `.env.local`:
 NEXT_PUBLIC_API_URL=http://api.selldesk.test:5000/api/v1
 INTERNAL_API_URL=http://localhost:5000/api/v1
 NEXT_PUBLIC_BASE_DOMAIN=selldesk.test:3001
+NEXT_PUBLIC_BUILDER_ORIGINS=http://app.selldesk.test:3000,https://app.selldesk.com
 REVALIDATION_SECRET=selldesk_secure_isr_secret_2026
 ```
+
+`NEXT_PUBLIC_BUILDER_ORIGINS` is the exact-origin allowlist for the admin homepage-builder iframe. Keep it restricted to trusted admin origins; preview messages are accepted only from an allowed origin and the parent window. Development automatically allows `http://app.selldesk.test:3000` and `http://localhost:3000`; these defaults are not enabled in production.
+
+For local previews, the builder targets the store subdomain directly, for example `http://my-store.selldesk.test:3001/?preview=true&live=1`. The local store subdomain must resolve to `127.0.0.1` in `/etc/hosts`. If your storefront dev server uses another port, set `NEXT_PUBLIC_STOREFRONT_PREVIEW_URL` in the store-admin app to a local URL with that port.
 
 ### 3. Development Server
 
@@ -87,6 +92,8 @@ REVALIDATION_SECRET=selldesk_secure_isr_secret_2026
 pnpm dev
 # Runs on http://selldesk.test:3001
 ```
+
+To use a custom local subdomain URL directly instead of the localhost preview fallback, add `127.0.0.1 my-store.selldesk.test` to `/etc/hosts` and make sure the storefront dev server is listening on the port used in that URL.
 
 ### 4. Testing Multi-Tenant Resolution
 

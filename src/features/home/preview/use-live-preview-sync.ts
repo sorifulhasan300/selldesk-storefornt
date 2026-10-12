@@ -58,7 +58,8 @@ function normalizeSyncMessage(
   const envelope = MessageEnvelopeSchema.safeParse(message);
   if (
     !envelope.success ||
-    envelope.data.type !== "SELLDESK_PREVIEW_SYNC" ||
+    (envelope.data.type !== "SELLDESK_PREVIEW_SYNC" &&
+      envelope.data.type !== "UPDATE_HOME_SECTIONS") ||
     envelope.data.seq === undefined
   ) {
     return null;
@@ -123,7 +124,7 @@ export function useLivePreviewSync(
     () => {
       if (typeof window === "undefined") return false;
       return (
-        new URLSearchParams(window.location.search).get("preview") === "true" ||
+        new URLSearchParams(window.location.search).get("preview") === "true" &&
         window.parent !== window
       );
     },
@@ -151,7 +152,11 @@ export function useLivePreviewSync(
         type: actionType,
         sectionId,
       };
-      window.parent.postMessage(message, parentOrigin.current);
+      try {
+        window.parent.postMessage(message, parentOrigin.current);
+      } catch (error) {
+        console.error("[useLivePreviewSync] Could not send action to builder", error);
+      }
     },
     [],
   );
@@ -212,9 +217,16 @@ export function useLivePreviewSync(
         return;
       }
 
-      BUILDER_ORIGINS.forEach((origin) => {
-        window.parent.postMessage(PREVIEW_READY_MESSAGE, origin);
-      });
+      for (const origin of BUILDER_ORIGINS) {
+        try {
+          window.parent.postMessage(PREVIEW_READY_MESSAGE, origin);
+        } catch (error) {
+          console.error(
+            `[useLivePreviewSync] Could not send ready message to ${origin}`,
+            error,
+          );
+        }
+      }
     };
 
     readyInterval = window.setInterval(sendReady, 500);

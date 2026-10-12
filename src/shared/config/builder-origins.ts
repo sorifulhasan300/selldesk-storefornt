@@ -1,8 +1,3 @@
-export const LOCAL_BUILDER_ORIGINS = [
-  "http://app.selldesk.test:3000",
-  "http://localhost:3000",
-] as const;
-
 function getConfiguredBuilderOrigins(configuredOrigins: string): string[] {
   return configuredOrigins
     .split(",")
@@ -20,9 +15,16 @@ function getConfiguredBuilderOrigins(configuredOrigins: string): string[] {
     });
 }
 
+const LOCAL_BUILDER_ORIGINS =
+  process.env.NODE_ENV === "development"
+    ? ["http://app.selldesk.test:3000", "http://localhost:3000"]
+    : [];
+
 export const BUILDER_ORIGINS = [
-  ...LOCAL_BUILDER_ORIGINS,
-  ...getConfiguredBuilderOrigins(
-    process.env.NEXT_PUBLIC_BUILDER_ORIGINS ?? "",
-  ),
+  ...new Set([
+    ...LOCAL_BUILDER_ORIGINS,
+    ...getConfiguredBuilderOrigins(
+      process.env.NEXT_PUBLIC_BUILDER_ORIGINS ?? "",
+    ),
+  ]),
 ];
