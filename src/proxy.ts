@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { API_ENDPOINTS } from "@/shared/constants";
+import { BUILDER_ORIGINS } from "@/shared/config/builder-origins";
 import { RESERVED_SUBDOMAINS, SLUG_REGEX } from "@/shared/config/constants";
 
 const ROOT_DOMAIN = (
@@ -160,9 +161,18 @@ export async function proxy(req: NextRequest) {
 
   const url = req.nextUrl.clone();
   url.pathname = `/store/${slug}${pathname === "/" ? "" : pathname}`;
-  return NextResponse.rewrite(url, {
+  const response = NextResponse.rewrite(url, {
     request: { headers: withTenantHeaders(req, slug, host) },
   });
+  const frameAncestors =
+    req.nextUrl.searchParams.get("preview") === "true"
+      ? ["'self'", ...BUILDER_ORIGINS].join(" ")
+      : "'none'";
+  response.headers.set(
+    "Content-Security-Policy",
+    `frame-ancestors ${frameAncestors}`,
+  );
+  return response;
 }
 
 export const config = {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from "react";
 import { z } from "zod";
+import { BUILDER_ORIGINS } from "@/shared/config/builder-origins";
 import { HomePageSection, SectionStyles } from "@/shared/types";
 
 const emptySubscribe = () => () => {};
@@ -11,29 +12,6 @@ const PREVIEW_READY_MESSAGE = {
   version: 1,
   type: "SELLDESK_PREVIEW_READY",
 } as const;
-
-const LOCAL_BUILDER_ORIGINS = [
-  "http://app.selldesk.test:3000",
-  "http://localhost:3000",
-];
-
-const BUILDER_ORIGINS = [
-  ...LOCAL_BUILDER_ORIGINS,
-  ...(process.env.NEXT_PUBLIC_BUILDER_ORIGINS ?? "")
-    .split(",")
-    .map((origin) => origin.trim())
-    .filter((origin) => {
-      try {
-        const url = new URL(origin);
-        return (
-          (url.protocol === "https:" || url.protocol === "http:") &&
-          url.origin === origin
-        );
-      } catch {
-        return false;
-      }
-    }),
-];
 
 const SectionSchema = z
   .object({
@@ -59,13 +37,12 @@ const SectionSchema = z
 const SectionsSchema = z.array(SectionSchema).max(MAX_PREVIEW_SECTIONS);
 const MessageEnvelopeSchema = z
   .object({
-    source: z.literal("selldesk").optional(),
-    version: z.literal(1).optional(),
+    source: z.literal("selldesk"),
+    version: z.literal(1),
     type: z.string(),
     seq: z.number().int().nonnegative().optional(),
     payload: z.unknown().optional(),
-    sections: z.unknown().optional(),
-    sectionId: z.string().min(1).max(100).optional(),
+    sectionId: z.string().min(1).max(100).nullable().optional(),
   })
   .passthrough();
 
@@ -77,10 +54,13 @@ function getRecord(value: unknown): Record<string, unknown> | null {
 
 function normalizeSyncMessage(
   message: unknown,
-  nextLegacySeq: number,
 ): { sections: HomePageSection[]; seq: number } | null {
   const envelope = MessageEnvelopeSchema.safeParse(message);
-  if (!envelope.success || envelope.data.type !== "SELLDESK_PREVIEW_SYNC") {
+  if (
+    !envelope.success ||
+    envelope.data.type !== "SELLDESK_PREVIEW_SYNC" ||
+    envelope.data.seq === undefined
+  ) {
     return null;
   }
 
@@ -89,28 +69,26 @@ function normalizeSyncMessage(
     ? envelope.data.payload
     : payloadRecord?.sections ??
       payloadRecord?.homePageSections ??
-      payloadRecord?.data ??
-      envelope.data.sections;
+      payloadRecord?.data;
   const sections = SectionsSchema.safeParse(rawSections);
   if (!sections.success) return null;
 
   return {
     sections: sections.data,
-    seq: envelope.data.seq ?? nextLegacySeq,
+    seq: envelope.data.seq,
   };
 }
 
-function normalizeSelectMessage(message: unknown): string | null {
+function normalizeSelectMessage(
+  message: unknown,
+): { sectionId: string | null } | null {
   const envelope = MessageEnvelopeSchema.safeParse(message);
   if (!envelope.success || envelope.data.type !== "SELECT_SECTION") {
     return null;
   }
 
-  const payload = getRecord(envelope.data.payload);
-  const sectionId = envelope.data.sectionId ?? payload?.sectionId;
-  return typeof sectionId === "string" && sectionId.length > 0 && sectionId.length <= 100
-    ? sectionId
-    : null;
+  if (envelope.data.sectionId === undefined) return null;
+  return { sectionId: envelope.data.sectionId };
 }
 
 const ACTION_TYPES = new Set([
@@ -158,8 +136,11 @@ export function useLivePreviewSync(
     (actionType: string, sectionId: string) => {
       if (
         !ACTION_TYPES.has(actionType) ||
+        !sectionId ||
+        sectionId.length > 100 ||
         typeof window === "undefined" ||
-        window.parent === window
+        window.parent === window ||
+        !parentOrigin.current
       ) {
         return;
       }
@@ -170,13 +151,7 @@ export function useLivePreviewSync(
         type: actionType,
         sectionId,
       };
-      const targetOrigins = parentOrigin.current
-        ? [parentOrigin.current]
-        : BUILDER_ORIGINS;
-
-      targetOrigins.forEach((origin) => {
-        window.parent.postMessage(message, origin);
-      });
+      window.parent.postMessage(message, parentOrigin.current);
     },
     [],
   );
@@ -198,7 +173,7 @@ export function useLivePreviewSync(
         return;
       }
 
-      const sync = normalizeSyncMessage(event.data, lastSeq.current + 1);
+      const sync = normalizeSyncMessage(event.data);
       if (sync) {
         if (sync.seq <= lastSeq.current) return;
         lastSeq.current = sync.seq;
@@ -209,18 +184,20 @@ export function useLivePreviewSync(
         return;
       }
 
-      const sectionId = normalizeSelectMessage(event.data);
-      if (!sectionId) return;
+      const selection = normalizeSelectMessage(event.data);
+      if (!selection) return;
 
       parentOrigin.current = event.origin;
       hasTrustedParentRef.current = true;
       setHasTrustedParent(true);
-      setSelectedSectionId(sectionId);
-      document
-        .querySelector<HTMLElement>(
-          `[data-section-id="${CSS.escape(sectionId)}"]`,
-        )
-        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      setSelectedSectionId(selection.sectionId);
+      if (selection.sectionId) {
+        document
+          .querySelector<HTMLElement>(
+            `[data-section-id="${CSS.escape(selection.sectionId)}"]`,
+          )
+          ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
     };
 
     window.addEventListener("message", handleMessage);
