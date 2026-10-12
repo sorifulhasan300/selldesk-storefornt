@@ -31,17 +31,19 @@ interface RawReviewRecord {
 function normalizeReviews(input: unknown): ReviewItem[] {
   if (!Array.isArray(input)) return [];
   return (input as RawReviewRecord[])
-    .filter((r) => Boolean(r.text || r.comment))
-    .map((r, i) => ({
-      _id: r._id || r.id || `review-${i}`,
-      id: r.id || r._id || `review-${i}`,
-      name: r.name || r.reviewerName || "Customer",
-      profession: r.profession || r.role || undefined,
+    .filter((review) => review && Boolean(review.text || review.comment))
+    .map((review, i) => ({
+      _id: review._id || review.id || `review-${i}`,
+      id: review.id || review._id || `review-${i}`,
+      name: review.name || review.reviewerName || "Customer",
+      profession: review.profession || review.role || undefined,
       rating:
-        typeof r.rating === "number" ? Math.min(5, Math.max(1, r.rating)) : 5,
-      text: r.text || r.comment || "",
-      picture: r.picture || r.avatarUrl,
-      date: r.date,
+        typeof review.rating === "number"
+          ? Math.min(5, Math.max(1, review.rating))
+          : 5,
+      text: review.text || review.comment || "",
+      picture: review.picture || review.avatarUrl,
+      date: review.date,
     }));
 }
 
@@ -51,12 +53,7 @@ export function CustomerReviewsBlock({
 }: CustomerReviewsBlockProps) {
   const { config = {}, styles = {}, data } = section;
 
-  const raw =
-    Array.isArray(data) && data.length > 0
-      ? data
-      : Array.isArray(config.reviews)
-      ? config.reviews
-      : config.reviewItems;
+  const raw = config.reviews ?? config.reviewItems ?? data;
 
   const reviews = normalizeReviews(raw);
   if (reviews.length === 0) {
@@ -65,19 +62,25 @@ export function CustomerReviewsBlock({
     ) : null;
   }
 
-  const desktopCols = Number(config.columns || styles.columns || 3);
-  const mobileCols = Number(config.mobileColumns || styles.mobileColumns || 1);
+  const desktopCols = Number(config.columns ?? styles.columns ?? 3);
+  const mobileCols = Number(config.mobileColumns ?? styles.mobileColumns ?? 1);
+  const cardGap = Number(config.cardGap ?? 16);
+  const cardRadius = Number(config.cardRadius ?? 14);
+  const showRating = config.showRating !== false;
+  const showProfile = config.showProfile !== false;
 
   return (
     <div
-      className={`grid ${getMobileGridClass(mobileCols)} ${getDesktopGridClass(
-        desktopCols,
-      )} gap-4 sm:gap-6`}
+      className={`grid ${getMobileGridClass(mobileCols)} ${getDesktopGridClass(desktopCols)}`}
+      style={{ gap: `${cardGap}px` }}
     >
       {reviews.map((review) => (
         <CustomerReviewCard
           key={review.id || review._id}
           review={review}
+          showRating={showRating}
+          showProfile={showProfile}
+          cardRadius={cardRadius}
         />
       ))}
     </div>

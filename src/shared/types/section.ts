@@ -102,6 +102,7 @@ export interface ReviewItem {
   name?: string;
   reviewerName?: string;
   profession?: string;
+  role?: string;
   rating: number;
   text?: string;
   comment?: string;
@@ -132,4 +133,3 @@ export interface HomePageSection {
   styles?: SectionStyles;
   data?: unknown;
 }
-
