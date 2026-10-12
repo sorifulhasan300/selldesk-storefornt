@@ -12,7 +12,6 @@ import {
   getDesktopGridClass,
   getMobileGridClass,
 } from "../utils/grid-layout.utils";
-import { SectionEmptyPlaceholder } from "./SectionEmptyPlaceholder";
 
 interface ProductShowcaseBlockProps {
   section: HomePageSection;
@@ -51,12 +50,13 @@ export function ProductShowcaseBlock({
   );
 
   const raw = Array.isArray(data) && data.length > 0 ? data : config.products;
-  const products = normalizeProductList(raw, fallbackProducts);
+  const products = normalizeProductList(
+    raw,
+    isPreview ? [] : fallbackProducts,
+  );
 
   if (products.length === 0) {
-    return isPreview ? (
-      <SectionEmptyPlaceholder itemType="Product" />
-    ) : null;
+    return null;
   }
 
   const viewType =

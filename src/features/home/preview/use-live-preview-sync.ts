@@ -54,11 +54,12 @@ function getRecord(value: unknown): Record<string, unknown> | null {
 
 function normalizeSyncMessage(
   message: unknown,
-): { sections: HomePageSection[]; seq: number } | null {
+): { sections: HomePageSection[]; seq: number; isHydrated: boolean } | null {
   const envelope = MessageEnvelopeSchema.safeParse(message);
   if (
     !envelope.success ||
     (envelope.data.type !== "SELLDESK_PREVIEW_SYNC" &&
+      envelope.data.type !== "SELLDESK_PREVIEW_HYDRATE" &&
       envelope.data.type !== "UPDATE_HOME_SECTIONS") ||
     envelope.data.seq === undefined
   ) {
@@ -77,7 +78,38 @@ function normalizeSyncMessage(
   return {
     sections: sections.data,
     seq: envelope.data.seq,
+    isHydrated: envelope.data.type === "SELLDESK_PREVIEW_HYDRATE",
   };
+}
+
+function hasSectionData(data: unknown): boolean {
+  return data !== null && data !== undefined &&
+    (!Array.isArray(data) || data.length > 0);
+}
+
+function preserveHydratedSectionData(
+  incoming: HomePageSection[],
+  current: HomePageSection[],
+): HomePageSection[] {
+  const currentById = new Map(
+    current.filter((section) => section.id).map((section) => [section.id, section]),
+  );
+
+  return incoming.map((section) => {
+    if (!section.id || hasSectionData(section.data)) return section;
+
+    const previous = currentById.get(section.id);
+    if (
+      !previous ||
+      previous.type !== section.type ||
+      previous.key !== section.key ||
+      !hasSectionData(previous.data)
+    ) {
+      return section;
+    }
+
+    return { ...section, data: previous.data };
+  });
 }
 
 function normalizeSelectMessage(
@@ -185,7 +217,11 @@ export function useLivePreviewSync(
         parentOrigin.current = event.origin;
         hasTrustedParentRef.current = true;
         setHasTrustedParent(true);
-        setSections(sync.sections);
+        setSections((current) =>
+          sync.isHydrated
+            ? sync.sections
+            : preserveHydratedSectionData(sync.sections, current),
+        );
         return;
       }
 
