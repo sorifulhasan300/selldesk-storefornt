@@ -26,11 +26,27 @@ export interface StoreSlider {
   order?: number;
 }
 
+export interface DeliveryZone {
+  id?: string;
+  name: string;
+  charge: number;
+  districts?: string[];
+}
+
+export interface FreeDeliveryConfig {
+  active: boolean;
+  minOrderAmount: number;
+}
+
 export interface StoreDeliveryCharge {
-  insideCity: number;
-  outsideCity: number;
+  chargeMode?: "district" | "city" | "flat" | string;
+  freeDelivery?: FreeDeliveryConfig | null;
+  zones?: DeliveryZone[] | null;
+  insideCity?: number;
+  outsideCity?: number;
   subAreaCharge?: number;
   freeDeliveryThreshold?: number | null;
+  isActive?: boolean;
 }
 
 export interface StorefrontColorConfig {

@@ -9,6 +9,7 @@ export interface CheckoutDto {
   customerPhone: string;
   customerEmail?: string;
   shippingAddress: string;
+  district?: string;
   city?: string;
   notes?: string;
   paymentMethod: "COD" | "BKASH" | "NAGAD" | "CARD" | string;

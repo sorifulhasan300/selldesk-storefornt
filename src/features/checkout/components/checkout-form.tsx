@@ -37,8 +37,12 @@ export function CheckoutForm({
     setCustomerPhone,
     shippingAddress,
     setShippingAddress,
+    district,
+    setDistrict,
     cityZone,
     setCityZone,
+    zones,
+    isFreeDelivery,
     insideFee,
     outsideFee,
     currentDeliveryFee,
@@ -94,6 +98,10 @@ export function CheckoutForm({
         <CheckoutDeliveryZone
           cityZone={cityZone}
           onZoneSelect={setCityZone}
+          district={district}
+          onDistrictChange={setDistrict}
+          zones={zones}
+          isFreeDelivery={isFreeDelivery}
           insideFee={insideFee}
           outsideFee={outsideFee}
           currency={currency}

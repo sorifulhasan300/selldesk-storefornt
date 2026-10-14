@@ -15,7 +15,7 @@ interface CheckoutOrderSummaryProps {
   subtotal: number;
   discount: number;
   coupon: CouponDiscount | null;
-  cityZone: "inside" | "outside" | null;
+  cityZone: "inside" | "outside" | string | null;
   deliveryFee: number;
   total: number;
   loading: boolean;
@@ -147,12 +147,16 @@ export function CheckoutOrderSummary({
             <span>
               Delivery Fee{" "}
               {cityZone
-                ? `(${cityZone === "inside" ? "Inside City" : "Outside City"})`
+                ? `(${cityZone === "inside" ? "Inside City" : cityZone === "outside" ? "Outside City" : cityZone})`
                 : ""}
             </span>
             <span>
               {cityZone ? (
-                formatCurrency(deliveryFee, currency)
+                deliveryFee === 0 ? (
+                  <span className="font-bold text-emerald-600">FREE</span>
+                ) : (
+                  formatCurrency(deliveryFee, currency)
+                )
               ) : (
                 <span className="text-xs text-slate-400 italic">
                   Select delivery zone

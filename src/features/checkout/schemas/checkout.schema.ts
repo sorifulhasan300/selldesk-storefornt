@@ -20,9 +20,8 @@ export const checkoutFormSchema = z.object({
     .trim()
     .min(5, "Shipping address must be at least 5 characters")
     .max(300, "Shipping address cannot exceed 300 characters"),
-  cityZone: z.enum(["inside", "outside"], {
-    message: "Please select a delivery zone",
-  }),
+  cityZone: z.string().min(1, "Please select a delivery zone"),
+  district: z.string().optional(),
   paymentMethod: z.string().min(1, "Please select a payment method"),
   notes: z
     .string()
