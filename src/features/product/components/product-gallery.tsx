@@ -12,6 +12,11 @@ interface ProductGalleryProps {
 export function ProductGallery({ images, title }: ProductGalleryProps) {
   const displayImages = images?.length > 0 ? images : [];
   const [selected, setSelected] = useState(0);
+  const [failedImages, setFailedImages] = useState<Set<string>>(() => new Set());
+
+  function markImageFailed(image: string) {
+    setFailedImages((current) => new Set(current).add(image));
+  }
 
   return (
     <div className="flex flex-col-reverse sm:flex-row gap-4">
@@ -28,13 +33,18 @@ export function ProductGallery({ images, title }: ProductGalleryProps) {
                   : "border-slate-200 hover:border-slate-300"
               }`}
             >
-              <Image
-                src={img}
-                alt={`${title} thumbnail ${idx + 1}`}
-                fill
-                sizes="72px"
-                className="object-cover"
-              />
+              {failedImages.has(img) ? (
+                <ShoppingBag className="w-6 h-6 text-slate-300" />
+              ) : (
+                <Image
+                  src={img}
+                  alt={`${title} thumbnail ${idx + 1}`}
+                  fill
+                  sizes="72px"
+                  className="object-cover"
+                  onError={() => markImageFailed(img)}
+                />
+              )}
             </button>
           ))}
         </div>
@@ -42,7 +52,7 @@ export function ProductGallery({ images, title }: ProductGalleryProps) {
 
       {/* Main Large Image */}
       <div className="relative w-full aspect-square rounded-3xl overflow-hidden bg-slate-100 border border-slate-200/80 shadow-xs flex items-center justify-center text-slate-300">
-        {displayImages[selected] ? (
+        {displayImages[selected] && !failedImages.has(displayImages[selected]) ? (
           <Image
             src={displayImages[selected]}
             alt={title}
@@ -51,6 +61,7 @@ export function ProductGallery({ images, title }: ProductGalleryProps) {
             fetchPriority="high"
             sizes="(max-width: 1024px) 100vw, 600px"
             className="object-cover object-center"
+            onError={() => markImageFailed(displayImages[selected])}
           />
         ) : (
           <ShoppingBag className="w-20 h-20 text-slate-300" />

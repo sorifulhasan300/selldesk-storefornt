@@ -132,6 +132,7 @@ export default async function TenantLayout({
         announcementText={topbarConfig?.announcementText}
         phone={topbarConfig?.phone}
         topbar={topbarConfig}
+        socialLinks={config?.socialLinks || config?.footer?.socialLinks}
       />
       <StoreHeader
         store={store}
@@ -162,4 +163,3 @@ export default async function TenantLayout({
 
   );
 }
-

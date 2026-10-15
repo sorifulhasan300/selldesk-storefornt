@@ -151,6 +151,7 @@ export interface StorefrontConfig {
   navbar?: StorefrontNavbarConfig;
   topbar?: StorefrontTopbarConfig;
   footer?: StorefrontFooterConfig;
+  socialLinks?: Record<string, string>;
   bottomNav?: StorefrontBottomNavConfig;
   homePage?: {
     sections: HomePageSection[];

@@ -79,7 +79,13 @@ function LogoSlot({
   if (logoSrc) {
     return (
       <div className="relative w-10 h-10 rounded-xl overflow-hidden border border-slate-200">
-        <Image src={logoSrc} alt={store.name} fill className="object-cover" />
+        <Image
+          src={logoSrc}
+          alt={store.name}
+          fill
+          sizes="40px"
+          className="object-cover"
+        />
       </div>
     );
   }

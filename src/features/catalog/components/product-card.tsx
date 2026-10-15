@@ -33,8 +33,10 @@ export function ProductCard({
 }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem);
   const [added, setAdded] = useState(false);
+  const [failedImage, setFailedImage] = useState<string | null>(null);
 
   const primaryImage = product.images?.[0] || null;
+  const imageFailed = primaryImage !== null && failedImage === primaryImage;
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -79,13 +81,14 @@ export function ProductCard({
         href={`/products/${product.slug}`}
         className="block relative aspect-square overflow-hidden bg-slate-100 flex items-center justify-center text-slate-300"
       >
-        {primaryImage ? (
+        {primaryImage && !imageFailed ? (
           <Image
             src={primaryImage}
             alt={product.name}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 320px"
             className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
+            onError={() => setFailedImage(primaryImage)}
           />
         ) : (
           <ShoppingBag className="w-12 h-12 text-slate-300" />
