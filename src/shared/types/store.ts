@@ -56,9 +56,13 @@ export interface StorefrontColorConfig {
 }
 
 export interface StorefrontTopbarConfig {
+  isActive?: boolean;
   announcementText?: string;
   showSocialLinks?: boolean;
   phone?: string;
+  showPhone?: boolean;
+  bgColor?: string;
+  textColor?: string;
 }
 
 export interface StorefrontHeaderConfig {
@@ -177,4 +181,3 @@ export interface StorefrontBootstrap {
   config?: StorefrontConfig;
   business?: unknown;
 }
-
