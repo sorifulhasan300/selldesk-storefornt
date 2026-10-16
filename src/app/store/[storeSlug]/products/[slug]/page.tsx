@@ -2,6 +2,7 @@ import { cache } from "react";
 import { notFound } from "next/navigation";
 import { getProductBySlug } from "@/features/product/server";
 import { getBootstrap } from "@/features/tenant/server";
+import { WishlistToggle } from "@/features/wishlist";
 import {
   ProductGallery,
   AddToCartCTA,
@@ -116,6 +117,8 @@ export default async function ProductDetailPage({ params }: PDPProps) {
               {product.name}
             </h1>
           </div>
+
+          <WishlistToggle storeSlug={storeSlug} product={product} />
 
           {/* Description */}
           <div className="prose prose-slate text-sm text-slate-600 leading-relaxed border-t border-b border-slate-100 py-4">

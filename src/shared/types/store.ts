@@ -65,11 +65,41 @@ export interface StorefrontTopbarConfig {
   textColor?: string;
 }
 
+export interface HeaderActionItem {
+  type: string;
+  showOnDesktop?: boolean;
+  showOnMobile?: boolean;
+  label?: string;
+  order?: number;
+}
+
+export interface HeaderLogoThumbs {
+  large?: string;
+  medium?: string;
+  url?: string;
+}
+
+export interface HeaderLogoObject {
+  thumbs?: HeaderLogoThumbs;
+  _id?: string;
+}
+
 export interface StorefrontHeaderConfig {
-  logo?: string | null;
+  logo?: string | HeaderLogoObject | null;
   searchEnabled?: boolean;
   cartEnabled?: boolean;
   wishListEnabled?: boolean;
+  stickyHeader?: boolean;
+  height?: number;
+  layout?: number | string;
+  actions?: HeaderActionItem[];
+  actionFontSize?: number;
+  actionIconSize?: number;
+  actionStyle?: number | string;
+  searchStyle?: number | string;
+  bgColor?: string;
+  textColor?: string;
+  hideDeveloperCredit?: boolean;
 }
 
 export interface StorefrontNavbarLinkConfig {
@@ -79,6 +109,7 @@ export interface StorefrontNavbarLinkConfig {
 }
 
 export interface StorefrontNavbarConfig {
+  style?: "default" | "pill" | "underline" | "bordered";
   links?: StorefrontNavbarLinkConfig[];
 }
 

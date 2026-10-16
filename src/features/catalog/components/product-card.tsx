@@ -3,9 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import React, { useState } from "react";
+import { useParams } from "next/navigation";
 import { Product } from "@/shared/types";
 import { cn, formatCurrency } from "@/shared/lib/utils";
 import { useCartStore } from "@/features/cart";
+import { WishlistToggle } from "@/features/wishlist";
 import { ShoppingBag, Check } from "lucide-react";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -17,6 +19,7 @@ export interface ProductCardProps {
   cardRadius?: number | string;
   showName?: boolean;
   showCategoryName?: boolean;
+  storeSlug?: string;
   className?: string;
   style?: React.CSSProperties;
 }
@@ -28,9 +31,14 @@ export function ProductCard({
   cardRadius = 16,
   showName = true,
   showCategoryName = true,
+  storeSlug,
   className,
   style,
 }: ProductCardProps) {
+  const routeParams = useParams<{ storeSlug?: string }>();
+  const resolvedStoreSlug =
+    storeSlug ??
+    (typeof routeParams?.storeSlug === "string" ? routeParams.storeSlug : "");
   const addItem = useCartStore((s) => s.addItem);
   const [added, setAdded] = useState(false);
   const [failedImage, setFailedImage] = useState<string | null>(null);
@@ -79,7 +87,7 @@ export function ProductCard({
     >
       <Link
         href={`/products/${product.slug}`}
-        className="block relative aspect-square overflow-hidden bg-slate-100 flex items-center justify-center text-slate-300"
+        className="relative flex aspect-square items-center justify-center overflow-hidden bg-slate-100 text-slate-300"
       >
         {primaryImage && !imageFailed ? (
           <Image
@@ -112,6 +120,12 @@ export function ProductCard({
         )}
       </Link>
 
+      {resolvedStoreSlug && (
+        <div className="absolute right-2 top-2 z-10">
+          <WishlistToggle storeSlug={resolvedStoreSlug} product={product} />
+        </div>
+      )}
+
       <div className="p-4 flex flex-col flex-1 justify-between">
         <div>
           {showCategoryName && product.category && (
@@ -122,7 +136,7 @@ export function ProductCard({
 
           {showName && (
             <Link href={`/products/${product.slug}`}>
-              <h3 className="text-sm font-semibold text-slate-800 line-clamp-2 hover:text-[var(--store-primary)] transition-colors">
+              <h3 className="line-clamp-2 text-sm font-semibold text-slate-800 transition-colors hover:text-(--store-primary)">
                 {product.name}
               </h3>
             </Link>
@@ -149,7 +163,7 @@ export function ProductCard({
               "size-9 rounded-xl p-0 transition-all duration-200",
               added
                 ? "bg-emerald-600 text-white hover:bg-emerald-600"
-                : "bg-slate-900 text-white hover:bg-[var(--store-primary)]",
+                : "bg-slate-900 text-white hover:bg-(--store-primary)",
             )}
             title="Add to cart"
             aria-label={added ? "Added to cart" : "Add to cart"}

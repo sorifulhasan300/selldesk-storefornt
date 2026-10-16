@@ -22,6 +22,13 @@ export const API_ENDPOINTS = {
   ORDERS: {
     BY_NUMBER: (orderNumber: string) =>
       `/orders/${encodeURIComponent(orderNumber)}`,
+    TRACK: "/orders/track",
+  },
+  CUSTOMER_AUTH: {
+    SEND_OTP: "/storefront/auth/send-otp",
+    VERIFY_OTP: "/storefront/auth/verify-otp",
+    RESEND_OTP: "/storefront/auth/resend-otp",
+    LOGOUT: "/storefront/auth/logout",
   },
 } as const;
 

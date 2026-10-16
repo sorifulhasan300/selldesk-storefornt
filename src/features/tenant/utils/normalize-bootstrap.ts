@@ -32,6 +32,13 @@ export function normalizeBootstrap(
   const color = config.color || {};
   const contact = config.contact || {};
   const header = config.header || {};
+  const headerLogo =
+    typeof header.logo === "string"
+      ? header.logo
+      : header.logo?.thumbs?.large ||
+        header.logo?.thumbs?.url ||
+        header.logo?.thumbs?.medium ||
+        null;
   const footer = config.footer || {};
   const rawSocial =
     config.socialLinks || footer.socialLinks || raw.socialLinks || {};
@@ -62,7 +69,7 @@ export function normalizeBootstrap(
     domain: raw.store?.domain || business.domain || null,
     currency:
       raw.store?.currency || business.currencyCode || business.currency || "USD",
-    logoUrl: raw.store?.logoUrl || business.logo || header.logo || null,
+    logoUrl: headerLogo || raw.store?.logoUrl || business.logo || null,
     bannerUrl: raw.store?.bannerUrl || business.bannerUrl || null,
     contactEmail:
       raw.store?.contactEmail || contact.email || raw.user?.email || null,
