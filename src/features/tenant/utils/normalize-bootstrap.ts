@@ -33,7 +33,18 @@ export function normalizeBootstrap(
   const contact = config.contact || {};
   const header = config.header || {};
   const footer = config.footer || {};
-  const socialLinks = footer.socialLinks || {};
+  const rawSocial =
+    config.socialLinks || footer.socialLinks || raw.socialLinks || {};
+  const socialLinks = Object.entries(
+    rawSocial as Record<string, unknown>,
+  ).reduce<Record<string, string>>((links, [platform, value]) => {
+    if (typeof value === "string" && value.trim()) {
+      links[platform] = value.trim();
+    }
+    return links;
+  }, {});
+  config.socialLinks = socialLinks;
+  footer.socialLinks = socialLinks;
 
   const cleanName =
     business.name ||
