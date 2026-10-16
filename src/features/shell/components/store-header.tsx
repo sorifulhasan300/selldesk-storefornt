@@ -12,6 +12,9 @@ import type {
 import { useCart } from "@/features/cart";
 import {
   Heart,
+  AppWindow,
+  ChevronDown,
+  Grid2X2,
   Menu,
   Phone,
   Search,
@@ -151,6 +154,9 @@ function LogoSlot({
 }
 
 type NavbarStyle = NonNullable<StorefrontNavbarConfig["style"]>;
+type NavbarMenuItem = NonNullable<
+  StorefrontNavbarConfig["menuItems"]
+>[number];
 
 const NAV_LINK_STYLE: Record<NavbarStyle, string> = {
   default: "",
@@ -187,15 +193,202 @@ function DesktopNav({
   );
 }
 
+function MenuItemLink({
+  item,
+  style,
+  fontSize,
+  depth = 0,
+}: {
+  item: NavbarMenuItem;
+  style: NavbarStyle;
+  fontSize: number;
+  depth?: number;
+}) {
+  const label = item.label?.trim();
+  if (!label) return null;
+
+  const children = item.children ?? [];
+  const url = item.link?.trim() || "#";
+
+  if (children.length === 0) {
+    return (
+      <Link
+        href={url}
+        className={`block whitespace-nowrap transition-colors hover:text-(--store-primary) ${NAV_LINK_STYLE[style]}`}
+        style={{ fontSize }}
+      >
+        {label}
+      </Link>
+    );
+  }
+
+  return (
+    <div className={`group relative ${depth > 0 ? "w-full" : ""}`}>
+      <div className="flex items-center gap-1">
+        <Link
+          href={url}
+          className={`whitespace-nowrap transition-colors hover:text-(--store-primary) ${NAV_LINK_STYLE[style]}`}
+          style={{ fontSize }}
+        >
+          {label}
+        </Link>
+        <button
+          type="button"
+          aria-label={`Show ${label} sub-items`}
+          className="rounded p-1 transition-colors hover:bg-muted"
+        >
+          <ChevronDown size={14} aria-hidden="true" />
+        </button>
+      </div>
+      <div
+        className={`invisible absolute z-50 min-w-48 rounded-md border border-border bg-popover p-2 text-popover-foreground opacity-0 shadow-lg transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 ${
+          depth > 0 ? "left-full top-0 ml-1" : "left-0 top-full pt-2"
+        }`}
+      >
+        <div className="space-y-1">
+          {children.map((child, index) => (
+            <MenuItemLink
+              key={`${child.link}-${child.label}-${index}`}
+              item={child}
+              style={style}
+              fontSize={fontSize}
+              depth={depth + 1}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ConfiguredDesktopNavbar({
+  navbar,
+  categories,
+}: {
+  navbar: StorefrontNavbarConfig;
+  categories?: Array<{ id: string; name: string; slug: string }>;
+}) {
+  const items = navbar.menuItems ?? [];
+  const layout = navbar.layout ?? 1;
+  const megaCategory = navbar.megaCategory;
+  const showCategoryButton =
+    megaCategory?.active !== false && (categories?.length ?? 0) > 0;
+  const categoryIcon =
+    megaCategory?.icon === "GridOutlined"
+      ? Grid2X2
+      : megaCategory?.icon === "MenuOutlined"
+        ? Menu
+        : AppWindow;
+  const CategoryIcon = categoryIcon;
+
+  return (
+    <nav
+      aria-label="Store navigation"
+      className="hidden border-t border-current/10 lg:block"
+      style={{
+        minHeight: `${navbar.height ?? 60}px`,
+        backgroundColor: navbar.bgColor || undefined,
+        color: navbar.textColor || undefined,
+        fontSize: `${navbar.fontSize ?? 13}px`,
+      }}
+    >
+      <div
+        className={`mx-auto flex min-h-[inherit] max-w-7xl items-center gap-5 px-4 sm:px-6 lg:px-8 ${
+          layout === 2
+            ? "justify-between"
+            : layout === 3
+              ? "justify-center"
+              : "justify-start"
+        }`}
+      >
+        {showCategoryButton && (
+          <div className="group relative shrink-0">
+            <button
+              type="button"
+              className="flex items-center gap-2 rounded-md px-3 py-2 font-medium transition-colors hover:bg-black/5"
+              aria-label={megaCategory?.label ?? "Categories"}
+            >
+              <CategoryIcon size={16} aria-hidden="true" />
+              <span>{megaCategory?.label || "Categories"}</span>
+              <ChevronDown size={14} aria-hidden="true" />
+            </button>
+            <div className="invisible absolute left-0 top-full z-50 min-w-56 rounded-md border border-border bg-popover p-2 text-popover-foreground opacity-0 shadow-lg transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+              <div className="space-y-1">
+                {categories?.map((category) => (
+                  <Link
+                    key={category.id}
+                    href={`/products?categoryId=${category.id}`}
+                    className="block rounded px-3 py-2 text-sm transition-colors hover:bg-muted"
+                  >
+                    {category.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+        <div
+          className={`flex flex-wrap items-center gap-5 ${
+            layout === 2
+              ? "flex-1 justify-end"
+              : layout === 3
+                ? "justify-center"
+                : ""
+          }`}
+        >
+          {items.map((item, index) => (
+            <MenuItemLink
+              key={`${item.link}-${item.label}-${index}`}
+              item={item}
+              style={navbar.style ?? "default"}
+              fontSize={navbar.fontSize ?? 13}
+            />
+          ))}
+        </div>
+      </div>
+    </nav>
+  );
+}
+
 function MobileDrawer({
   links,
   onClose,
+  menuItems,
+  fontSize,
   style = "default",
 }: {
   links: NavLink[];
   onClose: () => void;
   style?: NavbarStyle;
+  menuItems?: NavbarMenuItem[];
+  fontSize?: number;
 }) {
+  const renderMenuItems = (items: NavbarMenuItem[], depth = 0) =>
+    items.map((item, index) => {
+      const label = item.label?.trim();
+      if (!label) return null;
+      return (
+        <div
+          key={`${item.link}-${label}-${index}`}
+          className={depth > 0 ? "ml-4 border-l border-border pl-3" : ""}
+        >
+          <Link
+            href={item.link?.trim() || "#"}
+            onClick={onClose}
+            className={`block w-fit text-base font-semibold text-inherit hover:text-(--store-primary) ${NAV_LINK_STYLE[style]}`}
+            style={{ fontSize }}
+          >
+            {label}
+          </Link>
+          {item.children && item.children.length > 0 && (
+            <div className="mt-2 space-y-3">
+              {renderMenuItems(item.children, depth + 1)}
+            </div>
+          )}
+        </div>
+      );
+    });
+
   return (
     <SheetContent side="left" className="gap-6">
       <SheetTitle className="sr-only">Store navigation</SheetTitle>
@@ -203,7 +396,9 @@ function MobileDrawer({
         Browse store pages.
       </SheetDescription>
       <nav aria-label="Store navigation" className="space-y-4 pt-8">
-        {links.map((link) => (
+        {menuItems
+          ? renderMenuItems(menuItems)
+          : links.map((link) => (
           <Link
             key={`${link.url}-${link.title}`}
             href={link.url}
@@ -212,7 +407,7 @@ function MobileDrawer({
           >
             {link.title}
           </Link>
-        ))}
+            ))}
       </nav>
     </SheetContent>
   );
@@ -290,12 +485,24 @@ export function StoreHeader({
   }, [categories]);
 
   const rawLinks = resolvedNavbar?.links;
+  const hasConfiguredMenuItems = Array.isArray(resolvedNavbar?.menuItems);
+  const isConfiguredNavbar = hasConfiguredMenuItems;
   const sortedNavLinks = useMemo(
-    () =>
-      rawLinks && rawLinks.length > 0
+    () => {
+      if (hasConfiguredMenuItems) {
+        return (resolvedNavbar?.menuItems ?? [])
+          .filter((item) => Boolean(item.label?.trim()))
+          .map((item, index) => ({
+            title: item.label?.trim() ?? "",
+            url: item.link?.trim() || "#",
+            order: index + 1,
+          }));
+      }
+      return rawLinks && rawLinks.length > 0
         ? sortNavLinks(rawLinks)
-        : defaultLinks,
-    [rawLinks, defaultLinks],
+        : defaultLinks;
+    },
+    [hasConfiguredMenuItems, resolvedNavbar?.menuItems, rawLinks, defaultLinks],
   );
 
   const actions = [
@@ -326,6 +533,7 @@ export function StoreHeader({
   const isSplit = layout === 4;
   const isMinimal = layout === 5;
   const navbarStyle = resolvedNavbar?.style ?? "default";
+  const navbarActive = resolvedNavbar?.active !== false;
   const phoneHref = contactPhone?.replace(/[^\d+]/g, "");
   const headerStyle = {
     backgroundColor: resolvedHeader?.bgColor ?? "#ffffff",
@@ -447,7 +655,8 @@ export function StoreHeader({
     </div>
   );
 
-  const menuButton = sortedNavLinks.length > 0 && (
+  const menuButton =
+    (!isConfiguredNavbar || navbarActive) && sortedNavLinks.length > 0 && (
     <Button
       variant="ghost"
       size="icon"
@@ -497,20 +706,20 @@ export function StoreHeader({
           >
             {menuButton}
             {logo}
-            {layout === 1 && (
+            {!isConfiguredNavbar && layout === 1 && (
               <DesktopNav
                 links={sortedNavLinks}
                 style={navbarStyle}
                 className="flex-1 justify-center"
               />
             )}
-            {layout === 3 && (
+            {!isConfiguredNavbar && layout === 3 && (
               <DesktopNav links={sortedNavLinks} style={navbarStyle} />
             )}
             {!isMinimal && renderActions()}
           </div>
 
-          {(isCentered || isSplit) && (
+          {!isConfiguredNavbar && (isCentered || isSplit) && (
             <DesktopNav
               links={sortedNavLinks}
               style={navbarStyle}
@@ -525,14 +734,23 @@ export function StoreHeader({
           )}
         </div>
 
-        {sortedNavLinks.length > 0 && (
+        {sortedNavLinks.length > 0 && (!isConfiguredNavbar || navbarActive) && (
           <MobileDrawer
             links={sortedNavLinks}
+            menuItems={
+              isConfiguredNavbar ? resolvedNavbar?.menuItems : undefined
+            }
+            fontSize={
+              isConfiguredNavbar ? resolvedNavbar?.fontSize ?? 13 : undefined
+            }
             onClose={() => setMobileMenuOpen(false)}
             style={navbarStyle}
           />
         )}
       </header>
+      {navbarActive && isConfiguredNavbar && (
+        <ConfiguredDesktopNavbar navbar={resolvedNavbar} categories={categories} />
+      )}
     </Sheet>
   );
 }

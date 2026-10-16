@@ -110,7 +110,27 @@ export interface StorefrontNavbarLinkConfig {
   order?: number;
 }
 
+export interface StorefrontNavbarMenuItemConfig {
+  refType?: "custom" | "category" | "page" | string;
+  refId?: string | null;
+  label?: string;
+  link?: string;
+  children?: StorefrontNavbarMenuItemConfig[];
+}
+
 export interface StorefrontNavbarConfig {
+  active?: boolean;
+  layout?: number;
+  height?: number;
+  fontSize?: number;
+  bgColor?: string;
+  textColor?: string;
+  megaCategory?: {
+    active?: boolean;
+    label?: string;
+    icon?: string;
+  };
+  menuItems?: StorefrontNavbarMenuItemConfig[];
   style?: "default" | "pill" | "underline" | "bordered";
   links?: StorefrontNavbarLinkConfig[];
 }
