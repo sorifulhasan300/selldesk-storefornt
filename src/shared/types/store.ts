@@ -151,6 +151,15 @@ export interface StorefrontFooterConfig {
   columns?: StorefrontFooterColumnConfig[];
 }
 
+export type BottomNavItemKey =
+  | "category"
+  | "search"
+  | "home"
+  | "cart"
+  | "track"
+  | "wishlist"
+  | "account";
+
 export type BottomNavIconName =
   | "home"
   | "grid"
@@ -176,8 +185,24 @@ export interface StorefrontBottomNavItemConfig {
   openCart?: boolean;
 }
 
+export interface LegacyStorefrontBottomNavItemConfig {
+  label?: string;
+  icon?: string;
+  iconName?: string;
+  path?: string;
+  href?: string;
+  openCart?: boolean;
+}
+
 export interface StorefrontBottomNavConfig {
-  items: StorefrontBottomNavItemConfig[];
+  active?: boolean;
+  layout?: 1 | 2;
+  showLabels?: boolean;
+  bgColor?: string;
+  iconColor?: string;
+  activeColor?: string;
+  homeIcon?: string | null;
+  items?: Array<BottomNavItemKey | LegacyStorefrontBottomNavItemConfig>;
 }
 
 export interface StorefrontConfig {
