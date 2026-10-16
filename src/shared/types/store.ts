@@ -99,6 +99,8 @@ export interface StorefrontHeaderConfig {
   searchStyle?: number | string;
   bgColor?: string;
   textColor?: string;
+  bgColorMode?: "theme" | "custom";
+  textColorMode?: "theme" | "custom";
   hideDeveloperCredit?: boolean;
 }
 
