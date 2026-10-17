@@ -12,7 +12,6 @@ import type {
 import { useCart } from "@/features/cart";
 import {
   Heart,
-  AppWindow,
   ChevronDown,
   Grid2X2,
   Menu,
@@ -23,7 +22,7 @@ import {
   UserRound,
   X,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import {
@@ -153,6 +152,60 @@ function LogoSlot({
   );
 }
 
+function HeaderSearchBar({
+  searchStyle,
+  iconSize,
+  actionFontSize,
+}: {
+  searchStyle: number;
+  iconSize: number;
+  actionFontSize: number;
+}) {
+  const router = useRouter();
+  const [query, setQuery] = useState("");
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    router.push(`/products?search=${encodeURIComponent(query)}`);
+  };
+
+  const styleClassName =
+    searchStyle === 1
+      ? "rounded-full bg-black/5 px-3 py-1.5 focus-within:ring-2 focus-within:ring-current/20"
+      : searchStyle === 3
+        ? "rounded-none border-b-2 border-current/30 bg-transparent px-1 py-1 focus-within:border-current"
+        : "rounded-md border border-current/20 px-2 py-1";
+
+  return (
+    <form
+      role="search"
+      onSubmit={handleSubmit}
+      className={`flex min-w-0 items-center text-inherit ${styleClassName}`}
+    >
+      <input
+        type="search"
+        value={query}
+        onChange={(event) => setQuery(event.currentTarget.value)}
+        placeholder="Search products..."
+        aria-label="Search products"
+        className="min-w-0 flex-1 bg-transparent text-inherit outline-none placeholder:text-current/50"
+        style={{ fontSize: actionFontSize }}
+      />
+      <button
+        type="submit"
+        aria-label="Search"
+        className={`flex shrink-0 items-center justify-center text-inherit ${
+          searchStyle === 2
+            ? "ml-2 border-l border-current/20 pl-3"
+            : "ml-2 rounded-full p-1"
+        }`}
+      >
+        <Search size={iconSize} aria-hidden="true" />
+      </button>
+    </form>
+  );
+}
+
 type NavbarStyle = NonNullable<StorefrontNavbarConfig["style"]>;
 type NavbarMenuItem = NonNullable<
   StorefrontNavbarConfig["menuItems"]
@@ -273,13 +326,8 @@ function ConfiguredDesktopNavbar({
   const megaCategory = navbar.megaCategory;
   const showCategoryButton =
     megaCategory?.active !== false && (categories?.length ?? 0) > 0;
-  const categoryIcon =
-    megaCategory?.icon === "GridOutlined"
-      ? Grid2X2
-      : megaCategory?.icon === "MenuOutlined"
-        ? Menu
-        : AppWindow;
-  const CategoryIcon = categoryIcon;
+  const CategoryIcon =
+    megaCategory?.icon === "MenuOutlined" ? Menu : Grid2X2;
 
   return (
     <nav
@@ -422,6 +470,17 @@ function actionVisibility(action: HeaderActionItem): string {
   return "inline-flex";
 }
 
+function actionLayoutClass(actionStyle: number | string): string {
+  switch (Number(actionStyle)) {
+    case 2:
+      return "flex-col gap-0.5 text-center";
+    case 3:
+      return "flex-row gap-2";
+    default:
+      return "flex-row gap-0";
+  }
+}
+
 function ActionLink({
   href,
   label,
@@ -444,7 +503,7 @@ function ActionLink({
       href={href}
       aria-label={label}
       title={label}
-      className={`items-center justify-center gap-2 rounded-md px-2 py-1.5 text-inherit hover:bg-black/5 ${className}`}
+      className={`inline-flex items-center justify-center rounded-md px-2 py-1.5 text-inherit hover:bg-black/5 ${actionLayoutClass(actionStyle)} ${className}`}
     >
       <Icon size={iconSize} aria-hidden="true" />
       {Number(actionStyle) !== 1 && (
@@ -518,20 +577,21 @@ export function StoreHeader({
     standard: 1,
     centered: 2,
     action: 3,
-    split: 4,
-    minimal: 5,
+    split: 1,
+    minimal: 3,
   };
-  const rawLayout = resolvedHeader?.layout ?? 3;
+  const rawLayout = resolvedHeader?.layout ?? 1;
   const candidateLayout =
     typeof rawLayout === "string"
       ? layoutByName[rawLayout] ?? Number(rawLayout)
       : rawLayout;
-  const layout = [1, 2, 3, 4, 5].includes(candidateLayout)
-    ? candidateLayout
-    : 3;
+  const normalizedLayout =
+    candidateLayout === 4 ? 1 : candidateLayout === 5 ? 3 : candidateLayout;
+  const layout = [1, 2, 3].includes(normalizedLayout)
+    ? normalizedLayout
+    : 1;
   const isCentered = layout === 2;
-  const isSplit = layout === 4;
-  const isMinimal = layout === 5;
+  const isMinimal = layout === 3;
   const navbarStyle = resolvedNavbar?.style ?? "default";
   const navbarActive = resolvedNavbar?.active !== false;
   const phoneHref = contactPhone?.replace(/[^\d+]/g, "");
@@ -541,25 +601,21 @@ export function StoreHeader({
     minHeight: `${resolvedHeader?.height ?? 81}px`,
   };
 
-  const renderActions = () => (
-    <div
-      className={`flex items-center gap-1 sm:gap-2 ${
-        isCentered ? "absolute right-4 sm:right-6 lg:right-8" : ""
-      }`}
-    >
-      {resolvedHeader?.searchEnabled !== false && (
+  const renderActions = (includeCompactSearch: boolean) => (
+    <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+      {includeCompactSearch && resolvedHeader?.searchEnabled !== false && (
         <Button
           variant="ghost"
-          size={searchStyle === 1 ? "icon" : "default"}
+          size={Number(actionStyle) === 1 ? "icon" : "default"}
           onClick={() => router.push("/products")}
           aria-label="Search Products"
           title="Search Products"
-          className={`text-inherit ${
-            searchStyle === 3 ? "rounded-full border border-current/20" : ""
+          className={`text-inherit ${actionLayoutClass(actionStyle)} ${
+            Number(actionStyle) === 2 ? "h-auto min-h-9 px-2 py-1.5" : "px-2"
           }`}
         >
           <Search size={iconSize} />
-          {searchStyle !== 1 && (
+          {Number(actionStyle) !== 1 && (
             <span
               className="text-xs font-medium"
               style={{ fontSize: actionFontSize }}
@@ -583,7 +639,9 @@ export function StoreHeader({
               variant="ghost"
               size="default"
               onClick={() => toggleDrawer(true)}
-              className={`relative px-2 text-inherit ${visibility}`}
+              className={`relative px-2 text-inherit ${actionLayoutClass(actionStyle)} ${
+                Number(actionStyle) === 2 ? "h-auto min-h-9 py-1.5" : ""
+              } ${visibility}`}
               aria-label={label}
               title={label}
             >
@@ -692,44 +750,58 @@ export function StoreHeader({
         className={`${resolvedHeader?.stickyHeader === false ? "relative" : "sticky"} top-0 z-40 border-b border-slate-200/80 backdrop-blur-md`}
         style={headerStyle}
       >
-        <div
-          className={`mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 ${
-            isCentered || isSplit
-              ? "flex min-h-[inherit] flex-col justify-center gap-2 py-2"
-              : "flex min-h-[inherit] items-center justify-between gap-4"
-          }`}
-        >
-          <div
-            className={`relative flex min-h-13 items-center gap-4 ${
-              isCentered ? "justify-center" : "justify-between"
-            }`}
-          >
-            {menuButton}
-            {logo}
-            {!isConfiguredNavbar && layout === 1 && (
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="relative flex min-h-[inherit] items-center">
+            <div className="relative flex min-h-13 w-full items-center justify-between lg:hidden">
+              {menuButton ?? <span className="size-9 shrink-0" aria-hidden="true" />}
+              <div className="absolute left-1/2 -translate-x-1/2">{logo}</div>
+              {renderActions(true)}
+            </div>
+
+            <div className="hidden min-h-[inherit] w-full items-center gap-8 lg:flex">
+              {isCentered ? (
+                <>
+                  {resolvedHeader?.searchEnabled !== false && (
+                    <div className="w-full max-w-sm flex-1">
+                      <HeaderSearchBar
+                        searchStyle={searchStyle}
+                        iconSize={iconSize}
+                        actionFontSize={actionFontSize}
+                      />
+                    </div>
+                  )}
+                  <div className="absolute left-1/2 -translate-x-1/2">{logo}</div>
+                  <div className="ml-auto">
+                    {renderActions(false)}
+                  </div>
+                </>
+              ) : (
+                <>
+                  {logo}
+                  {!isMinimal && resolvedHeader?.searchEnabled !== false && (
+                    <div className="mx-auto w-full max-w-xl flex-1">
+                      <HeaderSearchBar
+                        searchStyle={searchStyle}
+                        iconSize={iconSize}
+                        actionFontSize={actionFontSize}
+                      />
+                    </div>
+                  )}
+                  <div className="ml-auto">
+                    {renderActions(isMinimal)}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+
+          {!isConfiguredNavbar && sortedNavLinks.length > 0 && (
+            <div className="hidden border-t border-current/10 py-2 lg:block">
               <DesktopNav
                 links={sortedNavLinks}
                 style={navbarStyle}
-                className="flex-1 justify-center"
+                className="justify-center"
               />
-            )}
-            {!isConfiguredNavbar && layout === 3 && (
-              <DesktopNav links={sortedNavLinks} style={navbarStyle} />
-            )}
-            {!isMinimal && renderActions()}
-          </div>
-
-          {!isConfiguredNavbar && (isCentered || isSplit) && (
-            <DesktopNav
-              links={sortedNavLinks}
-              style={navbarStyle}
-              className="justify-center"
-            />
-          )}
-
-          {isMinimal && (
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 sm:right-6 lg:right-8">
-              {renderActions()}
             </div>
           )}
         </div>
