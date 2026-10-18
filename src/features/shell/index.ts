@@ -6,3 +6,5 @@ export { AnnouncementBar } from "./components/announcement-bar";
 export type { AnnouncementBarProps } from "./components/announcement-bar";
 export { BottomNavigation } from "./components/bottom-navigation";
 export type { BottomNavigationProps } from "./components/bottom-navigation";
+export { PromotionalPopup } from "./components/PromotionalPopup";
+export type { PromotionalPopupProps } from "./components/PromotionalPopup";

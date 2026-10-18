@@ -319,6 +319,29 @@ export interface StorefrontConfig {
     family?: string;
     size?: string;
   };
+  popup?: StorefrontPopupConfig;
+  [key: string]: unknown;
+}
+
+export interface StorefrontPopupImageThumbs {
+  large?: string;
+  medium?: string;
+  url?: string;
+}
+
+export interface StorefrontPopupImage {
+  id?: string;
+  _id?: string;
+  type?: string;
+  url: string;
+  thumbs?: StorefrontPopupImageThumbs;
+}
+
+export interface StorefrontPopupConfig {
+  active?: boolean;
+  intervalMinutes?: number;
+  link?: string | null;
+  image?: StorefrontPopupImage | null;
   [key: string]: unknown;
 }
 

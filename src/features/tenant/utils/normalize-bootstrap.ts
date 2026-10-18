@@ -1,6 +1,7 @@
 import {
   StorefrontBootstrap,
   StorefrontSliderConfig,
+  StorefrontPopupConfig,
   HomePageSection,
 } from "@/shared/types";
 import { normalizeBootstrapSliders } from "./normalize-slider";
@@ -71,6 +72,10 @@ export function normalizeBootstrap(
     | StorefrontSliderConfig
     | undefined;
 
+  const popupConfig = (config.popup || rawConfig.popup || raw.popup) as
+    | StorefrontPopupConfig
+    | undefined;
+
   const { sliders, isSliderActive } = normalizeBootstrapSliders(
     sliderConfig,
     raw.sliders,
@@ -121,6 +126,7 @@ export function normalizeBootstrap(
     config: {
       ...config,
       ...(sliderConfig ? { slider: sliderConfig } : {}),
+      ...(popupConfig ? { popup: popupConfig } : {}),
       homePage: {
         ...(config.homePage as Record<string, unknown> | undefined),
         sections: homePageSections,

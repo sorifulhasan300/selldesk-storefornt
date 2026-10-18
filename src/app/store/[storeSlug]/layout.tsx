@@ -8,6 +8,7 @@ import {
   StoreFooter,
   AnnouncementBar,
   BottomNavigation,
+  PromotionalPopup,
 } from "@/features/shell";
 import { CartDrawer } from "@/features/cart";
 
@@ -102,6 +103,7 @@ export default async function TenantLayout({
       />
       <CartDrawer currency={store?.currency || "USD"} storeSlug={storeSlug} />
       <BottomNavigation config={bottomNavConfig} storeSlug={storeSlug} />
+      <PromotionalPopup popup={config?.popup} />
     </div>
   );
 }
