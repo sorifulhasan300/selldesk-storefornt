@@ -23,16 +23,8 @@ export function StorefrontHeroSlider({
 
   if (sliderConfig?.active === false || !hasSlides) return null;
 
-  const isFullWidth = Number(section.config?.layout) === 2;
-
   return (
-    <div
-      className={
-        isFullWidth
-          ? "relative left-1/2 w-screen -translate-x-1/2"
-          : "w-full"
-      }
-    >
+    <div className="w-full">
       <HeroSliderBlock
         section={section}
         currency={currency}

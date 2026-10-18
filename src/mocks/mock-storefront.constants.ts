@@ -125,9 +125,6 @@ export function getDefaultHomePageSections(
     {
       id: "sec-hero-default",
       type: "heroSlider",
-      title: "Elevate Your Shopping Experience",
-      subtitle:
-        "Explore curated collections delivered directly to your doorstep.",
       isActive: sliderConfig?.active !== false,
       data: sliders,
       config: {

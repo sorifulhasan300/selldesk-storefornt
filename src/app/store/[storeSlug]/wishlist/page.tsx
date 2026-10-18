@@ -14,9 +14,11 @@ export default async function WishlistPage({
   const bootstrap = await getBootstrap(storeSlug);
 
   return (
-    <WishlistView
-      storeSlug={storeSlug}
-      currency={bootstrap.store.currency || "USD"}
-    />
+    <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
+      <WishlistView
+        storeSlug={storeSlug}
+        currency={bootstrap.store.currency || "USD"}
+      />
+    </div>
   );
 }

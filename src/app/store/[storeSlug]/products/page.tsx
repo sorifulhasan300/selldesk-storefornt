@@ -1,6 +1,6 @@
 import { getProducts, getCategories } from "@/features/catalog/server";
 import { getBootstrap } from "@/features/tenant/server";
-import { ProductCard, FilterSidebar } from "@/features/catalog";
+import { ProductCard, FilterSidebar, CatalogPagination } from "@/features/catalog";
 import { Product, Category } from "@/shared/types";
 import { Search } from "lucide-react";
 import Link from "next/link";
@@ -52,7 +52,7 @@ export default async function CatalogPage({
   const currency = bData?.store?.currency || "USD";
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       {/* Header bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-5">
         <div>
@@ -125,37 +125,14 @@ export default async function CatalogPage({
             </div>
           )}
 
-          {/* Pagination controls */}
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 pt-6">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (pageNum) => {
-                  const queryParams = new URLSearchParams();
-                  if (categoryId) queryParams.set("categoryId", categoryId);
-                  if (search) queryParams.set("search", search);
-                  if (sortBy) queryParams.set("sortBy", sortBy);
-                  if (sortOrder) queryParams.set("sortOrder", sortOrder);
-                  queryParams.set("page", String(pageNum));
-
-                  const isCurrent = pageNum === page;
-
-                  return (
-                    <Link
-                      key={pageNum}
-                      href={`/products?${queryParams.toString()}`}
-                      className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold transition-all ${
-                        isCurrent
-                          ? "bg-slate-900 text-white shadow-xs"
-                          : "bg-white border border-slate-200 text-slate-700 hover:border-slate-300"
-                      }`}
-                    >
-                      {pageNum}
-                    </Link>
-                  );
-                },
-              )}
-            </div>
-          )}
+          <CatalogPagination
+            currentPage={page}
+            totalPages={totalPages}
+            categoryId={categoryId}
+            search={search}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+          />
         </div>
       </div>
     </div>

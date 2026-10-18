@@ -8,7 +8,6 @@ import {
 } from "@/shared/types";
 import { DynamicSectionBlock } from "./DynamicSectionBlock";
 import { resolveSectionBlock } from "./section-block-resolver";
-import { getDefaultHomePageSections } from "../utils/default-sections";
 import { isHeroSliderSection } from "../utils/home-section.utils";
 
 interface DynamicSectionRendererProps {
@@ -61,18 +60,14 @@ export function DynamicSectionRenderer({
           .map(({ section }) => section)
       : [];
 
-  const displaySections: HomePageSection[] =
-    activeSections.length > 0
-      ? activeSections
-      : getDefaultHomePageSections(
-          fallbackSliders,
-          fallbackCategories,
-          fallbackProducts,
-          sliderConfig,
-        );
+  const displaySections: HomePageSection[] = activeSections;
+
+  if (displaySections.length === 0) {
+    return null;
+  }
 
   return (
-    <div className="space-y-12 sm:space-y-16">
+    <div className="w-full">
       {displaySections.map((section, idx) => {
         const blockContent = resolveSectionBlock({
           section,

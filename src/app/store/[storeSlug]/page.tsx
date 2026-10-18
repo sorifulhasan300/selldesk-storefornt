@@ -2,7 +2,6 @@ import { getBootstrap } from "@/features/tenant/server";
 import { getProducts } from "@/features/catalog/server";
 import {
   StoreHomePageClient,
-  getDefaultHomePageSections,
   isHeroSliderSection,
 } from "@/features/home";
 import type { HomePageSection } from "@/shared/types";
@@ -49,15 +48,7 @@ export default async function StoreHomePage({
     (section) => !isHeroSliderSection(section),
   );
 
-  const initialSections: HomePageSection[] =
-    bodySections.length > 0
-      ? bodySections
-      : getDefaultHomePageSections(
-          sliders,
-          categories,
-          products,
-          sliderConfig,
-        );
+  const initialSections: HomePageSection[] = bodySections;
 
   return (
     <StoreHomePageClient

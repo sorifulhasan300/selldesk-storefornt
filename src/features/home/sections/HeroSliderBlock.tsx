@@ -127,8 +127,6 @@ export function HeroSliderBlock({
               slide={slide}
               isCurrent={current === idx}
               priority={idx === 0}
-              defaultTitle={section.title}
-              defaultSubtitle={section.subtitle}
             />
           ))}
 

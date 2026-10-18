@@ -46,7 +46,7 @@ export function resolveBannerSlides(
         (s.linkUrl as string) ||
         (s.redirectUrl as string) ||
         (s.ctaUrl as string) ||
-        "/products";
+        "";
 
       return {
         id: (s.id || s._id || `slide-${idx}`) as string,
@@ -54,7 +54,7 @@ export function resolveBannerSlides(
         headline: (s.headline || s.title || "") as string,
         subHeadline: (s.subHeadline || s.subtitle || "") as string,
         linkUrl: link,
-        ctaLabel: (s.ctaLabel || "Shop Collection") as string,
+        ctaLabel: (s.ctaLabel || "") as string,
         altText:
           (s.altText || s.headline || s.title || "Promotional banner") as string,
       };

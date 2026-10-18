@@ -10,5 +10,9 @@ export default async function AccountPage({
   params: Promise<{ storeSlug: string }>;
 }) {
   const { storeSlug } = await params;
-  return <CustomerAccountPage storeSlug={storeSlug} />;
+  return (
+    <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
+      <CustomerAccountPage storeSlug={storeSlug} />
+    </div>
+  );
 }

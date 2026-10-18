@@ -1,5 +1,4 @@
 import { cache } from "react";
-import { notFound } from "next/navigation";
 import { getProductBySlug } from "@/features/product/server";
 import { getBootstrap } from "@/features/tenant/server";
 import { WishlistToggle } from "@/features/wishlist";
@@ -8,10 +7,11 @@ import {
   AddToCartCTA,
   MobileStickyBuyBar,
   ProductPurchaseProvider,
+  ProductTrustBadges,
 } from "@/features/product";
 import { Metadata } from "next";
 import Link from "next/link";
-import { ChevronRight, ShieldCheck, Truck, RefreshCcw } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { JsonLd } from "@/shared/seo/json-ld";
 import {
   buildProductBreadcrumbJsonLd,
@@ -44,10 +44,7 @@ export async function generateMetadata({
   const origin = getStoreOrigin(store);
   const path = `/products/${encodeURIComponent(product.slug)}`;
   const title = toMetaDescription(product.name, "Product", 60);
-  const description = toMetaDescription(
-    product.description,
-    product.name,
-  );
+  const description = toMetaDescription(product.description, product.name);
   const image =
     toAbsoluteImage(product.images[0], origin) ??
     toAbsoluteImage(store.logoUrl, origin);
@@ -73,7 +70,7 @@ export default async function ProductDetailPage({ params }: PDPProps) {
   const origin = getStoreOrigin(bData.store);
 
   return (
-    <>
+    <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
       <JsonLd data={buildProductJsonLd({ product, currency, origin })} />
       <JsonLd data={buildProductBreadcrumbJsonLd(product, origin)} />
 
@@ -97,10 +94,8 @@ export default async function ProductDetailPage({ params }: PDPProps) {
 
       {/* PDP Main Grid */}
       <div className="grid grid-cols-1 gap-10 pb-32 lg:grid-cols-2 lg:gap-14 lg:pb-12">
-        {/* Left: Gallery */}
         <ProductGallery images={product.images} title={product.name} />
 
-        {/* Right: Product Details & Purchase Form */}
         <div className="space-y-6">
           <div>
             {product.category && (
@@ -120,40 +115,18 @@ export default async function ProductDetailPage({ params }: PDPProps) {
 
           <WishlistToggle storeSlug={storeSlug} product={product} />
 
-          {/* Description */}
           <div className="prose prose-slate text-sm text-slate-600 leading-relaxed border-t border-b border-slate-100 py-4">
             <p>{product.description}</p>
           </div>
 
-          {/* Add to Cart & Variant Selection */}
           <ProductPurchaseProvider product={product} currency={currency}>
             <AddToCartCTA />
             <MobileStickyBuyBar />
           </ProductPurchaseProvider>
 
-          {/* Trust Guarantees */}
-          <div className="grid grid-cols-3 gap-3 pt-6 border-t border-slate-100 text-center">
-            <div className="p-3 rounded-xl bg-white border border-slate-100 flex flex-col items-center">
-              <Truck className="w-5 h-5 text-[var(--store-primary)] mb-1" />
-              <span className="text-[11px] font-bold text-slate-800">
-                Fast Delivery
-              </span>
-            </div>
-            <div className="p-3 rounded-xl bg-white border border-slate-100 flex flex-col items-center">
-              <ShieldCheck className="w-5 h-5 text-emerald-600 mb-1" />
-              <span className="text-[11px] font-bold text-slate-800">
-                Authentic Quality
-              </span>
-            </div>
-            <div className="p-3 rounded-xl bg-white border border-slate-100 flex flex-col items-center">
-              <RefreshCcw className="w-5 h-5 text-amber-600 mb-1" />
-              <span className="text-[11px] font-bold text-slate-800">
-                7 Days Return
-              </span>
-            </div>
-          </div>
+          <ProductTrustBadges />
         </div>
       </div>
-    </>
+    </div>
   );
 }

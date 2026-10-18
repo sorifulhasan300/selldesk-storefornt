@@ -47,8 +47,6 @@ export function createStandaloneHeroSection(
   return {
     id: "store-layout-hero-slider",
     type: "heroSlider",
-    title: "Elevate Your Shopping Experience",
-    subtitle: "Explore curated collections delivered directly to your doorstep.",
     isActive: true,
     data: slides,
     config: { ...sliderConfig, items: slides },

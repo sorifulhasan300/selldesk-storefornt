@@ -16,7 +16,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
   const currency = bootstrap.store?.currency || "USD";
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       <div className="border-b border-slate-200/80 pb-4">
         <h1 className="text-2xl sm:text-3xl font-black text-slate-900">
           Checkout
