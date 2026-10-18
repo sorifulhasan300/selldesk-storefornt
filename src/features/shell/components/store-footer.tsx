@@ -1,13 +1,9 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import type {
-  StoreConfig,
-  StorefrontFooterConfig,
-} from "@/shared/types";
+import type { StoreConfig, StorefrontFooterConfig } from "@/shared/types";
 import type { SocialNetwork } from "./store-footer-social";
 import type { StoreFooterContactConfig } from "./store-footer-contact";
-import { ValuePropositions } from "./store-footer-value-props";
 import { FooterBottomBar } from "./store-footer-bottom-bar";
 import { FooterLayout3 } from "./store-footer-layout-3";
 import { FooterLayoutStandard } from "./store-footer-layout-standard";
@@ -110,8 +106,6 @@ export function StoreFooter({ store, footer, config }: StoreFooterProps) {
 
   return (
     <footer style={footerStyle}>
-      {layout !== 3 && <ValuePropositions />}
-
       {layout === 3 ? (
         <FooterLayout3
           store={store}
