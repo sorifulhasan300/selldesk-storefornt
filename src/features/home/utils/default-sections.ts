@@ -1,20 +1,16 @@
-import { HomePageSection, Product } from "@/shared/types";
+import {
+  HomePageSection,
+  Product,
+  StorefrontSliderConfig,
+} from "@/shared/types";
 
 export function getDefaultHomePageSections(
-  sliders: unknown[] = [],
+  _sliders: unknown[] = [],
   categories: unknown[] = [],
   products: Product[] = [],
+  _sliderConfig?: StorefrontSliderConfig | null,
 ): HomePageSection[] {
   return [
-    {
-      id: "sec-hero-default",
-      type: "heroSlider",
-      title: "Elevate Your Shopping Experience",
-      subtitle:
-        "Explore curated collections delivered directly to your doorstep.",
-      isActive: true,
-      data: sliders,
-    },
     {
       id: "sec-category-default",
       type: "category",
@@ -45,4 +41,3 @@ export function getDefaultHomePageSections(
     },
   ];
 }
-

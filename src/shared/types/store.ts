@@ -142,13 +142,48 @@ export interface StorefrontFooterLinkConfig {
 
 export interface StorefrontFooterColumnConfig {
   title: string;
-  links: StorefrontFooterLinkConfig[];
+  items?: Array<{
+    label: string;
+    link: string;
+  }>;
+  links?: StorefrontFooterLinkConfig[];
 }
 
 export interface StorefrontFooterConfig {
+  layout?: number;
+  collapsibleOnMobile?: boolean;
+  logo?: string | HeaderLogoObject | null;
+  about?: string;
   copyright?: string;
   socialLinks?: Record<string, string>;
+  socialIconStyle?: {
+    shape?: "circle" | "rounded" | "square" | "icon";
+    size?: number;
+    gap?: number;
+    mode?: "brand" | "custom";
+    color?: string;
+  };
   columns?: StorefrontFooterColumnConfig[];
+  bottomBar?: {
+    enabled?: boolean;
+    copyright?: string;
+    showDeveloperCredit?: boolean;
+    paymentIcons?: string[];
+  };
+  style?: {
+    backgroundMode?: "solid" | "gradient";
+    bgColor?: string;
+    gradientStartColor?: string;
+    gradientEndColor?: string;
+    textColor?: string;
+    headingColor?: string;
+    fontSize?: number;
+    headingFontSize?: number;
+    borderTopColor?: string;
+    borderTopSize?: number;
+    paddingTop?: number;
+    paddingBottom?: number;
+  };
 }
 
 export type BottomNavItemKey =
@@ -205,6 +240,51 @@ export interface StorefrontBottomNavConfig {
   items?: Array<BottomNavItemKey | LegacyStorefrontBottomNavItemConfig>;
 }
 
+export interface StorefrontSliderItemConfig {
+  id?: string;
+  _id?: string;
+  active?: boolean;
+  link?: string | null;
+  linkUrl?: string | null;
+  redirectUrl?: string | null;
+  title?: string;
+  subtitle?: string | null;
+  imageUrl?: string;
+  url?: string;
+  image?:
+    | {
+        id?: string;
+        _id?: string;
+        url?: string;
+        thumbs?: {
+          large?: string;
+          medium?: string;
+          url?: string;
+        };
+      }
+    | string
+    | null;
+  order?: number;
+  sortOrder?: number;
+}
+
+export interface StorefrontSliderConfig {
+  active?: boolean;
+  layout?: 1 | 2 | 3;
+  autoplay?: boolean;
+  autoplayInterval?: number;
+  showArrows?: boolean;
+  showDots?: boolean;
+  marginTop?: number;
+  marginBottom?: number;
+  borderRadius?: number;
+  cornerRadius?: number;
+  backgroundColor?: string | null;
+  backgroundGradient?: string | null;
+  items?: StorefrontSliderItemConfig[];
+  [key: string]: unknown;
+}
+
 export interface StorefrontConfig {
   seo?: {
     metaTitle?: string;
@@ -231,6 +311,7 @@ export interface StorefrontConfig {
   footer?: StorefrontFooterConfig;
   socialLinks?: Record<string, string>;
   bottomNav?: StorefrontBottomNavConfig;
+  slider?: StorefrontSliderConfig;
   homePage?: {
     sections: HomePageSection[];
   };

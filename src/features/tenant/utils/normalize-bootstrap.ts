@@ -1,20 +1,32 @@
-import { StorefrontBootstrap, StoreConfig } from "@/shared/types";
+import {
+  StorefrontBootstrap,
+  StorefrontSliderConfig,
+  HomePageSection,
+} from "@/shared/types";
+import { normalizeBootstrapSliders } from "./normalize-slider";
+import {
+  buildStoreConfig,
+  extractHeaderLogo,
+  extractSocialLinks,
+} from "./normalize-store";
 
-const COLOR_REGEX =
-  /^(#[0-9a-f]{3,8}|rgba?\([\d\s.,%]+\)|hsla?\([\d\s.,%]+\)|transparent)$/i;
+function isLegacyHeroSliderSection(section: HomePageSection): boolean {
+  const normalize = (value: string | undefined) =>
+    value?.trim().toLowerCase().replace(/[-_]/g, "");
 
-function safeColor(v: unknown, fallback: string = "#2563eb"): string {
-  if (typeof v === "string" && COLOR_REGEX.test(v.trim())) {
-    return v.trim();
-  }
-  return fallback;
+  return (
+    normalize(section.type) === "heroslider" ||
+    normalize(section.key) === "heroslider" ||
+    section.id?.trim().toLowerCase() === "sec-hero-slider" ||
+    section.id?.trim().toLowerCase() === "sec-hero-default"
+  );
 }
 
 export function normalizeBootstrap(
-  raw: any,
+  rawInput: unknown,
   storeSlug: string,
 ): StorefrontBootstrap {
-  if (!raw) {
+  if (!rawInput || typeof rawInput !== "object") {
     return {
       store: {
         id: "",
@@ -27,96 +39,69 @@ export function normalizeBootstrap(
     };
   }
 
-  const business = raw.business || {};
-  const config = raw.config || {};
-  const color = config.color || {};
-  const contact = config.contact || {};
-  const header = config.header || {};
-  const headerLogo =
-    typeof header.logo === "string"
-      ? header.logo
-      : header.logo?.thumbs?.large ||
-        header.logo?.thumbs?.url ||
-        header.logo?.thumbs?.medium ||
-        null;
-  const footer = config.footer || {};
-  const rawSocial =
-    config.socialLinks || footer.socialLinks || raw.socialLinks || {};
-  const socialLinks = Object.entries(
-    rawSocial as Record<string, unknown>,
-  ).reduce<Record<string, string>>((links, [platform, value]) => {
-    if (typeof value === "string" && value.trim()) {
-      links[platform] = value.trim();
-    }
-    return links;
-  }, {});
+  const raw = rawInput as Record<string, unknown>;
+  const business = (raw.business || {}) as Record<string, unknown>;
+  const rawConfig = (raw.config && typeof raw.config === "object"
+    ? raw.config
+    : {}) as Record<string, unknown>;
+  const config = { ...rawConfig };
+  const header = (config.header || {}) as Record<string, unknown>;
+  const footer = (config.footer || {}) as Record<string, unknown>;
+  const headerLogo = extractHeaderLogo(header);
+  const rawSocial = config.socialLinks || footer.socialLinks || raw.socialLinks;
+  const socialLinks = extractSocialLinks(rawSocial);
   config.socialLinks = socialLinks;
   footer.socialLinks = socialLinks;
 
-  const cleanName =
-    business.name ||
-    raw.store?.name ||
-    storeSlug
-      .replace(/-/g, " ")
-      .replace(/\b\w/g, (c: string) => c.toUpperCase());
+  const store = buildStoreConfig(raw, storeSlug, headerLogo, socialLinks);
 
-  const store: StoreConfig = {
-    id: raw.store?.id || business.id || "",
-    name: cleanName,
-    subDomain:
-      raw.store?.subDomain ||
-      (business.domain ? business.domain.split(".")[0] : storeSlug),
-    domain: raw.store?.domain || business.domain || null,
-    currency:
-      raw.store?.currency || business.currencyCode || business.currency || "USD",
-    logoUrl: headerLogo || raw.store?.logoUrl || business.logo || null,
-    bannerUrl: raw.store?.bannerUrl || business.bannerUrl || null,
-    contactEmail:
-      raw.store?.contactEmail || contact.email || raw.user?.email || null,
-    contactPhone:
-      raw.store?.contactPhone || contact.phone || raw.user?.phone || null,
-    themeColor: safeColor(
-      raw.store?.themeColor || color.primary || color.theme,
-      "#2563eb",
-    ),
-    description:
-      raw.store?.description ||
-      config.seo?.metaDescription ||
-      null,
-    facebookUrl: raw.store?.facebookUrl || socialLinks.facebook || null,
-    instagramUrl: raw.store?.instagramUrl || socialLinks.instagram || null,
-  };
+  const rawHome = (config.homePage || raw.homePage || {}) as Record<string, unknown>;
+  const rawSectionsList: HomePageSection[] =
+    (rawHome.sections as HomePageSection[]) ||
+    (raw.sections as HomePageSection[]) ||
+    [];
 
-  const homePageSections = config.homePage?.sections || raw.sections || [];
-  const bannerSection = homePageSections.find(
-    (s: any) => s.type === "banners" || s.type === "heroSlider",
-  );
-  const categorySection = homePageSections.find(
-    (s: any) => s.type === "categories" || s.type === "category",
+  const legacyHeroSection = rawSectionsList.find(isLegacyHeroSliderSection);
+
+  const categorySection = rawSectionsList.find(
+    (s) => s.type === "categories" || s.type === "category",
   );
 
-  const sliders =
-    raw.sliders ||
-    (bannerSection?.data
-      ? bannerSection.data.map((item: any) => ({
-          id: item.id || `s-${item.sortOrder || 1}`,
-          title: item.title || "",
-          subtitle: item.subtitle || null,
-          imageUrl: item.imageUrl || "",
-          linkUrl: item.redirectUrl || item.linkUrl || "/products",
-          order: item.sortOrder ?? 0,
-        }))
-      : []);
+  const sliderConfig = (config.slider || rawConfig.slider) as
+    | StorefrontSliderConfig
+    | undefined;
+
+  const { sliders, isSliderActive } = normalizeBootstrapSliders(
+    sliderConfig,
+    raw.sliders,
+    legacyHeroSection?.data,
+  );
+
+  const homePageSections: HomePageSection[] = rawSectionsList.map((sec) => {
+    if (isLegacyHeroSliderSection(sec)) {
+      return {
+        ...sec,
+        isActive: sliderConfig ? sliderConfig.active !== false : isSliderActive && sec.isActive !== false,
+        data: sliders.length > 0 ? sliders : sec.data,
+        config: {
+          ...(sec.config || {}),
+          ...(sliderConfig || {}),
+          ...(sliders.length > 0 ? { items: sliders } : {}),
+        },
+      };
+    }
+    return sec;
+  });
 
   const categories =
     raw.categories ||
     (categorySection?.data
-      ? categorySection.data.map((item: any) => ({
-          id: item.id || item._id,
-          name: item.name,
-          slug: item.slug,
-          imageUrl: item.imageUrl || null,
-          productCount: item.productCount,
+      ? (categorySection.data as Record<string, unknown>[]).map((item) => ({
+          id: (item.id || item._id) as string,
+          name: (item.name || "") as string,
+          slug: (item.slug || "") as string,
+          imageUrl: (item.imageUrl || null) as string | null,
+          productCount: item.productCount as number | undefined,
         }))
       : []);
 
@@ -124,11 +109,23 @@ export function normalizeBootstrap(
     ...raw,
     store,
     sliders,
-    categories,
-    deliveryCharge: raw.deliveryCharge || config.deliveryCharge,
-    homePage: raw.homePage || config.homePage,
-    sections: raw.sections || homePageSections,
-    config,
+    categories: categories as StorefrontBootstrap["categories"],
+    deliveryCharge:
+      (raw.deliveryCharge as StorefrontBootstrap["deliveryCharge"]) ||
+      (config.deliveryCharge as StorefrontBootstrap["deliveryCharge"]),
+    homePage: {
+      ...rawHome,
+      sections: homePageSections,
+    },
+    sections: homePageSections,
+    config: {
+      ...config,
+      ...(sliderConfig ? { slider: sliderConfig } : {}),
+      homePage: {
+        ...(config.homePage as Record<string, unknown> | undefined),
+        sections: homePageSections,
+      },
+    },
     business,
   };
 }

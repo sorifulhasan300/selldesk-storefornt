@@ -2,7 +2,13 @@
 
 import dynamic from "next/dynamic";
 import { DynamicSectionRenderer } from "./DynamicSectionRenderer";
-import type { HomePageSection, Product, StoreConfig } from "@/shared/types";
+import { StorefrontHeroSlider } from "./StorefrontHeroSlider";
+import type {
+  HomePageSection,
+  Product,
+  StoreConfig,
+  StorefrontSliderConfig,
+} from "@/shared/types";
 
 export interface StoreHomePageClientProps {
   initialSections: HomePageSection[];
@@ -11,6 +17,7 @@ export interface StoreHomePageClientProps {
   products?: Product[];
   categories?: unknown[];
   sliders?: unknown[];
+  sliderConfig?: StorefrontSliderConfig | null;
   isPreview?: boolean;
 }
 
@@ -25,6 +32,7 @@ export function StoreHomePageClient({
   products = [],
   categories = [],
   sliders = [],
+  sliderConfig,
   isPreview = false,
 }: StoreHomePageClientProps) {
   const resolvedCurrency = currency || store?.currency || "USD";
@@ -37,18 +45,25 @@ export function StoreHomePageClient({
         products={products}
         categories={categories}
         sliders={sliders}
+        sliderConfig={sliderConfig}
       />
     );
   }
 
   return (
     <div className="w-full">
+      <StorefrontHeroSlider
+        sliders={sliders}
+        sliderConfig={sliderConfig}
+        currency={resolvedCurrency}
+      />
       <DynamicSectionRenderer
         sections={initialSections}
         currency={resolvedCurrency}
         fallbackProducts={products}
         fallbackCategories={categories}
         fallbackSliders={sliders}
+        sliderConfig={sliderConfig}
       />
     </div>
   );

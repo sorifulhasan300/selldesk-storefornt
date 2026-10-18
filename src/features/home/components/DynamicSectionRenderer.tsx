@@ -1,18 +1,15 @@
 "use client";
 
 import React from "react";
-import { HomePageSection, Product } from "@/shared/types";
-import { DynamicSectionBlock } from "./DynamicSectionBlock";
-import { getDefaultHomePageSections } from "../utils/default-sections";
 import {
-  HeroSliderBlock,
-  CategoryGridBlock,
-  ProductShowcaseBlock,
-  VideoReelsBlock,
-  CustomerReviewsBlock,
-  BannerGridBlock,
-  BrandShowcaseBlock,
-} from "../sections";
+  HomePageSection,
+  Product,
+  StorefrontSliderConfig,
+} from "@/shared/types";
+import { DynamicSectionBlock } from "./DynamicSectionBlock";
+import { resolveSectionBlock } from "./section-block-resolver";
+import { getDefaultHomePageSections } from "../utils/default-sections";
+import { isHeroSliderSection } from "../utils/home-section.utils";
 
 interface DynamicSectionRendererProps {
   sections: HomePageSection[];
@@ -20,95 +17,10 @@ interface DynamicSectionRendererProps {
   fallbackProducts?: Product[];
   fallbackCategories?: unknown[];
   fallbackSliders?: unknown[];
+  sliderConfig?: StorefrontSliderConfig | null;
   isPreview?: boolean;
   selectedSectionId?: string | null;
   onAction?: (actionType: string, sectionId: string) => void;
-}
-
-function resolveSectionBlock(
-  section: HomePageSection,
-  currency: string,
-  fallbackProducts: Product[],
-  fallbackSliders: unknown[],
-  isPreview: boolean,
-): React.ReactNode {
-  const rawType = (section.type || section.key || "")
-    .trim()
-    .toLowerCase()
-    .replace(/[-_]/g, "");
-
-  switch (rawType) {
-    case "heroslider":
-      return (
-        <HeroSliderBlock
-          section={section}
-          currency={currency}
-          isPreview={isPreview}
-          fallbackSliders={fallbackSliders}
-        />
-      );
-
-    case "banners":
-    case "banner":
-      if (
-        section.config?.displayType === "slider" ||
-        section.config?.viewType === "slider" ||
-        section.config?.displayMode === "slider" ||
-        section.config?.displayMode === "carousel" ||
-        section.config?.displayType === "carousel" ||
-        section.config?.viewType === "carousel" ||
-        section.config?.layout === "carousel" ||
-        section.config?.isCarousel === true ||
-        section.title?.toLowerCase().includes("hero") ||
-        section.title?.toLowerCase().includes("slider") ||
-        Boolean(
-          section.config?.autoPlayInterval &&
-            section.config?.displayMode !== "grid",
-        )
-      ) {
-        return (
-          <HeroSliderBlock
-            section={section}
-            currency={currency}
-            isPreview={isPreview}
-            fallbackSliders={fallbackSliders}
-          />
-        );
-      }
-      return <BannerGridBlock section={section} isPreview={isPreview} />;
-
-    case "category":
-    case "categories":
-      return <CategoryGridBlock section={section} isPreview={isPreview} />;
-
-    case "products":
-    case "product":
-      return (
-        <ProductShowcaseBlock
-          section={section}
-          currency={currency}
-          fallbackProducts={fallbackProducts}
-          isPreview={isPreview}
-        />
-      );
-
-    case "videos":
-    case "video":
-      return <VideoReelsBlock section={section} isPreview={isPreview} />;
-
-    case "customerreviews":
-    case "customerreview":
-    case "reviews":
-    case "testimonials":
-      return <CustomerReviewsBlock section={section} isPreview={isPreview} />;
-
-    case "brands":
-    case "brand":
-      return <BrandShowcaseBlock section={section} isPreview={isPreview} />;
-
-    default:
-      return null;
-  }
 }
 
 export function DynamicSectionRenderer({
@@ -117,6 +29,7 @@ export function DynamicSectionRenderer({
   fallbackProducts = [],
   fallbackCategories = [],
   fallbackSliders = [],
+  sliderConfig,
   isPreview = false,
   selectedSectionId,
   onAction,
@@ -124,14 +37,28 @@ export function DynamicSectionRenderer({
   const seenSectionIds = new Set<string>();
   const activeSections =
     Array.isArray(sections) && sections.length > 0
-      ? sections.filter((s) => {
-          if (s.isActive === false) return false;
-          if (!isPreview && s.id) {
-            if (seenSectionIds.has(s.id)) return false;
-            seenSectionIds.add(s.id);
-          }
-          return true;
-        })
+      ? sections
+          .map((section, index) => ({ section, index }))
+          .filter(({ section }) => {
+            if (section.isActive === false || isHeroSliderSection(section)) {
+              return false;
+            }
+            if (!isPreview && section.id) {
+              if (seenSectionIds.has(section.id)) return false;
+              seenSectionIds.add(section.id);
+            }
+            return true;
+          })
+          .sort(
+            (left, right) =>
+              (left.section.order ??
+                left.section.sortOrder ??
+                left.index) -
+              (right.section.order ??
+                right.section.sortOrder ??
+                right.index),
+          )
+          .map(({ section }) => section)
       : [];
 
   const displaySections: HomePageSection[] =
@@ -141,21 +68,22 @@ export function DynamicSectionRenderer({
           fallbackSliders,
           fallbackCategories,
           fallbackProducts,
+          sliderConfig,
         );
 
   return (
     <div className="space-y-12 sm:space-y-16">
       {displaySections.map((section, idx) => {
-        const blockContent = resolveSectionBlock(
+        const blockContent = resolveSectionBlock({
           section,
           currency,
           fallbackProducts,
-          fallbackSliders,
           isPreview,
-        );
+        });
         if (!blockContent) return null;
 
-        const uniqueKey = `${section.id || section.type || section.key || "sec"}-${idx}`;
+        const uniqueKey =
+          section.id || `${section.type || section.key || "section"}-${idx}`;
 
         const isFirst = idx === 0;
         const isLast = idx === displaySections.length - 1;

@@ -119,6 +119,7 @@ export function getDefaultHomePageSections(
   sliders: unknown[] = [],
   categories: unknown[] = [],
   products: Product[] = [],
+  sliderConfig?: Record<string, unknown> | null,
 ): HomePageSection[] {
   return [
     {
@@ -127,8 +128,21 @@ export function getDefaultHomePageSections(
       title: "Elevate Your Shopping Experience",
       subtitle:
         "Explore curated collections delivered directly to your doorstep.",
-      isActive: true,
+      isActive: sliderConfig?.active !== false,
       data: sliders,
+      config: {
+        layout: sliderConfig?.layout ?? 1,
+        autoplay: sliderConfig?.autoplay !== false,
+        autoplayInterval: sliderConfig?.autoplayInterval ?? 3,
+        showArrows: sliderConfig?.showArrows !== false,
+        showDots: sliderConfig?.showDots !== false,
+        marginTop: sliderConfig?.marginTop ?? 0,
+        marginBottom: sliderConfig?.marginBottom ?? 0,
+        borderRadius: sliderConfig?.borderRadius ?? 0,
+        backgroundColor: sliderConfig?.backgroundColor ?? "",
+        backgroundGradient: sliderConfig?.backgroundGradient ?? "",
+        ...(sliderConfig || {}),
+      },
     },
     {
       id: "sec-category-default",

@@ -153,6 +153,7 @@ export default async function TenantLayout({
         footer={footerConfig}
         config={{
           footer: config?.footer,
+          socialLinks: config?.socialLinks || config?.footer?.socialLinks,
           contact: config?.contact
             ? {
                 phone: config.contact.phone,

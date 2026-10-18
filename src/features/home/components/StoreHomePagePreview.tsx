@@ -2,7 +2,12 @@
 
 import { useLivePreviewSync } from "../preview/use-live-preview-sync";
 import { DynamicSectionRenderer } from "./DynamicSectionRenderer";
-import type { HomePageSection, Product } from "@/shared/types";
+import { StorefrontHeroSlider } from "./StorefrontHeroSlider";
+import type {
+  HomePageSection,
+  Product,
+  StorefrontSliderConfig,
+} from "@/shared/types";
 
 interface StoreHomePagePreviewProps {
   initialSections: HomePageSection[];
@@ -10,6 +15,7 @@ interface StoreHomePagePreviewProps {
   products: Product[];
   categories: unknown[];
   sliders: unknown[];
+  sliderConfig?: StorefrontSliderConfig | null;
 }
 
 export default function StoreHomePagePreview({
@@ -18,6 +24,7 @@ export default function StoreHomePagePreview({
   products,
   categories,
   sliders,
+  sliderConfig,
 }: StoreHomePagePreviewProps) {
   const {
     sections,
@@ -28,12 +35,19 @@ export default function StoreHomePagePreview({
 
   return (
     <div className="w-full">
+      <StorefrontHeroSlider
+        sliders={sliders}
+        sliderConfig={sliderConfig}
+        currency={currency}
+        isPreview={isPreviewActive}
+      />
       <DynamicSectionRenderer
         sections={sections}
         currency={currency}
         fallbackProducts={products}
         fallbackCategories={categories}
         fallbackSliders={sliders}
+        sliderConfig={sliderConfig}
         isPreview={isPreviewActive}
         selectedSectionId={selectedSectionId}
         onAction={sendBuilderAction}
