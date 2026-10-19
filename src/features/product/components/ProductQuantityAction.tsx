@@ -12,11 +12,18 @@ import {
   MessageSquare,
   PhoneCall,
   Heart,
+  Ruler,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useProductPurchase } from "./product-purchase-provider";
 import { Button } from "@/shared/ui/button";
-import { useWishlistStore } from "@/features/wishlist/store/use-wishlist-store";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/shared/ui/sheet";
+import { useWishlistStore } from "@/features/wishlist";
 import {
   buildWhatsAppOrderUrl,
   buildMessengerOrderUrl,
@@ -24,12 +31,12 @@ import {
 } from "../utils/product-url.utils";
 import type {
   ProductActionButtonItem,
-  ActionButtonKey,
 } from "@/shared/types";
 
 export interface ProductQuantityActionProps {
   storeSlug: string;
   actionsConfig?: ProductActionButtonItem[];
+  sizeGuide?: { enabled?: boolean; title?: string; content?: string | null } | null;
   contactPhone?: string | null;
   whatsappPhone?: string | null;
   facebookUrl?: string | null;
@@ -39,6 +46,7 @@ export interface ProductQuantityActionProps {
 export function ProductQuantityAction({
   storeSlug,
   actionsConfig,
+  sizeGuide,
   contactPhone,
   whatsappPhone,
   facebookUrl,
@@ -59,6 +67,7 @@ export function ProductQuantityAction({
 
   const [isAdded, setIsAdded] = useState(false);
   const [isBuying, setIsBuying] = useState(false);
+  const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
 
   // Wishlist state
   const isWishlisted = useWishlistStore((state) =>
@@ -136,19 +145,31 @@ export function ProductQuantityAction({
   const messengerUrl = facebookUrl ? buildMessengerOrderUrl(facebookUrl) : null;
   const hotlineUrl = buildHotlineTelUrl(targetPhone);
 
-  // If actionsConfig is provided, filter enabled ones
-  const configuredActions = actionsConfig
+  const hasConfiguredActions = Array.isArray(actionsConfig);
+  const configuredActions = hasConfiguredActions
     ? actionsConfig.filter((a) => a.enabled)
-    : null;
+    : [];
 
   return (
     <div className="space-y-5 pt-1">
       {/* Variant Selector (if hasVariants) */}
       {product.hasVariants && product.variants?.length > 0 && (
         <div className="space-y-2.5">
-          <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
-            Select Option / Variant
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              Select Option / Variant
+            </label>
+            {sizeGuide?.enabled && (
+              <button
+                type="button"
+                onClick={() => setIsSizeGuideOpen(true)}
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--store-primary,#2563eb)] hover:underline cursor-pointer"
+              >
+                <Ruler className="w-3.5 h-3.5" />
+                <span>{sizeGuide.title || "Size Guide"}</span>
+              </button>
+            )}
+          </div>
           <div className="flex flex-wrap gap-2">
             {product.variants.map((variant) => {
               const label = variant.attributes
@@ -180,6 +201,20 @@ export function ProductQuantityAction({
               );
             })}
           </div>
+        </div>
+      )}
+
+      {/* Fallback Size Guide button when product has no variants */}
+      {!product.hasVariants && sizeGuide?.enabled && (
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => setIsSizeGuideOpen(true)}
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--store-primary,#2563eb)] hover:underline cursor-pointer"
+          >
+            <Ruler className="w-3.5 h-3.5" />
+            <span>{sizeGuide.title || "Size Guide"}</span>
+          </button>
         </div>
       )}
 
@@ -225,15 +260,17 @@ export function ProductQuantityAction({
         </span>
       </div>
 
-      {/* Render Actions: Either Configured or Standard Reference UI */}
-      {configuredActions && configuredActions.length > 0 ? (
-        <div className="flex flex-wrap gap-2.5 pt-1">
+      {/* Render Actions: Either Configured or Standard Default UI */}
+      {hasConfiguredActions ? (
+        <div className="flex flex-wrap gap-3 pt-1">
           {configuredActions.map((action) => {
             const isFull = action.width === "full";
-            const showIcon = action.display === "both" || action.display === "icon";
-            const showLabel = action.display === "both" || action.display === "label";
+            const showIcon =
+              action.display === "both" || action.display === "icon";
+            const showLabel =
+              action.display === "both" || action.display === "label";
 
-            const widthClass = isFull ? "w-full" : "w-[calc(50%-0.35rem)]";
+            const widthClass = isFull ? "w-full" : "w-[calc(50%-0.375rem)]";
 
             switch (action.key) {
               case "addToCart":
@@ -246,13 +283,12 @@ export function ProductQuantityAction({
                     variant="outline"
                     className={`h-12 rounded-xl border-2 border-[var(--store-primary,#0f172a)] text-[var(--store-primary,#0f172a)] bg-[var(--store-primary,#0f172a)]/8 hover:bg-[var(--store-primary,#0f172a)]/18 font-extrabold text-sm transition-all shadow-2xs ${widthClass}`}
                   >
-                    {showIcon && (
-                      isAdded ? (
+                    {showIcon &&
+                      (isAdded ? (
                         <Check className="w-4 h-4 text-emerald-600" />
                       ) : (
                         <ShoppingBag className="w-4 h-4" />
-                      )
-                    )}
+                      ))}
                     {showLabel && (
                       <span>{isAdded ? "Added!" : action.label || "Add to Cart"}</span>
                     )}
@@ -270,7 +306,9 @@ export function ProductQuantityAction({
                   >
                     {showIcon && <Zap className="w-4 h-4 fill-current" />}
                     {showLabel && (
-                      <span>{isBuying ? "Redirecting..." : action.label || "Buy Now"}</span>
+                      <span>
+                        {isBuying ? "Redirecting..." : action.label || "Buy Now"}
+                      </span>
                     )}
                   </Button>
                 );
@@ -286,7 +324,7 @@ export function ProductQuantityAction({
                     className={`flex items-center justify-center gap-2 h-11 px-3 rounded-xl text-white font-bold text-xs shadow-xs hover:opacity-95 transition-all ${widthClass}`}
                   >
                     {showIcon && <MessageCircle className="w-4 h-4 fill-current" />}
-                    {showLabel && <span>{action.label || "WhatsApp"}</span>}
+                    {showLabel && <span>{action.label || "WhatsApp Order"}</span>}
                   </a>
                 );
 
@@ -314,7 +352,11 @@ export function ProductQuantityAction({
                   >
                     {showIcon && <PhoneCall className="w-4 h-4 text-emerald-400" />}
                     {showLabel && (
-                      <span>{action.label ? `${action.label}: ${targetPhone}` : `Call: ${targetPhone}`}</span>
+                      <span>
+                        {action.label
+                          ? `${action.label}: ${targetPhone}`
+                          : `Call: ${targetPhone}`}
+                      </span>
                     )}
                   </a>
                 );
@@ -347,9 +389,9 @@ export function ProductQuantityAction({
           })}
         </div>
       ) : (
-        /* Standard Default High-Converting 2-Column Action Buttons */
+        /* Standard Default 2-Column Action Buttons */
         <div className="space-y-3 pt-1">
-          {/* Main Action Buttons: Add to Cart (Light outline) & Buy Now (Primary bold) */}
+          {/* Main Action Buttons: Add to Cart & Buy Now */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Button
               type="button"
@@ -443,6 +485,41 @@ export function ProductQuantityAction({
             </Button>
           </div>
         </div>
+      )}
+
+      {/* Size Guide Drawer / Sheet */}
+      {sizeGuide?.enabled && (
+        <Sheet open={isSizeGuideOpen} onOpenChange={setIsSizeGuideOpen}>
+          <SheetContent
+            side="right"
+            className="w-full sm:max-w-md p-6 overflow-y-auto"
+          >
+            <SheetHeader className="mb-4">
+              <SheetTitle className="flex items-center gap-2 text-lg font-bold">
+                <Ruler className="w-5 h-5 text-[var(--store-primary,#2563eb)]" />
+                <span>{sizeGuide.title || "Size Guide"}</span>
+              </SheetTitle>
+            </SheetHeader>
+            <div className="text-sm text-slate-700 leading-relaxed">
+              {sizeGuide.content ? (
+                /<\/?[a-z][\s\S]*>/i.test(sizeGuide.content) ? (
+                  <div
+                    dangerouslySetInnerHTML={{ __html: sizeGuide.content }}
+                    className="prose prose-sm max-w-none text-slate-700"
+                  />
+                ) : (
+                  <div className="whitespace-pre-line text-slate-700 leading-relaxed">
+                    {sizeGuide.content}
+                  </div>
+                )
+              ) : (
+                <p className="text-slate-400 italic">
+                  No size guide information provided.
+                </p>
+              )}
+            </div>
+          </SheetContent>
+        </Sheet>
       )}
     </div>
   );

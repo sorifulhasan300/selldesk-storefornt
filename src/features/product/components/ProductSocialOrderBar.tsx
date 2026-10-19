@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { MessageCircle, MessageSquare, PhoneCall } from "lucide-react";
 import {
   buildWhatsAppOrderUrl,
@@ -27,13 +27,8 @@ export function ProductSocialOrderBar({
   currentUrl: initialUrl,
   className = "",
 }: ProductSocialOrderBarProps) {
-  const [resolvedUrl, setResolvedUrl] = useState(initialUrl || "");
-
-  useEffect(() => {
-    if (!resolvedUrl && typeof window !== "undefined") {
-      setResolvedUrl(window.location.href);
-    }
-  }, [resolvedUrl]);
+  const resolvedUrl =
+    initialUrl || (typeof window !== "undefined" ? window.location.href : "");
 
   const targetWhatsapp = whatsappPhone || phone || "01700000000";
   const targetPhone = phone || whatsappPhone || "01700000000";

@@ -4,7 +4,7 @@ import React, { useContext } from "react";
 import { Star, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
 import type { Product } from "@/shared/types";
 import { Badge } from "@/shared/ui/badge";
-import { useProductPurchase } from "./product-purchase-provider";
+import { useOptionalProductPurchase } from "./product-purchase-provider";
 
 export interface ProductInfoSummaryProps {
   product: Product;
@@ -43,12 +43,7 @@ export function ProductInfoSummary({
   showReviews = true,
 }: ProductInfoSummaryProps) {
   // Read from ProductPurchaseContext if available
-  let purchaseContext: ReturnType<typeof useProductPurchase> | null = null;
-  try {
-    purchaseContext = useProductPurchase();
-  } catch {
-    purchaseContext = null;
-  }
+  const purchaseContext = useOptionalProductPurchase();
 
   const effectivePrice =
     purchaseContext?.currentPrice ?? propPrice ?? product.salePrice ?? product.price;

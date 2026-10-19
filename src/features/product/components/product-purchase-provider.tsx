@@ -29,6 +29,7 @@ interface ProductPurchaseContextValue {
 interface ProductPurchaseProviderProps {
   product: Product;
   currency: string;
+  defaultVariantSelection?: "first" | "none";
   children: ReactNode;
 }
 
@@ -38,10 +39,11 @@ const ProductPurchaseContext =
 export function ProductPurchaseProvider({
   product,
   currency,
+  defaultVariantSelection = "first",
   children,
 }: ProductPurchaseProviderProps) {
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
-    product.variants?.[0] ?? null,
+    defaultVariantSelection === "none" ? null : (product.variants?.[0] ?? null),
   );
   const [quantity, setQuantity] = useState(1);
   const addItem = useCartStore((state) => state.addItem);
@@ -109,4 +111,8 @@ export function useProductPurchase() {
     );
   }
   return context;
+}
+
+export function useOptionalProductPurchase() {
+  return useContext(ProductPurchaseContext);
 }

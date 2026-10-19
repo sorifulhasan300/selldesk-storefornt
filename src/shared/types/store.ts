@@ -369,6 +369,12 @@ export interface ProductTabItem {
   content?: string | null;
 }
 
+export interface ProductPageSizeGuide {
+  enabled?: boolean;
+  title?: string;
+  content?: string | null;
+}
+
 export interface ProductPageConfig {
   layout?: ProductPageLayout;
   tabLayout?: ProductTabLayout;
@@ -376,11 +382,16 @@ export interface ProductPageConfig {
   imageZoom?: boolean;
   showRelatedProducts?: boolean;
   showReviews?: boolean;
+  showStickyBuyButton?: boolean;
+  showStockCounter?: boolean;
+  sizeGuide?: ProductPageSizeGuide | null;
   defaultVariantSelection?: "first" | "none";
   actions?: ProductActionButtonItem[];
   tabs?: ProductTabItem[];
   [key: string]: unknown;
 }
+
+export type StorefrontProductPageConfig = ProductPageConfig;
 
 export interface StorefrontPopupImageThumbs {
   large?: string;

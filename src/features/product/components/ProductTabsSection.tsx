@@ -22,7 +22,7 @@ export function ProductTabsSection({
 }: ProductTabsSectionProps) {
   // Built-in tabs fallback if not provided
   const activeTabs: ProductTabItem[] =
-    tabsConfig && tabsConfig.length > 0
+    Array.isArray(tabsConfig) && tabsConfig.length > 0
       ? tabsConfig
       : [
           {
@@ -62,10 +62,6 @@ export function ProductTabsSection({
   };
 
   const renderTabContent = (tab: ProductTabItem) => {
-    if (tab.key === "specifications") {
-      return <ProductSpecifications product={product} />;
-    }
-
     if (tab.key === "description") {
       return (
         <div className="prose prose-slate max-w-none text-slate-700 leading-relaxed text-sm sm:text-base space-y-4">
@@ -84,11 +80,19 @@ export function ProductTabsSection({
       );
     }
 
+    if (tab.key === "specifications") {
+      return <ProductSpecifications product={product} />;
+    }
+
     // Custom tab content
     return (
       <div className="prose prose-slate max-w-none text-slate-700 leading-relaxed text-sm sm:text-base">
         {tab.content ? (
-          <p>{tab.content}</p>
+          /<\/?[a-z][\s\S]*>/i.test(tab.content) ? (
+            <div dangerouslySetInnerHTML={{ __html: tab.content }} />
+          ) : (
+            <p className="whitespace-pre-line">{tab.content}</p>
+          )
         ) : (
           <p className="text-slate-400 italic">No additional information available.</p>
         )}
@@ -96,78 +100,41 @@ export function ProductTabsSection({
     );
   };
 
-  // Layout 4: All Expanded (Stacked sections with left vertical highlight bar) - Matching Reference UI
+  // Layout 4: All Expanded (Stacked sections with left vertical highlight bar)
   if (tabLayout === 4) {
     return (
       <div className="space-y-10 pt-4 border-t border-slate-200/80">
-        {/* Section 1: | Description */}
-        <section aria-labelledby="section-description" className="space-y-4">
-          <div className="flex items-center gap-2 border-l-4 border-[var(--store-primary,#0f172a)] pl-3.5 py-0.5">
-            <h2
-              id="section-description"
-              className="text-lg sm:text-xl font-black text-slate-900 tracking-tight"
-            >
-              Description
-            </h2>
-          </div>
-          <div className="pl-1">
-            {renderTabContent({
-              key: "description",
-              type: "builtin",
-              label: "Description",
-            })}
-          </div>
-        </section>
-
-        {/* Section 2: | Specifications */}
-        <section aria-labelledby="section-specifications" className="space-y-4">
-          <div className="flex items-center gap-2 border-l-4 border-[var(--store-primary,#0f172a)] pl-3.5 py-0.5">
-            <h2
-              id="section-specifications"
-              className="text-lg sm:text-xl font-black text-slate-900 tracking-tight"
-            >
-              Specifications
-            </h2>
-          </div>
-          <div className="pl-1">
-            <ProductSpecifications product={product} />
-          </div>
-        </section>
-
-        {/* Custom tabs if any */}
-        {activeTabs
-          .filter((t) => t.key !== "description" && t.key !== "specifications")
-          .map((customTab) => (
-            <section
-              key={customTab.key}
-              aria-labelledby={`section-${customTab.key}`}
-              className="space-y-4"
-            >
-              <div className="flex items-center gap-2 border-l-4 border-[var(--store-primary,#0f172a)] pl-3.5 py-0.5">
-                <h2
-                  id={`section-${customTab.key}`}
-                  className="text-lg sm:text-xl font-black text-slate-900 tracking-tight"
-                >
-                  {customTab.label}
-                </h2>
-              </div>
-              <div className="pl-1">{renderTabContent(customTab)}</div>
-            </section>
-          ))}
+        {activeTabs.map((tab) => (
+          <section
+            key={tab.key}
+            aria-labelledby={`section-${tab.key}`}
+            className="space-y-4"
+          >
+            <div className="flex items-center gap-2 border-l-4 border-[var(--store-primary,#0f172a)] pl-3.5 py-0.5">
+              <h2
+                id={`section-${tab.key}`}
+                className="text-lg sm:text-xl font-black text-slate-900 tracking-tight"
+              >
+                {tab.label}
+              </h2>
+            </div>
+            <div className="pl-1">{renderTabContent(tab)}</div>
+          </section>
+        ))}
       </div>
     );
   }
 
-  // Layout 3: Accordion
+  // Layout 3: Accordion (Collapsible accordion panels with chevron toggles)
   if (tabLayout === 3) {
     return (
       <div className="space-y-3 pt-4 border-t border-slate-200/80">
         {activeTabs.map((tab) => {
-          const isOpen = Boolean(openAccordions[tab.key]);
+          const isOpen = openAccordions[tab.key] ?? true;
           return (
             <div
               key={tab.key}
-              className="border border-slate-200/80 rounded-2xl overflow-hidden bg-white shadow-2xs"
+              className="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-2xs"
             >
               <button
                 type="button"
@@ -197,8 +164,10 @@ export function ProductTabsSection({
     );
   }
 
-  // Layout 1: Classic horizontal tabs or Layout 2: Pill tabs
+  // Layout 1: Classic horizontal underline tabs or Layout 2: Pill tabs
   const isPill = tabLayout === 2;
+  const currentTab =
+    activeTabs.find((t) => t.key === activeTabKey) || activeTabs[0];
 
   return (
     <div className="space-y-6 pt-4 border-t border-slate-200/80">
@@ -211,7 +180,7 @@ export function ProductTabsSection({
         }`}
       >
         {activeTabs.map((tab) => {
-          const isSelected = activeTabKey === tab.key;
+          const isSelected = (currentTab?.key ?? activeTabKey) === tab.key;
           return (
             <button
               key={tab.key}
@@ -244,11 +213,7 @@ export function ProductTabsSection({
 
       {/* Tab Panel */}
       <div className="py-2">
-        {activeTabs
-          .filter((t) => t.key === activeTabKey)
-          .map((tab) => (
-            <div key={tab.key}>{renderTabContent(tab)}</div>
-          ))}
+        {currentTab && <div>{renderTabContent(currentTab)}</div>}
       </div>
     </div>
   );

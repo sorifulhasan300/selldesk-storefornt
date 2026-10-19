@@ -3,6 +3,7 @@ import {
   StorefrontSliderConfig,
   StorefrontPopupConfig,
   StorefrontProductCardConfig,
+  StorefrontProductPageConfig,
   HomePageSection,
 } from "@/shared/types";
 import { normalizeBootstrapSliders } from "./normalize-slider";
@@ -83,6 +84,43 @@ export function normalizeBootstrap(
     raw.productCard ||
     rawTheme.productCard) as StorefrontProductCardConfig | undefined;
 
+  const rawProductPage = (config.productPage ||
+    rawConfig.productPage ||
+    raw.productPage) as Partial<StorefrontProductPageConfig> | undefined;
+
+  const productPage: StorefrontProductPageConfig | undefined = rawProductPage
+    ? {
+        layout: (Number(rawProductPage.layout) || 1) as StorefrontProductPageConfig["layout"],
+        tabLayout: (Number(rawProductPage.tabLayout) || 4) as StorefrontProductPageConfig["tabLayout"],
+        imageZoom: rawProductPage.imageZoom ?? true,
+        showBreadcrumb: rawProductPage.showBreadcrumb ?? true,
+        showRelatedProducts: rawProductPage.showRelatedProducts ?? true,
+        showReviews: rawProductPage.showReviews ?? true,
+        showStickyBuyButton: rawProductPage.showStickyBuyButton ?? true,
+        showStockCounter: rawProductPage.showStockCounter ?? true,
+        sizeGuide: rawProductPage.sizeGuide || null,
+        defaultVariantSelection: rawProductPage.defaultVariantSelection ?? "first",
+        actions:
+          Array.isArray(rawProductPage.actions) && rawProductPage.actions.length > 0
+            ? rawProductPage.actions
+            : [
+                { key: "addToCart", enabled: true, label: "Add to Cart", display: "both", width: "half" },
+                { key: "buyNow", enabled: true, label: "Buy Now", display: "both", width: "half" },
+                { key: "whatsapp", enabled: true, label: "WhatsApp Order", display: "both", width: "half" },
+                { key: "messenger", enabled: false, label: "Messenger", display: "both", width: "half" },
+                { key: "call", enabled: true, label: "Call Hotline", display: "both", width: "half" },
+                { key: "wishlist", enabled: true, label: "Add to Wishlist", display: "both", width: "full" },
+              ],
+        tabs:
+          Array.isArray(rawProductPage.tabs) && rawProductPage.tabs.length > 0
+            ? rawProductPage.tabs
+            : [
+                { key: "description", type: "builtin", label: "Description", content: null },
+                { key: "specifications", type: "builtin", label: "Specifications", content: null },
+              ],
+      }
+    : undefined;
+
   const { sliders, isSliderActive } = normalizeBootstrapSliders(
     sliderConfig,
     raw.sliders,
@@ -135,6 +173,7 @@ export function normalizeBootstrap(
       ...(sliderConfig ? { slider: sliderConfig } : {}),
       ...(popupConfig ? { popup: popupConfig } : {}),
       ...(productCard ? { productCard } : {}),
+      ...(productPage ? { productPage } : {}),
       homePage: {
         ...(config.homePage as Record<string, unknown> | undefined),
         sections: homePageSections,

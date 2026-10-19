@@ -9,6 +9,7 @@ export { ProductRelatedGrid } from "./components/ProductRelatedGrid";
 export {
   ProductPurchaseProvider,
   useProductPurchase,
+  useOptionalProductPurchase,
 } from "./components/product-purchase-provider";
 export { MobileStickyBuyBar } from "./components/mobile-sticky-buy-bar";
 export { ProductTrustBadges } from "./components/product-trust-badges";

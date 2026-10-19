@@ -131,13 +131,18 @@ export default async function ProductDetailPage({ params }: PDPProps) {
           title={product.name}
           regularPrice={product.price}
           salePrice={product.salePrice}
+          layout={productPageConfig?.layout ?? 1}
           imageZoom={productPageConfig?.imageZoom !== false}
           hasFreeDelivery={hasFreeDelivery}
         />
 
         {/* Right Column: Information, Stepper, Actions & Trust Badges */}
         <div className="space-y-6">
-          <ProductPurchaseProvider product={product} currency={currency}>
+          <ProductPurchaseProvider
+            product={product}
+            currency={currency}
+            defaultVariantSelection={productPageConfig?.defaultVariantSelection ?? "first"}
+          >
             {/* Title, Brand, Rating/Reviews, In-Stock Badge, Dynamic Price */}
             <ProductInfoSummary
               product={product}
@@ -149,6 +154,7 @@ export default async function ProductDetailPage({ params }: PDPProps) {
             <ProductQuantityAction
               storeSlug={storeSlug}
               actionsConfig={productPageConfig?.actions}
+              sizeGuide={productPageConfig?.sizeGuide}
               contactPhone={contactPhone}
               whatsappPhone={whatsappPhone}
               facebookUrl={facebookUrl}
@@ -159,7 +165,9 @@ export default async function ProductDetailPage({ params }: PDPProps) {
             <ProductTrustBadges />
 
             {/* Mobile Fixed Bottom Buy Bar */}
-            <MobileStickyBuyBar />
+            {productPageConfig?.showStickyBuyButton !== false && (
+              <MobileStickyBuyBar />
+            )}
           </ProductPurchaseProvider>
         </div>
       </div>
