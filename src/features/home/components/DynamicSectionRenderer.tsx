@@ -4,6 +4,7 @@ import React from "react";
 import {
   HomePageSection,
   Product,
+  StorefrontProductCardConfig,
   StorefrontSliderConfig,
 } from "@/shared/types";
 import { DynamicSectionBlock } from "./DynamicSectionBlock";
@@ -20,6 +21,7 @@ interface DynamicSectionRendererProps {
   isPreview?: boolean;
   selectedSectionId?: string | null;
   onAction?: (actionType: string, sectionId: string) => void;
+  cardConfig?: StorefrontProductCardConfig;
 }
 
 export function DynamicSectionRenderer({
@@ -32,6 +34,7 @@ export function DynamicSectionRenderer({
   isPreview = false,
   selectedSectionId,
   onAction,
+  cardConfig,
 }: DynamicSectionRendererProps) {
   const seenSectionIds = new Set<string>();
   const activeSections =
@@ -74,6 +77,7 @@ export function DynamicSectionRenderer({
           currency,
           fallbackProducts,
           isPreview,
+          cardConfig,
         });
         if (!blockContent) return null;
 

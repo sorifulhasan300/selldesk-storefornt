@@ -39,6 +39,8 @@ export interface Product {
   hasVariants: boolean;
   variants: ProductVariant[];
   sku?: string;
+  isPreOrder?: boolean;
+  preOrder?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }

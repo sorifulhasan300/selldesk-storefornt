@@ -285,6 +285,23 @@ export interface StorefrontSliderConfig {
   [key: string]: unknown;
 }
 
+export interface StorefrontProductCardConfig {
+  style?: number | string;
+  showAddToCart?: boolean;
+  showBuyNow?: boolean;
+  showBrand?: boolean;
+  showDiscountBadge?: boolean;
+  showStockBadge?: boolean;
+  showBoxShadow?: boolean;
+  showQuickView?: boolean;
+  addToCartLabel?: string;
+  buyNowLabel?: string;
+  preOrderLabel?: string;
+  imgHeight?: number;
+  borderRadius?: number;
+  titleLines?: number;
+}
+
 export interface StorefrontConfig {
   seo?: {
     metaTitle?: string;
@@ -312,6 +329,7 @@ export interface StorefrontConfig {
   socialLinks?: Record<string, string>;
   bottomNav?: StorefrontBottomNavConfig;
   slider?: StorefrontSliderConfig;
+  productCard?: StorefrontProductCardConfig;
   homePage?: {
     sections: HomePageSection[];
   };

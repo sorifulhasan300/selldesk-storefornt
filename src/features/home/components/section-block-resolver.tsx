@@ -1,5 +1,9 @@
 import type { ReactNode } from "react";
-import type { HomePageSection, Product } from "@/shared/types";
+import type {
+  HomePageSection,
+  Product,
+  StorefrontProductCardConfig,
+} from "@/shared/types";
 import {
   BannerGridBlock,
   BrandShowcaseBlock,
@@ -14,6 +18,7 @@ interface ResolveSectionBlockOptions {
   currency: string;
   fallbackProducts: Product[];
   isPreview: boolean;
+  cardConfig?: StorefrontProductCardConfig;
 }
 
 export function resolveSectionBlock({
@@ -21,6 +26,7 @@ export function resolveSectionBlock({
   currency,
   fallbackProducts,
   isPreview,
+  cardConfig,
 }: ResolveSectionBlockOptions): ReactNode {
   const rawType = (section.type || section.key || "")
     .trim()
@@ -42,6 +48,7 @@ export function resolveSectionBlock({
           currency={currency}
           fallbackProducts={fallbackProducts}
           isPreview={isPreview}
+          cardConfig={cardConfig}
         />
       );
     case "videos":

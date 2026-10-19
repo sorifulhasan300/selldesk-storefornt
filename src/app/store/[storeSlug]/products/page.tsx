@@ -120,6 +120,7 @@ export default async function CatalogPage({
                   key={product.id}
                   product={product}
                   currency={currency}
+                  cardConfig={bData?.config?.productCard}
                 />
               ))}
             </div>

@@ -7,6 +7,7 @@ import type {
   HomePageSection,
   Product,
   StoreConfig,
+  StorefrontProductCardConfig,
   StorefrontSliderConfig,
 } from "@/shared/types";
 
@@ -19,6 +20,7 @@ export interface StoreHomePageClientProps {
   sliders?: unknown[];
   sliderConfig?: StorefrontSliderConfig | null;
   isPreview?: boolean;
+  cardConfig?: StorefrontProductCardConfig;
 }
 
 const StoreHomePagePreview = dynamic(
@@ -34,6 +36,7 @@ export function StoreHomePageClient({
   sliders = [],
   sliderConfig,
   isPreview = false,
+  cardConfig,
 }: StoreHomePageClientProps) {
   const resolvedCurrency = currency || store?.currency || "USD";
 
@@ -46,6 +49,7 @@ export function StoreHomePageClient({
         categories={categories}
         sliders={sliders}
         sliderConfig={sliderConfig}
+        cardConfig={cardConfig}
       />
     );
   }
@@ -64,6 +68,7 @@ export function StoreHomePageClient({
         fallbackCategories={categories}
         fallbackSliders={sliders}
         sliderConfig={sliderConfig}
+        cardConfig={cardConfig}
       />
     </div>
   );

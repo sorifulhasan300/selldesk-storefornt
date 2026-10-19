@@ -11,6 +11,7 @@ import {
   PromotionalPopup,
 } from "@/features/shell";
 import { CartDrawer } from "@/features/cart";
+import { ProductCardConfigProvider } from "@/features/catalog";
 
 interface TenantLayoutProps {
   children: ReactNode;
@@ -84,7 +85,9 @@ export default async function TenantLayout({
           bottomNavConfig?.active === false ? "" : "pb-16 lg:pb-0"
         }`}
       >
-        {children}
+        <ProductCardConfigProvider config={config?.productCard}>
+          {children}
+        </ProductCardConfigProvider>
       </main>
       <StoreFooter
         store={store}

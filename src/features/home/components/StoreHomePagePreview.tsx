@@ -6,6 +6,7 @@ import { StorefrontHeroSlider } from "./StorefrontHeroSlider";
 import type {
   HomePageSection,
   Product,
+  StorefrontProductCardConfig,
   StorefrontSliderConfig,
 } from "@/shared/types";
 
@@ -16,6 +17,7 @@ interface StoreHomePagePreviewProps {
   categories: unknown[];
   sliders: unknown[];
   sliderConfig?: StorefrontSliderConfig | null;
+  cardConfig?: StorefrontProductCardConfig;
 }
 
 export default function StoreHomePagePreview({
@@ -25,6 +27,7 @@ export default function StoreHomePagePreview({
   categories,
   sliders,
   sliderConfig,
+  cardConfig,
 }: StoreHomePagePreviewProps) {
   const {
     sections,
@@ -48,6 +51,7 @@ export default function StoreHomePagePreview({
         fallbackCategories={categories}
         fallbackSliders={sliders}
         sliderConfig={sliderConfig}
+        cardConfig={cardConfig}
         isPreview={isPreviewActive}
         selectedSectionId={selectedSectionId}
         onAction={sendBuilderAction}

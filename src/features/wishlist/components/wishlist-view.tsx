@@ -3,14 +3,17 @@
 import Link from "next/link";
 import { Heart } from "lucide-react";
 import { ProductCard } from "@/features/catalog";
+import type { StorefrontProductCardConfig } from "@/shared/types";
 import { useWishlistStore } from "../store/use-wishlist-store";
 
 export function WishlistView({
   storeSlug,
   currency,
+  cardConfig,
 }: {
   storeSlug: string;
   currency: string;
+  cardConfig?: StorefrontProductCardConfig;
 }) {
   const products = useWishlistStore(
     (state) => state.productsByStore[storeSlug] ?? [],
@@ -62,6 +65,7 @@ export function WishlistView({
             product={product}
             currency={currency}
             storeSlug={storeSlug}
+            cardConfig={cardConfig}
           />
         ))}
       </div>

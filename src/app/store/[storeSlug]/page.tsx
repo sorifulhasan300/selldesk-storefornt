@@ -60,6 +60,7 @@ export default async function StoreHomePage({
       sliders={sliders}
       sliderConfig={sliderConfig}
       isPreview={isPreview}
+      cardConfig={bootstrap.config?.productCard}
     />
   );
 }

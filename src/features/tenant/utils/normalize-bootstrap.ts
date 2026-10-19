@@ -2,6 +2,7 @@ import {
   StorefrontBootstrap,
   StorefrontSliderConfig,
   StorefrontPopupConfig,
+  StorefrontProductCardConfig,
   HomePageSection,
 } from "@/shared/types";
 import { normalizeBootstrapSliders } from "./normalize-slider";
@@ -76,6 +77,12 @@ export function normalizeBootstrap(
     | StorefrontPopupConfig
     | undefined;
 
+  const rawTheme = (raw.theme || {}) as Record<string, unknown>;
+  const productCard = (config.productCard ||
+    rawConfig.productCard ||
+    raw.productCard ||
+    rawTheme.productCard) as StorefrontProductCardConfig | undefined;
+
   const { sliders, isSliderActive } = normalizeBootstrapSliders(
     sliderConfig,
     raw.sliders,
@@ -127,6 +134,7 @@ export function normalizeBootstrap(
       ...config,
       ...(sliderConfig ? { slider: sliderConfig } : {}),
       ...(popupConfig ? { popup: popupConfig } : {}),
+      ...(productCard ? { productCard } : {}),
       homePage: {
         ...(config.homePage as Record<string, unknown> | undefined),
         sections: homePageSections,

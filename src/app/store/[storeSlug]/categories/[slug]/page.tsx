@@ -108,6 +108,7 @@ export default async function CategoryPage({
               key={product.id}
               product={product}
               currency={bootstrap.store.currency}
+              cardConfig={bootstrap?.config?.productCard}
             />
           ))}
         </div>

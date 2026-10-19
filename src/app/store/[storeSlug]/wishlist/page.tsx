@@ -18,6 +18,7 @@ export default async function WishlistPage({
       <WishlistView
         storeSlug={storeSlug}
         currency={bootstrap.store.currency || "USD"}
+        cardConfig={bootstrap.config?.productCard}
       />
     </div>
   );

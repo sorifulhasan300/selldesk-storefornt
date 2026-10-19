@@ -2,7 +2,11 @@
 
 import { useRef, useCallback } from "react";
 import Link from "next/link";
-import { HomePageSection, Product } from "@/shared/types";
+import type {
+  HomePageSection,
+  Product,
+  StorefrontProductCardConfig,
+} from "@/shared/types";
 import { ProductCard } from "@/features/catalog";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
@@ -18,6 +22,7 @@ interface ProductShowcaseBlockProps {
   currency?: string;
   fallbackProducts?: Product[];
   isPreview?: boolean;
+  cardConfig?: StorefrontProductCardConfig;
 }
 
 export function ProductShowcaseBlock({
@@ -25,6 +30,7 @@ export function ProductShowcaseBlock({
   currency = "USD",
   fallbackProducts = [],
   isPreview = false,
+  cardConfig,
 }: ProductShowcaseBlockProps) {
   const { config = {}, styles = {}, data } = section;
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -125,6 +131,7 @@ export function ProductShowcaseBlock({
                 <ProductCard
                   product={product}
                   currency={currency}
+                  cardConfig={cardConfig}
                   cardRadius={cardRadius}
                   showName={showName}
                   showCategoryName={showCategoryName}
@@ -168,6 +175,7 @@ export function ProductShowcaseBlock({
               key={product.id}
               product={product}
               currency={currency}
+              cardConfig={cardConfig}
               cardRadius={cardRadius}
               showName={showName}
               showCategoryName={showCategoryName}
