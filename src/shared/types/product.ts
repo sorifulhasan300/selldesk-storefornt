@@ -43,6 +43,9 @@ export interface Product {
   preOrder?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  specifications?: Record<string, any> | Array<{ label: string; value: any }> | null;
+  shortDescription?: string | null;
+  videoUrl?: string | null;
 }
 
 export interface ProductListResponse {

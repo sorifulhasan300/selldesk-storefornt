@@ -330,6 +330,7 @@ export interface StorefrontConfig {
   bottomNav?: StorefrontBottomNavConfig;
   slider?: StorefrontSliderConfig;
   productCard?: StorefrontProductCardConfig;
+  productPage?: ProductPageConfig;
   homePage?: {
     sections: HomePageSection[];
   };
@@ -338,6 +339,46 @@ export interface StorefrontConfig {
     size?: string;
   };
   popup?: StorefrontPopupConfig;
+  [key: string]: unknown;
+}
+
+export type ProductPageLayout = 1 | 2 | 3;
+export type ProductTabLayout = 1 | 2 | 3 | 4;
+export type ActionButtonDisplay = "both" | "icon" | "label";
+export type ActionButtonWidth = "half" | "full";
+export type ActionButtonKey =
+  | "addToCart"
+  | "buyNow"
+  | "whatsapp"
+  | "messenger"
+  | "call"
+  | "wishlist";
+
+export interface ProductActionButtonItem {
+  key: ActionButtonKey;
+  enabled: boolean;
+  label: string;
+  display: ActionButtonDisplay;
+  width: ActionButtonWidth;
+}
+
+export interface ProductTabItem {
+  key: string;
+  type: "builtin" | "custom";
+  label: string;
+  content?: string | null;
+}
+
+export interface ProductPageConfig {
+  layout?: ProductPageLayout;
+  tabLayout?: ProductTabLayout;
+  showBreadcrumb?: boolean;
+  imageZoom?: boolean;
+  showRelatedProducts?: boolean;
+  showReviews?: boolean;
+  defaultVariantSelection?: "first" | "none";
+  actions?: ProductActionButtonItem[];
+  tabs?: ProductTabItem[];
   [key: string]: unknown;
 }
 

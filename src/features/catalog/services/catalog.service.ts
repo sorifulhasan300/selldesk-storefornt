@@ -3,6 +3,7 @@ import { serverFetch } from "@/shared/api/server-fetch";
 import { tags, REVALIDATE } from "@/shared/api/tags";
 import { API_ENDPOINTS } from "@/shared/constants";
 import { ProductListResponse, Category } from "@/shared/types";
+import { normalizeProductList } from "@/features/home";
 import { z } from "zod";
 
 interface CategoryTreeEntry {
@@ -292,7 +293,7 @@ export const catalogService = {
     if (params.sortOrder) searchParams.set("sortOrder", params.sortOrder);
 
     const qs = searchParams.toString() ? `?${searchParams.toString()}` : "";
-    return serverFetch<ProductListResponse>(
+    const raw = await serverFetch<any>(
       `${API_ENDPOINTS.CATALOG.PRODUCTS}${qs}`,
       storeSlug,
       {
@@ -300,6 +301,30 @@ export const catalogService = {
         tags: [tags.products(storeSlug)],
       },
     );
+
+    const rawList = Array.isArray(raw)
+      ? raw
+      : (raw?.data || raw?.items || []);
+    const items = normalizeProductList(rawList);
+    const meta = raw?.meta || {};
+    const total = Number(meta.total ?? raw?.total ?? items.length);
+    const page = Number(meta.page ?? raw?.page ?? (params.page || 1));
+    const limit = Number(
+      meta.limit ?? raw?.limit ?? (params.limit || items.length || 12),
+    );
+    const totalPages = Number(
+      meta.totalPages ??
+        raw?.totalPages ??
+        Math.max(1, Math.ceil(total / (limit || 1))),
+    );
+
+    return {
+      items,
+      total,
+      page,
+      limit,
+      totalPages,
+    };
   },
 
   async getCategories(storeSlug: string): Promise<Category[]> {

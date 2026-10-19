@@ -7,7 +7,7 @@ import { z } from "zod";
 
 const inventorySchema = z.object({
   id: z.string(),
-  sku: z.string(),
+  sku: z.string().nullish().transform((s) => s || ""),
   sellingPrice: z.coerce.number(),
   regularPrice: z.coerce.number(),
   stockQuantity: z.coerce.number(),
@@ -19,6 +19,14 @@ const productResponseSchema = z.object({
   name: z.string(),
   slug: z.string().nullish(),
   description: z.string().nullish(),
+  shortDescription: z.string().nullish(),
+  videoUrl: z.string().nullish(),
+  specifications: z
+    .union([
+      z.record(z.string(), z.any()),
+      z.array(z.any()),
+    ])
+    .nullish(),
   imageUrl: z.string().nullish(),
   galleryImages: z.array(z.string()).optional(),
   brand: z.object({ name: z.string() }).nullish(),
@@ -81,8 +89,11 @@ function normalizeProductResponse(raw: unknown): Product {
   return {
     id: source.id,
     name: source.name,
-    slug: source.slug || source.id,
+    slug: (source.slug && source.slug.trim()) || source.id,
     description: source.description ?? "",
+    shortDescription: source.shortDescription ?? null,
+    videoUrl: source.videoUrl ?? null,
+    specifications: source.specifications ?? null,
     price: defaultVariant?.price ?? 0,
     salePrice: defaultVariant?.salePrice ?? null,
     stock: variants.reduce((total, variant) => total + variant.stock, 0),
@@ -107,14 +118,21 @@ function normalizeProductResponse(raw: unknown): Product {
 
 export const productService = {
   async getBySlug(storeSlug: string, slug: string): Promise<Product> {
+    const cleanSlug = decodeURIComponent(slug).trim();
+    if (!cleanSlug) {
+      throw new Error("Product slug or ID is required");
+    }
     const raw = await serverFetch<unknown>(
-      API_ENDPOINTS.PRODUCTS.PRODUCT_BY_SLUG(slug),
+      API_ENDPOINTS.PRODUCTS.PRODUCT_BY_SLUG(cleanSlug),
       storeSlug,
       {
         revalidate: REVALIDATE.product,
-        tags: [tags.product(storeSlug, slug)],
+        tags: [tags.product(storeSlug, cleanSlug)],
       },
     );
     return normalizeProductResponse(raw);
+  },
+  async getProductBySlug(storeSlug: string, slug: string): Promise<Product> {
+    return this.getBySlug(storeSlug, slug);
   },
 };

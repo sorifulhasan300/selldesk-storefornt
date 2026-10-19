@@ -19,6 +19,8 @@ interface ProductPurchaseContextValue {
   quantity: number;
   setQuantity: Dispatch<SetStateAction<number>>;
   currentPrice: number;
+  regularPrice: number;
+  salePrice: number | null;
   currentStock: number;
   isOutOfStock: boolean;
   addToCart: () => AddItemResult;
@@ -47,6 +49,9 @@ export function ProductPurchaseProvider({
   const currentPrice = selectedVariant
     ? (selectedVariant.salePrice ?? selectedVariant.price)
     : (product.salePrice ?? product.price);
+  const regularPrice = selectedVariant ? selectedVariant.price : product.price;
+  const salePrice =
+    (selectedVariant ? selectedVariant.salePrice : product.salePrice) ?? null;
   const currentStock = selectedVariant ? selectedVariant.stock : product.stock;
   const isOutOfStock = currentStock <= 0;
 
@@ -84,6 +89,8 @@ export function ProductPurchaseProvider({
         quantity,
         setQuantity,
         currentPrice,
+        regularPrice,
+        salePrice,
         currentStock,
         isOutOfStock,
         addToCart,
