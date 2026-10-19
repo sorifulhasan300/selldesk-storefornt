@@ -141,6 +141,7 @@ export function DynamicSectionHeader({ section }: DynamicSectionHeaderProps) {
   }
 
   const titleAlign = styles.titleAlignment || styles.titleAlign || "left";
+  const subtitleAlign = styles.subtitleAlignment || titleAlign;
 
   const titleStyles: React.CSSProperties = {
     fontSize: formatFontSize(styles.titleFontSize ?? config.titleFontSize),
@@ -153,6 +154,7 @@ export function DynamicSectionHeader({ section }: DynamicSectionHeaderProps) {
       styles.titleLineHeight ?? config.titleLineHeight,
     ),
     color: safeColor(styles.titleColor ?? config.titleColor),
+    textAlign: titleAlign,
   };
 
   const subtitleStyles: React.CSSProperties = {
@@ -172,6 +174,7 @@ export function DynamicSectionHeader({ section }: DynamicSectionHeaderProps) {
       styles.subtitleLineHeight ?? config.subtitleLineHeight,
     ),
     color: safeColor(styles.subtitleColor ?? config.subtitleColor),
+    textAlign: subtitleAlign,
   };
 
   const headerAlignmentClass =

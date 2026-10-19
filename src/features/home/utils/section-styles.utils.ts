@@ -3,10 +3,7 @@ import { HomePageSection, SectionStyles } from "@/shared/types";
 
 const MAX_SPACING = 400;
 
-export function parsePx(
-  val: unknown,
-  defaultVal: number,
-): number {
+export function parsePx(val: unknown, defaultVal: number): number {
   if (val === undefined || val === null || val === "") return defaultVal;
   const n = typeof val === "number" ? val : parseFloat(String(val));
   if (!Number.isFinite(n)) return defaultVal;
@@ -156,15 +153,27 @@ export function buildSectionStyleVariables(
 }
 
 export function getSectionContainerClass(section: HomePageSection): string {
-  const layout = section.styles?.layout?.toLowerCase();
+  const rawLayout = section.styles?.layout;
+  const layout =
+    typeof rawLayout === "string" ? rawLayout.toLowerCase() : rawLayout;
 
-  if (layout === "full-width") {
+  if (layout === "full-width" || layout === 1 || layout === "1") {
     return "w-full px-0";
   }
-  if (layout === "cropped" || layout === "fluid") {
+  if (
+    layout === "cropped" ||
+    layout === "fluid" ||
+    layout === 2 ||
+    layout === "2"
+  ) {
     return "w-full max-w-[1920px] mx-auto px-4 sm:px-8 overflow-hidden";
   }
-  if (layout === "standard" || layout === "boxed") {
+  if (
+    layout === "standard" ||
+    layout === "boxed" ||
+    layout === 3 ||
+    layout === "3"
+  ) {
     return "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8";
   }
 
@@ -194,4 +203,3 @@ export function buildCardVariables(s: HomePageSection): React.CSSProperties {
   set("--card-radius", parsePxOrUndef(c.cardRadius ?? st.borderRadius));
   return out as React.CSSProperties;
 }
-

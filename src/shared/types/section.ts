@@ -9,7 +9,7 @@ export type SectionType =
   | string;
 
 export interface SectionStyles {
-  layout?: "full-width" | "boxed" | "fluid" | "standard" | "cropped";
+  layout?: "full-width" | "boxed" | "fluid" | "standard" | "cropped" | number | string;
   paddingTop?: number | string;
   paddingRight?: number | string;
   paddingBottom?: number | string;
@@ -45,6 +45,13 @@ export interface SectionStyles {
   subtitleLineHeight?: number;
   subtitleColor?: string;
   subtitleAlignment?: "left" | "center" | "right";
+  bodyColor?: string;
+  bodyFontSize?: number | string;
+  bodyFontStyle?: "normal" | "italic";
+  bodyFontWeight?: number | string;
+  bodyLetterSpacing?: number | string;
+  bodyLineHeight?: number;
+  bodyAlignment?: "left" | "center" | "right";
   borderRadius?: number | string;
   borderRadiusTopLeft?: number;
   borderRadiusTopRight?: number;
@@ -56,6 +63,18 @@ export interface SectionStyles {
   borderWidthRight?: number;
   borderWidthBottom?: number;
   borderWidthLeft?: number;
+  borderTopWidth?: number;
+  borderRightWidth?: number;
+  borderBottomWidth?: number;
+  borderLeftWidth?: number;
+  mobileBorderWidthTop?: number;
+  mobileBorderWidthRight?: number;
+  mobileBorderWidthBottom?: number;
+  mobileBorderWidthLeft?: number;
+  mobileBorderRadiusTopLeft?: number;
+  mobileBorderRadiusTopRight?: number;
+  mobileBorderRadiusBottomRight?: number;
+  mobileBorderRadiusBottomLeft?: number;
   hideOnMobile?: boolean;
   hideOnDesktop?: boolean;
   boxShadow?: string;

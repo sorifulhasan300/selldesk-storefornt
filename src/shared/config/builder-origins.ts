@@ -17,7 +17,17 @@ function getConfiguredBuilderOrigins(configuredOrigins: string): string[] {
 
 const LOCAL_BUILDER_ORIGINS =
   process.env.NODE_ENV === "development"
-    ? ["http://app.selldesk.test:3000", "http://localhost:3000"]
+    ? [
+        "http://*.selldesk.test:3000",
+        "http://*.selldesk.test:3001",
+        "http://selldesk.test:3000",
+        "http://selldesk.test:3001",
+        "http://app.selldesk.test:3000",
+        "http://app.selldesk.test:3001",
+        "http://admin.selldesk.test:3001",
+        "http://localhost:3000",
+        "http://localhost:3001",
+      ]
     : [];
 
 export const BUILDER_ORIGINS = [

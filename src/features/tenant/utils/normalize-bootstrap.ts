@@ -58,10 +58,11 @@ export function normalizeBootstrap(
 
   const store = buildStoreConfig(raw, storeSlug, headerLogo, socialLinks);
 
-  const rawHome = (config.homePage || raw.homePage || {}) as Record<string, unknown>;
+  const rawHome = (raw.homePage || config.homePage || rawConfig.homePage || {}) as Record<string, unknown>;
   const rawSectionsList: HomePageSection[] =
     (rawHome.sections as HomePageSection[]) ||
     (raw.sections as HomePageSection[]) ||
+    (rawConfig.sections as HomePageSection[]) ||
     [];
 
   const legacyHeroSection = rawSectionsList.find(isLegacyHeroSliderSection);
