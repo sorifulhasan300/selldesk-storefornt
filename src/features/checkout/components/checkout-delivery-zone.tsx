@@ -2,7 +2,7 @@
 
 import { formatCurrency, cn } from "@/shared/lib/utils";
 import { Card } from "@/shared/ui/card";
-import { DeliveryZone } from "@/shared/types";
+import { DeliveryZone, StorefrontCheckoutConfig } from "@/shared/types";
 import { BANGLADESH_DISTRICTS } from "../constants/districts";
 import { Sparkles, MapPin, CheckCircle2 } from "lucide-react";
 
@@ -19,6 +19,7 @@ interface CheckoutDeliveryZoneProps {
   onDistrictChange?: (district: string) => void;
   zones?: DeliveryZone[];
   isFreeDelivery?: boolean;
+  checkoutConfig?: StorefrontCheckoutConfig;
 }
 
 export function CheckoutDeliveryZone({
@@ -33,6 +34,7 @@ export function CheckoutDeliveryZone({
   onDistrictChange,
   zones,
   isFreeDelivery = false,
+  checkoutConfig,
 }: CheckoutDeliveryZoneProps) {
   const displayZones: DeliveryZone[] =
     zones && zones.length > 0
@@ -95,7 +97,7 @@ export function CheckoutDeliveryZone({
             className="block text-xs font-semibold text-slate-700 flex items-center gap-1.5"
           >
             <MapPin className="size-3.5 text-slate-400" />
-            <span>Select Your District</span>
+            <span>{`${checkoutConfig?.districtLabel || "District"} *`}</span>
           </label>
           <div className="relative">
             <select

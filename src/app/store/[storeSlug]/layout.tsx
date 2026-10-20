@@ -78,6 +78,7 @@ export default async function TenantLayout({
         categories={bootstrap.categories}
         header={headerConfig}
         navbar={navbarConfig}
+        wishlist={config?.wishlist}
         contactPhone={config?.contact?.phone ?? store.contactPhone ?? undefined}
       />
       <main
@@ -85,7 +86,10 @@ export default async function TenantLayout({
           bottomNavConfig?.active === false ? "" : "pb-16 lg:pb-0"
         }`}
       >
-        <ProductCardConfigProvider config={config?.productCard}>
+        <ProductCardConfigProvider
+          config={config?.productCard}
+          wishlist={config?.wishlist}
+        >
           {children}
         </ProductCardConfigProvider>
       </main>
@@ -105,7 +109,11 @@ export default async function TenantLayout({
         }}
       />
       <CartDrawer currency={store?.currency || "USD"} storeSlug={storeSlug} />
-      <BottomNavigation config={bottomNavConfig} storeSlug={storeSlug} />
+      <BottomNavigation
+        config={bottomNavConfig}
+        storeSlug={storeSlug}
+        wishlist={config?.wishlist}
+      />
       <PromotionalPopup popup={config?.popup} />
     </div>
   );

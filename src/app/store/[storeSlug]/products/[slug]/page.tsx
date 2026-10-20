@@ -97,8 +97,7 @@ export default async function ProductDetailPage({ params }: PDPProps) {
   // Contact details resolution
   const contactPhone =
     bData?.config?.contact?.phone || bData?.store?.contactPhone || null;
-  const whatsappPhone =
-    bData?.config?.contact?.whatsapp || contactPhone;
+  const whatsappPhone = bData?.config?.contact?.whatsapp || contactPhone;
   const facebookUrl =
     bData?.config?.contact?.messenger ||
     bData?.store?.facebookUrl ||
@@ -107,8 +106,8 @@ export default async function ProductDetailPage({ params }: PDPProps) {
 
   const hasFreeDelivery = Boolean(
     bData?.deliveryCharge?.freeDelivery?.active ||
-      (bData?.deliveryCharge?.freeDeliveryThreshold &&
-        bData.deliveryCharge.freeDeliveryThreshold > 0),
+    (bData?.deliveryCharge?.freeDeliveryThreshold &&
+      bData.deliveryCharge.freeDeliveryThreshold > 0),
   );
 
   return (
@@ -141,7 +140,9 @@ export default async function ProductDetailPage({ params }: PDPProps) {
           <ProductPurchaseProvider
             product={product}
             currency={currency}
-            defaultVariantSelection={productPageConfig?.defaultVariantSelection ?? "first"}
+            defaultVariantSelection={
+              productPageConfig?.defaultVariantSelection ?? "first"
+            }
           >
             {/* Title, Brand, Rating/Reviews, In-Stock Badge, Dynamic Price */}
             <ProductInfoSummary
@@ -159,6 +160,7 @@ export default async function ProductDetailPage({ params }: PDPProps) {
               whatsappPhone={whatsappPhone}
               facebookUrl={facebookUrl}
               currentUrl={currentUrl}
+              wishlist={bData?.config?.wishlist || bData?.wishlist}
             />
 
             {/* Trust and Assurance Badges */}

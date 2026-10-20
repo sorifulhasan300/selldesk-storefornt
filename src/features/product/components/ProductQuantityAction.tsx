@@ -41,6 +41,7 @@ export interface ProductQuantityActionProps {
   whatsappPhone?: string | null;
   facebookUrl?: string | null;
   currentUrl?: string;
+  wishlist?: { active: boolean };
 }
 
 export function ProductQuantityAction({
@@ -51,8 +52,10 @@ export function ProductQuantityAction({
   whatsappPhone,
   facebookUrl,
   currentUrl: initialUrl,
+  wishlist,
 }: ProductQuantityActionProps) {
   const router = useRouter();
+  const isWishlistDisabled = wishlist?.active === false;
   const {
     product,
     selectedVariant,
@@ -362,6 +365,7 @@ export function ProductQuantityAction({
                 );
 
               case "wishlist":
+                if (isWishlistDisabled) return null;
                 return (
                   <Button
                     key="wishlist"
@@ -471,19 +475,21 @@ export function ProductQuantityAction({
           )}
 
           {/* Wishlist button */}
-          <div className="pt-1">
-            <Button
-              type="button"
-              onClick={handleWishlistToggle}
-              variant="outline"
-              className="w-full h-10 rounded-xl border-slate-200 text-slate-700 hover:text-rose-600 hover:border-rose-200 font-semibold text-xs transition-colors"
-            >
-              <Heart
-                className={`w-4 h-4 ${isWishlisted ? "fill-rose-600 text-rose-600" : ""}`}
-              />
-              <span>{isWishlisted ? "In Wishlist" : "Add to Wishlist"}</span>
-            </Button>
-          </div>
+          {!isWishlistDisabled && (
+            <div className="pt-1">
+              <Button
+                type="button"
+                onClick={handleWishlistToggle}
+                variant="outline"
+                className="w-full h-10 rounded-xl border-slate-200 text-slate-700 hover:text-rose-600 hover:border-rose-200 font-semibold text-xs transition-colors"
+              >
+                <Heart
+                  className={`w-4 h-4 ${isWishlisted ? "fill-rose-600 text-rose-600" : ""}`}
+                />
+                <span>{isWishlisted ? "In Wishlist" : "Add to Wishlist"}</span>
+              </Button>
+            </div>
+          )}
         </div>
       )}
 

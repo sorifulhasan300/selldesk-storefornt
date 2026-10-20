@@ -82,14 +82,26 @@ function normalizeLegacyItem(
 
 export function resolveBottomNavItems(
   config?: StorefrontBottomNavConfig,
+  wishlistConfig?: { active: boolean },
 ): StorefrontBottomNavItemConfig[] {
   const configuredItems = config?.items;
-  if (!configuredItems?.length) return DEFAULT_BOTTOM_NAV_ITEMS;
+  const items = !configuredItems?.length
+    ? DEFAULT_BOTTOM_NAV_ITEMS
+    : configuredItems.map((item) => {
+        if (typeof item === "string") {
+          return isBottomNavItemKey(item) ? MENU_ITEM_CONFIG[item] : MENU_ITEM_CONFIG.home;
+        }
+        return normalizeLegacyItem(item);
+      });
 
-  return configuredItems.map((item) => {
-    if (typeof item === "string") {
-      return isBottomNavItemKey(item) ? MENU_ITEM_CONFIG[item] : MENU_ITEM_CONFIG.home;
-    }
-    return normalizeLegacyItem(item);
-  });
+  if (wishlistConfig?.active === false) {
+    return items.filter(
+      (item) =>
+        item.href !== "/wishlist" &&
+        item.iconName !== "heart" &&
+        item.label?.toLowerCase() !== "wishlist",
+    );
+  }
+
+  return items;
 }

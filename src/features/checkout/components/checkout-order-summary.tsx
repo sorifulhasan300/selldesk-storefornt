@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { CartItem, CouponDiscount } from "@/shared/types";
+import { CartItem, CouponDiscount, StorefrontCheckoutConfig } from "@/shared/types";
 import { formatCurrency } from "@/shared/lib/utils";
 import { Tag, Loader2, X } from "lucide-react";
 import { Button } from "@/shared/ui/button";
@@ -24,6 +24,7 @@ interface CheckoutOrderSummaryProps {
   validatingCoupon: boolean;
   onApplyCoupon: (code: string) => void;
   onRemoveCoupon: () => void;
+  checkoutConfig?: StorefrontCheckoutConfig;
 }
 
 export function CheckoutOrderSummary({
@@ -41,11 +42,14 @@ export function CheckoutOrderSummary({
   validatingCoupon,
   onApplyCoupon,
   onRemoveCoupon,
+  checkoutConfig,
 }: CheckoutOrderSummaryProps) {
   return (
     <Card>
       <CardHeader className="pb-4">
-        <CardTitle>Order Items ({items.length})</CardTitle>
+        <CardTitle>
+          {`${checkoutConfig?.orderSummaryLabel || "Order Summary"} (${items.length})`}
+        </CardTitle>
       </CardHeader>
       <Separator />
       <CardContent className="space-y-5 pt-6">
@@ -81,60 +85,62 @@ export function CheckoutOrderSummary({
         </div>
 
         {/* Coupon section */}
-        <div className="pt-2 border-t border-slate-100">
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Tag className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-              <Input
-                type="text"
-                disabled={validatingCoupon || loading}
-                placeholder="Promo Code"
-                value={couponCode}
-                onChange={(e) => onCouponCodeChange(e.target.value)}
-                className="h-9 rounded-xl pl-9 pr-3 text-xs font-semibold uppercase"
-              />
-            </div>
-            <Button
-              size="sm"
-              type="button"
-              onClick={() => onApplyCoupon(couponCode)}
-              disabled={validatingCoupon || !couponCode.trim() || loading}
-              className="rounded-xl bg-slate-900 text-xs font-bold text-white hover:bg-slate-800"
-            >
-              {validatingCoupon ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                "Apply"
-              )}
-            </Button>
-          </div>
-
-          {coupon && (
-            <div className="mt-2 flex items-center justify-between text-xs text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
-              <span>
-                Applied: <strong>{coupon.code}</strong> (-
-                {formatCurrency(discount, currency)})
-              </span>
+        {checkoutConfig?.showCoupon !== false && (
+          <div className="pt-2 border-t border-slate-100">
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Tag className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
+                <Input
+                  type="text"
+                  disabled={validatingCoupon || loading}
+                  placeholder={checkoutConfig?.couponLabel || "Promo Code"}
+                  value={couponCode}
+                  onChange={(e) => onCouponCodeChange(e.target.value)}
+                  className="h-9 rounded-xl pl-9 pr-3 text-xs font-semibold uppercase"
+                />
+              </div>
               <Button
-                aria-label="Remove coupon"
-                size="icon"
-                variant="ghost"
+                size="sm"
                 type="button"
-                onClick={onRemoveCoupon}
-                className="size-7 text-emerald-700 hover:text-rose-600"
-                title="Remove coupon"
+                onClick={() => onApplyCoupon(couponCode)}
+                disabled={validatingCoupon || !couponCode.trim() || loading}
+                className="rounded-xl bg-slate-900 text-xs font-bold text-white hover:bg-slate-800"
               >
-                <X className="size-3.5" />
+                {validatingCoupon ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  "Apply"
+                )}
               </Button>
             </div>
-          )}
-        </div>
+
+            {coupon && (
+              <div className="mt-2 flex items-center justify-between text-xs text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
+                <span>
+                  Applied: <strong>{coupon.code}</strong> (-
+                  {formatCurrency(discount, currency)})
+                </span>
+                <Button
+                  aria-label="Remove coupon"
+                  size="icon"
+                  variant="ghost"
+                  type="button"
+                  onClick={onRemoveCoupon}
+                  className="size-7 text-emerald-700 hover:text-rose-600"
+                  title="Remove coupon"
+                >
+                  <X className="size-3.5" />
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Cost breakdown */}
         <Separator />
         <div className="space-y-2 text-sm">
           <div className="flex justify-between text-slate-600">
-            <span>Subtotal</span>
+            <span>{checkoutConfig?.subtotalLabel || "Subtotal"}</span>
             <span>{formatCurrency(subtotal, currency)}</span>
           </div>
           {discount > 0 && (
@@ -145,7 +151,7 @@ export function CheckoutOrderSummary({
           )}
           <div className="flex justify-between text-slate-600">
             <span>
-              Delivery Fee{" "}
+              {checkoutConfig?.deliveryChargeLabel || "Delivery Fee"}{" "}
               {cityZone
                 ? `(${cityZone === "inside" ? "Inside City" : cityZone === "outside" ? "Outside City" : cityZone})`
                 : ""}
@@ -166,7 +172,7 @@ export function CheckoutOrderSummary({
           </div>
           <Separator className="my-3" />
           <div className="flex justify-between text-base font-extrabold text-slate-900">
-            <span>Total Amount</span>
+            <span>{checkoutConfig?.totalLabel || "Total Amount"}</span>
             <span className="text-(--store-primary)">
               {formatCurrency(total, currency)}
             </span>

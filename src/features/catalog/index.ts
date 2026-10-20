@@ -2,6 +2,7 @@ export { ProductCard } from "./components/product-card";
 export {
   ProductCardConfigProvider,
   useProductCardConfig,
+  useProductCardWishlist,
 } from "./components/product-card-config-provider";
 export { ProductCardImage } from "./components/product-card-image";
 export { ProductCardContent } from "./components/product-card-content";

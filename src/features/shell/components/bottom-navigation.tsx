@@ -15,6 +15,7 @@ import { BottomNavigationItem } from "./bottom-navigation-item";
 export interface BottomNavigationProps {
   config?: StorefrontBottomNavConfig;
   storeSlug: string;
+  wishlist?: { active: boolean };
 }
 
 function isActiveItem(pathname: string, item: StorefrontBottomNavItemConfig) {
@@ -27,30 +28,49 @@ function isActiveItem(pathname: string, item: StorefrontBottomNavItemConfig) {
 function getDisplayItems(
   configuredItems: StorefrontBottomNavItemConfig[],
   isNotchLayout: boolean,
+  isWishlistDisabled: boolean,
 ): StorefrontBottomNavItemConfig[] {
+  const fallbackList = isWishlistDisabled
+    ? DEFAULT_BOTTOM_NAV_ITEMS.filter(
+        (candidate) =>
+          candidate.href !== "/wishlist" &&
+          candidate.iconName !== "heart" &&
+          candidate.label?.toLowerCase() !== "wishlist",
+      )
+    : DEFAULT_BOTTOM_NAV_ITEMS;
+
   const items = [...configuredItems];
   while (items.length < 5) {
     const fallbackItem =
-      DEFAULT_BOTTOM_NAV_ITEMS.find(
+      fallbackList.find(
         (candidate) =>
           !items.some((item) => item.label === candidate.label),
-      ) ?? DEFAULT_BOTTOM_NAV_ITEMS[items.length % DEFAULT_BOTTOM_NAV_ITEMS.length];
+      ) ?? fallbackList[items.length % fallbackList.length];
     items.push(fallbackItem);
   }
 
-  if (isNotchLayout) items[2] = DEFAULT_BOTTOM_NAV_ITEMS[2];
+  if (isNotchLayout) items[2] = fallbackList[2] ?? items[2];
   return items.slice(0, 5);
 }
 
-export function BottomNavigation({ config, storeSlug }: BottomNavigationProps) {
+export function BottomNavigation({
+  config,
+  storeSlug,
+  wishlist,
+}: BottomNavigationProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { itemCount, toggleDrawer } = useCart(storeSlug);
 
   if (config?.active === false) return null;
 
+  const isWishlistDisabled = wishlist?.active === false;
   const isNotchLayout = config?.layout === 2;
-  const items = getDisplayItems(resolveBottomNavItems(config), isNotchLayout);
+  const items = getDisplayItems(
+    resolveBottomNavItems(config, wishlist),
+    isNotchLayout,
+    isWishlistDisabled,
+  );
   const backgroundColor = config?.bgColor ?? "var(--store-bg, #ffffff)";
   const iconColor = config?.iconColor ?? "#8a94a6";
   const activeColor = config?.activeColor ?? "var(--store-primary)";

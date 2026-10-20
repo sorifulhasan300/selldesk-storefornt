@@ -23,7 +23,7 @@ export interface ResolvedProductCardConfig {
 export interface ProductCardProps {
   product: Product;
   currency?: string;
-  cardConfig?: StorefrontProductCardConfig;
+  cardConfig?: StorefrontProductCardConfig & { wishlist?: { active: boolean } };
   cardWidth?: number | string;
   cardRadius?: number | string;
   showName?: boolean;

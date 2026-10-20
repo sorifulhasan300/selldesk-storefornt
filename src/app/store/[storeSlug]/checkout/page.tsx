@@ -14,6 +14,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
     outsideCity: 120,
   };
   const currency = bootstrap.store?.currency || "USD";
+  const checkoutConfig = bootstrap.config?.checkout || bootstrap.checkout;
 
   return (
     <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
@@ -30,6 +31,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
         storeSlug={storeSlug}
         currency={currency}
         deliveryChargeConfig={deliveryCharge}
+        checkoutConfig={checkoutConfig}
       />
     </div>
   );

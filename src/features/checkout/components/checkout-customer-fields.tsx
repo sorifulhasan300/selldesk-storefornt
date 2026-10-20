@@ -4,6 +4,7 @@ import { Truck } from "lucide-react";
 import { Card } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
 import { Textarea } from "@/shared/ui/textarea";
+import { StorefrontCheckoutConfig } from "@/shared/types";
 
 interface CheckoutCustomerFieldsProps {
   customerName: string;
@@ -16,6 +17,7 @@ interface CheckoutCustomerFieldsProps {
   onNotesChange: (val: string) => void;
   fieldErrors: Record<string, string>;
   disabled?: boolean;
+  checkoutConfig?: StorefrontCheckoutConfig;
 }
 
 export function CheckoutCustomerFields({
@@ -29,18 +31,19 @@ export function CheckoutCustomerFields({
   onNotesChange,
   fieldErrors,
   disabled,
+  checkoutConfig,
 }: CheckoutCustomerFieldsProps) {
   return (
     <Card className="space-y-5 p-6">
       <h2 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
         <Truck className="w-5 h-5 text-(--store-primary)" />
-        <span>Shipping & Customer Details</span>
+        <span>{checkoutConfig?.deliveryInfoLabel || "Shipping & Customer Details"}</span>
       </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label htmlFor="customer-name" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-            Full Name *
+            {`${checkoutConfig?.nameLabel || "Full Name"} *`}
           </label>
           <Input
             id="customer-name"
@@ -60,7 +63,7 @@ export function CheckoutCustomerFields({
 
         <div>
           <label htmlFor="customer-phone" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-            Phone Number *
+            {`${checkoutConfig?.phoneLabel || "Phone Number"} *`}
           </label>
           <Input
             id="customer-phone"
@@ -81,7 +84,7 @@ export function CheckoutCustomerFields({
 
       <div>
         <label htmlFor="shipping-address" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-          Full Shipping Address *
+          {`${checkoutConfig?.addressLabel || "Full Shipping Address"} *`}
         </label>
         <Textarea
           id="shipping-address"

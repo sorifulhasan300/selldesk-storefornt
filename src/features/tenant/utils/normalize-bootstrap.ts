@@ -4,6 +4,7 @@ import {
   StorefrontPopupConfig,
   StorefrontProductCardConfig,
   StorefrontProductPageConfig,
+  StorefrontCheckoutConfig,
   HomePageSection,
 } from "@/shared/types";
 import { normalizeBootstrapSliders } from "./normalize-slider";
@@ -25,6 +26,99 @@ function isLegacyHeroSliderSection(section: HomePageSection): boolean {
   );
 }
 
+export const DEFAULT_CHECKOUT_CONFIG: StorefrontCheckoutConfig = {
+  deliveryInfoLabel: "Shipping & Customer Details",
+  nameLabel: "Full Name",
+  phoneLabel: "Phone Number",
+  districtLabel: "District",
+  addressLabel: "Full Shipping Address",
+  showCoupon: true,
+  couponLabel: "Promo Code",
+  orderSummaryLabel: "Order Summary",
+  subtotalLabel: "Subtotal",
+  deliveryChargeLabel: "Delivery Fee",
+  totalLabel: "Total Amount",
+  placeOrderLabel: "Confirm Order",
+  showAgreement: true,
+};
+
+export function normalizeCheckoutConfig(
+  raw?: unknown,
+): StorefrontCheckoutConfig {
+  if (!raw || typeof raw !== "object") {
+    return { ...DEFAULT_CHECKOUT_CONFIG };
+  }
+
+  const data = raw as Record<string, unknown>;
+
+  return {
+    deliveryInfoLabel:
+      typeof data.deliveryInfoLabel === "string" && data.deliveryInfoLabel.trim() !== ""
+        ? data.deliveryInfoLabel
+        : DEFAULT_CHECKOUT_CONFIG.deliveryInfoLabel,
+    nameLabel:
+      typeof data.nameLabel === "string" && data.nameLabel.trim() !== ""
+        ? data.nameLabel
+        : DEFAULT_CHECKOUT_CONFIG.nameLabel,
+    phoneLabel:
+      typeof data.phoneLabel === "string" && data.phoneLabel.trim() !== ""
+        ? data.phoneLabel
+        : DEFAULT_CHECKOUT_CONFIG.phoneLabel,
+    districtLabel:
+      typeof data.districtLabel === "string" && data.districtLabel.trim() !== ""
+        ? data.districtLabel
+        : DEFAULT_CHECKOUT_CONFIG.districtLabel,
+    addressLabel:
+      typeof data.addressLabel === "string" && data.addressLabel.trim() !== ""
+        ? data.addressLabel
+        : DEFAULT_CHECKOUT_CONFIG.addressLabel,
+    showCoupon:
+      typeof data.showCoupon === "boolean"
+        ? data.showCoupon
+        : DEFAULT_CHECKOUT_CONFIG.showCoupon,
+    couponLabel:
+      typeof data.couponLabel === "string" && data.couponLabel.trim() !== ""
+        ? data.couponLabel
+        : DEFAULT_CHECKOUT_CONFIG.couponLabel,
+    orderSummaryLabel:
+      typeof data.orderSummaryLabel === "string" && data.orderSummaryLabel.trim() !== ""
+        ? data.orderSummaryLabel
+        : DEFAULT_CHECKOUT_CONFIG.orderSummaryLabel,
+    subtotalLabel:
+      typeof data.subtotalLabel === "string" && data.subtotalLabel.trim() !== ""
+        ? data.subtotalLabel
+        : DEFAULT_CHECKOUT_CONFIG.subtotalLabel,
+    deliveryChargeLabel:
+      typeof data.deliveryChargeLabel === "string" && data.deliveryChargeLabel.trim() !== ""
+        ? data.deliveryChargeLabel
+        : DEFAULT_CHECKOUT_CONFIG.deliveryChargeLabel,
+    totalLabel:
+      typeof data.totalLabel === "string" && data.totalLabel.trim() !== ""
+        ? data.totalLabel
+        : DEFAULT_CHECKOUT_CONFIG.totalLabel,
+    placeOrderLabel:
+      typeof data.placeOrderLabel === "string" && data.placeOrderLabel.trim() !== ""
+        ? data.placeOrderLabel
+        : DEFAULT_CHECKOUT_CONFIG.placeOrderLabel,
+    showAgreement:
+      typeof data.showAgreement === "boolean"
+        ? data.showAgreement
+        : DEFAULT_CHECKOUT_CONFIG.showAgreement,
+  };
+}
+
+function normalizeWishlistConfig(rawWishlist: unknown): { active: boolean } {
+  if (
+    rawWishlist &&
+    typeof rawWishlist === "object" &&
+    "active" in rawWishlist &&
+    typeof (rawWishlist as { active: unknown }).active === "boolean"
+  ) {
+    return { active: (rawWishlist as { active: boolean }).active };
+  }
+  return { active: true };
+}
+
 export function normalizeBootstrap(
   rawInput: unknown,
   storeSlug: string,
@@ -38,6 +132,12 @@ export function normalizeBootstrap(
         currency: "USD",
         themeColor: "#2563eb",
         description: null,
+      },
+      checkout: { ...DEFAULT_CHECKOUT_CONFIG },
+      wishlist: { active: true },
+      config: {
+        wishlist: { active: true },
+        checkout: { ...DEFAULT_CHECKOUT_CONFIG },
       },
     };
   }
@@ -156,6 +256,20 @@ export function normalizeBootstrap(
         }))
       : []);
 
+  const rawCheckout =
+    raw.checkout ||
+    config.checkout ||
+    rawConfig.checkout ||
+    raw.checkoutConfig ||
+    config.checkoutConfig;
+  const checkout = normalizeCheckoutConfig(rawCheckout);
+
+  const rawWishlist =
+    raw.wishlist ??
+    config.wishlist ??
+    rawConfig.wishlist;
+  const wishlist = normalizeWishlistConfig(rawWishlist);
+
   return {
     ...raw,
     store,
@@ -164,6 +278,8 @@ export function normalizeBootstrap(
     deliveryCharge:
       (raw.deliveryCharge as StorefrontBootstrap["deliveryCharge"]) ||
       (config.deliveryCharge as StorefrontBootstrap["deliveryCharge"]),
+    checkout,
+    wishlist,
     homePage: {
       ...rawHome,
       sections: homePageSections,
@@ -175,6 +291,8 @@ export function normalizeBootstrap(
       ...(popupConfig ? { popup: popupConfig } : {}),
       ...(productCard ? { productCard } : {}),
       ...(productPage ? { productPage } : {}),
+      checkout,
+      wishlist,
       homePage: {
         ...(config.homePage as Record<string, unknown> | undefined),
         sections: homePageSections,

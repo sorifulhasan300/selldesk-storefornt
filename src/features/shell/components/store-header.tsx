@@ -41,6 +41,7 @@ interface NavLink {
 interface StoreHeaderConfig {
   navbar?: StorefrontNavbarConfig;
   header?: StorefrontHeaderConfig;
+  wishlist?: { active: boolean };
 }
 
 export interface StoreHeaderProps {
@@ -48,6 +49,7 @@ export interface StoreHeaderProps {
   config?: StoreHeaderConfig;
   header?: StorefrontHeaderConfig;
   navbar?: StorefrontNavbarConfig;
+  wishlist?: { active: boolean };
   categories?: Array<{ id: string; name: string; slug: string }>;
   contactPhone?: string;
 }
@@ -520,6 +522,7 @@ export function StoreHeader({
   config,
   header,
   navbar,
+  wishlist,
   categories,
   contactPhone,
 }: StoreHeaderProps) {
@@ -564,11 +567,16 @@ export function StoreHeader({
     [hasConfiguredMenuItems, resolvedNavbar?.menuItems, rawLinks, defaultLinks],
   );
 
+  const isWishlistDisabled =
+    wishlist?.active === false || config?.wishlist?.active === false;
+
   const actions = [
     ...(resolvedHeader?.actions?.length
       ? resolvedHeader.actions
       : DEFAULT_ACTIONS),
-  ].sort((left, right) => (left.order ?? Infinity) - (right.order ?? Infinity));
+  ]
+    .filter((action) => !isWishlistDisabled || action.type !== "wishlist")
+    .sort((left, right) => (left.order ?? Infinity) - (right.order ?? Infinity));
   const iconSize = resolvedHeader?.actionIconSize ?? 18;
   const actionFontSize = resolvedHeader?.actionFontSize ?? 12;
   const actionStyle = resolvedHeader?.actionStyle ?? 3;
@@ -675,7 +683,7 @@ export function StoreHeader({
         if (actionLink) {
           if (
             action.type === "wishlist" &&
-            resolvedHeader?.wishListEnabled === false
+            (resolvedHeader?.wishListEnabled === false || isWishlistDisabled)
           ) {
             return null;
           }

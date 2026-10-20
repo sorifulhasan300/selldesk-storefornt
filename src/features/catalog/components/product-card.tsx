@@ -89,6 +89,7 @@ export function ProductCard({
         product={product}
         config={resolvedConfig}
         storeSlug={resolvedStoreSlug}
+        wishlist={cardConfig?.wishlist}
       />
 
       <div className="flex flex-1 flex-col justify-between p-4">

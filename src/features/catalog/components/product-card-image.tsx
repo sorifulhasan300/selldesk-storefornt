@@ -7,19 +7,25 @@ import { ShoppingBag } from "lucide-react";
 import type { Product } from "@/shared/types";
 import { Badge } from "@/shared/ui/badge";
 import { WishlistToggle } from "@/features/wishlist";
+import { useProductCardWishlist } from "./product-card-config-provider";
 import type { ResolvedProductCardConfig } from "../types";
 
 export interface ProductCardImageProps {
   product: Product;
   config: ResolvedProductCardConfig;
   storeSlug?: string;
+  wishlist?: { active: boolean };
 }
 
 export function ProductCardImage({
   product,
   config,
   storeSlug,
+  wishlist: explicitWishlist,
 }: ProductCardImageProps) {
+  const contextWishlist = useProductCardWishlist();
+  const wishlist = explicitWishlist ?? contextWishlist;
+  const isWishlistActive = wishlist?.active !== false;
   const [imageFailed, setImageFailed] = useState(false);
   const primaryImage = product.images?.[0] || null;
 
@@ -85,7 +91,7 @@ export function ProductCardImage({
         )}
       </div>
 
-      {storeSlug && (
+      {storeSlug && isWishlistActive && (
         <div className="absolute right-2 top-2 z-20">
           <WishlistToggle storeSlug={storeSlug} product={product} />
         </div>

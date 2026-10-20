@@ -302,6 +302,22 @@ export interface StorefrontProductCardConfig {
   titleLines?: number;
 }
 
+export interface StorefrontCheckoutConfig {
+  deliveryInfoLabel?: string;
+  nameLabel?: string;
+  phoneLabel?: string;
+  districtLabel?: string;
+  addressLabel?: string;
+  showCoupon?: boolean;
+  couponLabel?: string;
+  orderSummaryLabel?: string;
+  subtotalLabel?: string;
+  deliveryChargeLabel?: string;
+  totalLabel?: string;
+  placeOrderLabel?: string;
+  showAgreement?: boolean;
+}
+
 export interface StorefrontConfig {
   seo?: {
     metaTitle?: string;
@@ -339,6 +355,8 @@ export interface StorefrontConfig {
     size?: string;
   };
   popup?: StorefrontPopupConfig;
+  checkout?: StorefrontCheckoutConfig;
+  wishlist?: { active: boolean };
   [key: string]: unknown;
 }
 
@@ -432,5 +450,7 @@ export interface StorefrontBootstrap {
   };
   sections?: HomePageSection[];
   config?: StorefrontConfig;
+  checkout?: StorefrontCheckoutConfig;
+  wishlist?: { active: boolean };
   business?: unknown;
 }
