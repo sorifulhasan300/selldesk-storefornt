@@ -16,9 +16,7 @@ export default async function WishlistPage({
 
   const wishlistConfig = bootstrap.config?.wishlist ?? bootstrap.wishlist;
   if (wishlistConfig?.active === false) {
-    redirect(
-      process.env.NODE_ENV === "development" ? `/store/${storeSlug}` : "/",
-    );
+    redirect("/");
   }
 
   return (

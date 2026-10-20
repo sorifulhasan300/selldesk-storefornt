@@ -10,6 +10,7 @@ import type {
   StorefrontNavbarConfig,
 } from "@/shared/types";
 import { useCart } from "@/features/cart";
+import { useWishlistStore } from "@/features/wishlist";
 import {
   Heart,
   ChevronDown,
@@ -67,7 +68,7 @@ const DEFAULT_ACTIONS: HeaderActionItem[] = [
   {
     type: "wishlist",
     showOnDesktop: true,
-    showOnMobile: false,
+    showOnMobile: true,
     label: "Wishlist",
     order: 2,
   },
@@ -321,11 +322,32 @@ function MenuItemLink({
 function ConfiguredDesktopNavbar({
   navbar,
   categories,
+  isWishlistDisabled,
+  isAccountDisabled,
 }: {
   navbar: StorefrontNavbarConfig;
   categories?: Array<{ id: string; name: string; slug: string }>;
+  isWishlistDisabled?: boolean;
+  isAccountDisabled?: boolean;
 }) {
-  const items = navbar.menuItems ?? [];
+  const rawItems = navbar.menuItems ?? [];
+  const items = rawItems.filter((item) => {
+    if (isWishlistDisabled) {
+      const link = item.link?.toLowerCase().trim() ?? "";
+      const label = item.label?.toLowerCase().trim() ?? "";
+      if (link === "/wishlist" || link.endsWith("/wishlist") || label === "wishlist") {
+        return false;
+      }
+    }
+    if (isAccountDisabled) {
+      const link = item.link?.toLowerCase().trim() ?? "";
+      const label = item.label?.toLowerCase().trim() ?? "";
+      if (link === "/account" || link.endsWith("/account") || label === "account") {
+        return false;
+      }
+    }
+    return true;
+  });
   const layout = navbar.layout ?? 1;
   const megaCategory = navbar.megaCategory;
   const showCategoryButton =
@@ -408,13 +430,54 @@ function MobileDrawer({
   menuItems,
   fontSize,
   style = "default",
+  isWishlistDisabled,
+  isAccountDisabled,
 }: {
   links: NavLink[];
   onClose: () => void;
   style?: NavbarStyle;
   menuItems?: NavbarMenuItem[];
   fontSize?: number;
+  isWishlistDisabled?: boolean;
+  isAccountDisabled?: boolean;
 }) {
+  const filteredLinks = links.filter((link) => {
+    if (isWishlistDisabled) {
+      const url = link.url.toLowerCase();
+      const title = link.title.toLowerCase();
+      if (url === "/wishlist" || url.endsWith("/wishlist") || title === "wishlist") {
+        return false;
+      }
+    }
+    if (isAccountDisabled) {
+      const url = link.url.toLowerCase();
+      const title = link.title.toLowerCase();
+      if (url === "/account" || url.endsWith("/account") || title === "account") {
+        return false;
+      }
+    }
+    return true;
+  });
+
+  const rawMenuItems = menuItems ?? [];
+  const filteredMenuItems = rawMenuItems.filter((item) => {
+    if (isWishlistDisabled) {
+      const link = item.link?.toLowerCase().trim() ?? "";
+      const label = item.label?.toLowerCase().trim() ?? "";
+      if (link === "/wishlist" || link.endsWith("/wishlist") || label === "wishlist") {
+        return false;
+      }
+    }
+    if (isAccountDisabled) {
+      const link = item.link?.toLowerCase().trim() ?? "";
+      const label = item.label?.toLowerCase().trim() ?? "";
+      if (link === "/account" || link.endsWith("/account") || label === "account") {
+        return false;
+      }
+    }
+    return true;
+  });
+
   const renderMenuItems = (items: NavbarMenuItem[], depth = 0) =>
     items.map((item, index) => {
       const label = item.label?.trim();
@@ -449,8 +512,8 @@ function MobileDrawer({
       </SheetDescription>
       <nav aria-label="Store navigation" className="space-y-4 pt-8">
         {menuItems
-          ? renderMenuItems(menuItems)
-          : links.map((link) => (
+          ? renderMenuItems(filteredMenuItems)
+          : filteredLinks.map((link) => (
           <Link
             key={`${link.url}-${link.title}`}
             href={link.url}
@@ -530,6 +593,11 @@ export function StoreHeader({
   contactPhone,
 }: StoreHeaderProps) {
   const { itemCount, toggleDrawer } = useCart(store.subDomain);
+  const wishlistCount = useWishlistStore((state) =>
+    state.hasHydrated
+      ? state.productsByStore[store.subDomain]?.length ?? 0
+      : 0,
+  );
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouter();
 
@@ -552,23 +620,6 @@ export function StoreHeader({
   const rawLinks = resolvedNavbar?.links;
   const hasConfiguredMenuItems = Array.isArray(resolvedNavbar?.menuItems);
   const isConfiguredNavbar = hasConfiguredMenuItems;
-  const sortedNavLinks = useMemo(
-    () => {
-      if (hasConfiguredMenuItems) {
-        return (resolvedNavbar?.menuItems ?? [])
-          .filter((item) => Boolean(item.label?.trim()))
-          .map((item, index) => ({
-            title: item.label?.trim() ?? "",
-            url: item.link?.trim() || "#",
-            order: index + 1,
-          }));
-      }
-      return rawLinks && rawLinks.length > 0
-        ? sortNavLinks(rawLinks)
-        : defaultLinks;
-    },
-    [hasConfiguredMenuItems, resolvedNavbar?.menuItems, rawLinks, defaultLinks],
-  );
 
   const isWishlistDisabled =
     wishlist?.active === false || config?.wishlist?.active === false;
@@ -576,11 +627,88 @@ export function StoreHeader({
   const isAccountDisabled =
     account?.active === false || config?.account?.active === false;
 
-  const actions = [
-    ...(resolvedHeader?.actions?.length
-      ? resolvedHeader.actions
-      : DEFAULT_ACTIONS),
-  ]
+  const sortedNavLinks = useMemo(
+    () => {
+      let list: NavLink[] = [];
+      if (hasConfiguredMenuItems) {
+        list = (resolvedNavbar?.menuItems ?? [])
+          .filter((item) => Boolean(item.label?.trim()))
+          .map((item, index) => ({
+            title: item.label?.trim() ?? "",
+            url: item.link?.trim() || "#",
+            order: index + 1,
+          }));
+      } else {
+        list =
+          rawLinks && rawLinks.length > 0
+            ? sortNavLinks(rawLinks)
+            : defaultLinks;
+      }
+
+      if (isWishlistDisabled) {
+        list = list.filter((link) => {
+          const url = link.url.toLowerCase();
+          const title = link.title.toLowerCase();
+          return (
+            url !== "/wishlist" &&
+            !url.endsWith("/wishlist") &&
+            title !== "wishlist"
+          );
+        });
+      }
+
+      if (isAccountDisabled) {
+        list = list.filter((link) => {
+          const url = link.url.toLowerCase();
+          const title = link.title.toLowerCase();
+          return (
+            url !== "/account" &&
+            !url.endsWith("/account") &&
+            title !== "account"
+          );
+        });
+      }
+
+      return list;
+    },
+    [
+      hasConfiguredMenuItems,
+      resolvedNavbar?.menuItems,
+      rawLinks,
+      defaultLinks,
+      isWishlistDisabled,
+      isAccountDisabled,
+    ],
+  );
+
+  const configuredActions = resolvedHeader?.actions?.length
+    ? [...resolvedHeader.actions]
+    : [...DEFAULT_ACTIONS];
+
+  const hasWishlistAction = configuredActions.some(
+    (a) => a.type === "wishlist",
+  );
+  if (!isWishlistDisabled && !hasWishlistAction) {
+    configuredActions.push({
+      type: "wishlist",
+      showOnDesktop: true,
+      showOnMobile: true,
+      label: "Wishlist",
+      order: 2,
+    });
+  }
+
+  const actions = configuredActions
+    .map((action) => {
+      if (action.type === "wishlist") {
+        return {
+          ...action,
+          showOnDesktop: true,
+          showOnMobile: true,
+        };
+      }
+      return action;
+    })
     .filter((action) => !isWishlistDisabled || action.type !== "wishlist")
     .filter((action) => !isAccountDisabled || action.type !== "account")
     .sort((left, right) => (left.order ?? Infinity) - (right.order ?? Infinity));
@@ -678,22 +806,45 @@ export function StoreHeader({
           );
         }
 
+        if (action.type === "wishlist") {
+          if (isWishlistDisabled) return null;
+          return (
+            <Link
+              key={`${action.type}-${index}`}
+              href="/wishlist"
+              aria-label={label}
+              title={label}
+              className={`relative inline-flex items-center justify-center rounded-md px-2 py-1.5 text-inherit hover:bg-black/5 ${actionLayoutClass(actionStyle)} ${iconClassName}`}
+            >
+              <div className="relative inline-flex">
+                <Heart size={iconSize} aria-hidden="true" />
+                {wishlistCount > 0 && (
+                  <Badge className="absolute -right-2 -top-2 size-4 min-w-4 justify-center border border-white/30 p-0 text-[10px] shadow-sm ring-2 ring-white">
+                    {wishlistCount}
+                  </Badge>
+                )}
+              </div>
+              {Number(actionStyle) !== 1 && (
+                <span
+                  className="text-xs font-medium"
+                  style={{ fontSize: actionFontSize }}
+                >
+                  {label}
+                </span>
+              )}
+            </Link>
+          );
+        }
+
         const actionLinks: Record<
           string,
           { href: string; Icon: typeof Phone }
         > = {
-          wishlist: { href: "/wishlist", Icon: Heart },
           account: { href: "/account", Icon: UserRound },
           track: { href: "/track-order", Icon: Truck },
         };
         const actionLink = actionLinks[action.type];
         if (actionLink) {
-          if (
-            action.type === "wishlist" &&
-            (resolvedHeader?.wishListEnabled === false || isWishlistDisabled)
-          ) {
-            return null;
-          }
           return (
             <ActionLink
               key={`${action.type}-${index}`}
@@ -832,11 +983,18 @@ export function StoreHeader({
             }
             onClose={() => setMobileMenuOpen(false)}
             style={navbarStyle}
+            isWishlistDisabled={isWishlistDisabled}
+            isAccountDisabled={isAccountDisabled}
           />
         )}
       </header>
       {navbarActive && isConfiguredNavbar && (
-        <ConfiguredDesktopNavbar navbar={resolvedNavbar} categories={categories} />
+        <ConfiguredDesktopNavbar
+          navbar={resolvedNavbar}
+          categories={categories}
+          isWishlistDisabled={isWishlistDisabled}
+          isAccountDisabled={isAccountDisabled}
+        />
       )}
     </Sheet>
   );

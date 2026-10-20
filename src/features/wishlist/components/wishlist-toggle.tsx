@@ -12,8 +12,8 @@ export function WishlistToggle({
   product: Product;
 }) {
   const isWishlisted = useWishlistStore((state) =>
-    (state.productsByStore[storeSlug] ?? []).some(
-      (item) => item.id === product.id,
+    Boolean(
+      state.productsByStore[storeSlug]?.some((item) => item.id === product.id),
     ),
   );
   const addProduct = useWishlistStore((state) => state.addProduct);

@@ -74,8 +74,8 @@ export function ProductQuantityAction({
 
   // Wishlist state
   const isWishlisted = useWishlistStore((state) =>
-    (state.productsByStore[storeSlug] ?? []).some(
-      (item) => item.id === product.id,
+    Boolean(
+      state.productsByStore[storeSlug]?.some((item) => item.id === product.id),
     ),
   );
   const addWishlistProduct = useWishlistStore((state) => state.addProduct);

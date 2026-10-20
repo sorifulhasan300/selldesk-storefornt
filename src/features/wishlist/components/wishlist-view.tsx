@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { Heart } from "lucide-react";
 import { ProductCard } from "@/features/catalog";
-import type { StorefrontProductCardConfig } from "@/shared/types";
+import type { Product, StorefrontProductCardConfig } from "@/shared/types";
 import { useWishlistStore } from "../store/use-wishlist-store";
+
+const EMPTY_PRODUCTS: Product[] = [];
 
 export function WishlistView({
   storeSlug,
@@ -15,11 +17,13 @@ export function WishlistView({
   currency: string;
   cardConfig?: StorefrontProductCardConfig;
 }) {
-  const products = useWishlistStore(
-    (state) => state.productsByStore[storeSlug] ?? [],
+  const storeProducts = useWishlistStore(
+    (state) => state.productsByStore[storeSlug],
   );
   const hasHydrated = useWishlistStore((state) => state.hasHydrated);
-
+  const products =
+    hasHydrated && storeProducts ? storeProducts : EMPTY_PRODUCTS;
+  console.log("WishlistView products:", products);
   if (!hasHydrated) {
     return (
       <p className="py-12 text-center text-sm text-slate-500">
@@ -55,11 +59,12 @@ export function WishlistView({
           Your wishlist
         </h1>
         <p className="mt-2 text-sm text-slate-500">
-          {products.length} saved {products.length === 1 ? "product" : "products"}
+          {products.length} saved{" "}
+          {products.length === 1 ? "product" : "products"}
         </p>
       </header>
       <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
-        {products.map((product) => (
+        {products?.map((product) => (
           <ProductCard
             key={product.id}
             product={product}
