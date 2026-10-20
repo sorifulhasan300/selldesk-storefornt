@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useCart } from "@/features/cart";
+import { useWishlistStore } from "@/features/wishlist";
 import type {
   StorefrontBottomNavConfig,
   StorefrontBottomNavItemConfig,
@@ -74,6 +75,11 @@ export function BottomNavigation({
   const router = useRouter();
   const pathname = usePathname();
   const { itemCount, toggleDrawer } = useCart(storeSlug);
+  const wishlistCount = useWishlistStore((state) =>
+    state.hasHydrated
+      ? state.productsByStore[storeSlug]?.length ?? 0
+      : 0,
+  );
 
   if (config?.active === false) return null;
 
@@ -107,6 +113,7 @@ export function BottomNavigation({
               key={`${item.label}-${index}`}
               item={item}
               itemCount={itemCount}
+              wishlistCount={wishlistCount}
               isActive={isActive}
               isRaisedHome={isRaisedHome}
               showLabels={showLabels}

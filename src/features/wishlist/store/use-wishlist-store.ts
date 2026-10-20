@@ -4,11 +4,12 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import type { Product } from "@/shared/types";
 
-interface WishlistState {
+export interface WishlistState {
   productsByStore: Record<string, Product[]>;
   hasHydrated: boolean;
   addProduct: (storeSlug: string, product: Product) => void;
   removeProduct: (storeSlug: string, productId: string) => void;
+  clearWishlist: (storeSlug: string) => void;
   setHasHydrated: (hasHydrated: boolean) => void;
 }
 
@@ -35,6 +36,13 @@ export const useWishlistStore = create<WishlistState>()(
             [storeSlug]: (state.productsByStore[storeSlug] ?? []).filter(
               (product) => product.id !== productId,
             ),
+          },
+        })),
+      clearWishlist: (storeSlug) =>
+        set((state) => ({
+          productsByStore: {
+            ...state.productsByStore,
+            [storeSlug]: [],
           },
         })),
       setHasHydrated: (hasHydrated) => set({ hasHydrated }),

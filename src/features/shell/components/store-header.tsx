@@ -820,7 +820,7 @@ export function StoreHeader({
                 <Heart size={iconSize} aria-hidden="true" />
                 {wishlistCount > 0 && (
                   <Badge className="absolute -right-2 -top-2 size-4 min-w-4 justify-center border border-white/30 p-0 text-[10px] shadow-sm ring-2 ring-white">
-                    {wishlistCount}
+                    {wishlistCount > 99 ? "99+" : wishlistCount}
                   </Badge>
                 )}
               </div>

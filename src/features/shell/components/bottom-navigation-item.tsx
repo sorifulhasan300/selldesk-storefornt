@@ -44,6 +44,7 @@ const ICON_MAP: Record<BottomNavIconName, IconComponent> = {
 interface BottomNavigationItemProps {
   item: StorefrontBottomNavItemConfig;
   itemCount: number;
+  wishlistCount?: number;
   isActive: boolean;
   isRaisedHome: boolean;
   showLabels: boolean;
@@ -56,6 +57,7 @@ interface BottomNavigationItemProps {
 export function BottomNavigationItem({
   item,
   itemCount,
+  wishlistCount = 0,
   isActive,
   isRaisedHome,
   showLabels,
@@ -66,6 +68,17 @@ export function BottomNavigationItem({
 }: BottomNavigationItemProps) {
   const Icon = ICON_MAP[item.iconName] ?? Home;
   const foregroundColor = isActive ? activeColor : iconColor;
+
+  const isWishlistItem =
+    item.href === "/wishlist" ||
+    item.iconName === "heart" ||
+    item.label?.toLowerCase() === "wishlist";
+
+  const badgeCount = item.openCart
+    ? itemCount
+    : isWishlistItem
+      ? wishlistCount
+      : 0;
 
   return (
     <Button
@@ -93,12 +106,12 @@ export function BottomNavigationItem({
       ) : (
         <span className="relative">
           <Icon className="size-5" aria-hidden="true" />
-          {item.openCart && itemCount > 0 && (
+          {badgeCount > 0 && (
             <Badge
               className="absolute -right-2 -top-2 h-[18px] min-w-[18px] justify-center p-0 text-[10px] font-bold ring-2"
               style={{ "--tw-ring-color": backgroundColor } as CSSProperties}
             >
-              {itemCount > 99 ? "99+" : itemCount}
+              {badgeCount > 99 ? "99+" : badgeCount}
             </Badge>
           )}
         </span>

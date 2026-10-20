@@ -74,9 +74,11 @@ export function ProductQuantityAction({
 
   // Wishlist state
   const isWishlisted = useWishlistStore((state) =>
-    Boolean(
-      state.productsByStore[storeSlug]?.some((item) => item.id === product.id),
-    ),
+    state.hasHydrated
+      ? Boolean(
+          state.productsByStore[storeSlug]?.some((item) => item.id === product.id),
+        )
+      : false,
   );
   const addWishlistProduct = useWishlistStore((state) => state.addProduct);
   const removeWishlistProduct = useWishlistStore((state) => state.removeProduct);
@@ -126,10 +128,10 @@ export function ProductQuantityAction({
   const handleWishlistToggle = () => {
     if (isWishlisted) {
       removeWishlistProduct(storeSlug, product.id);
-      toast.info("Removed from wishlist");
+      toast.info(`"${product.name}" removed from wishlist`);
     } else {
       addWishlistProduct(storeSlug, product);
-      toast.success("Added to wishlist");
+      toast.success(`"${product.name}" added to wishlist`);
     }
   };
 
@@ -372,10 +374,12 @@ export function ProductQuantityAction({
                     type="button"
                     onClick={handleWishlistToggle}
                     variant="outline"
-                    className={`h-11 rounded-xl border-slate-200 text-slate-700 hover:text-rose-600 hover:border-rose-200 font-semibold text-xs ${widthClass}`}
+                    className={`h-11 rounded-xl border-slate-200 text-slate-700 hover:text-rose-600 hover:border-rose-200 font-semibold text-xs transition-transform duration-150 active:scale-95 cursor-pointer ${
+                      isWishlisted ? "text-rose-600 border-rose-200 bg-rose-50/50" : ""
+                    } ${widthClass}`}
                   >
                     <Heart
-                      className={`w-4 h-4 ${isWishlisted ? "fill-rose-600 text-rose-600" : ""}`}
+                      className={`w-4 h-4 transition-colors ${isWishlisted ? "fill-rose-600 text-rose-600" : ""}`}
                     />
                     {showLabel && (
                       <span>
@@ -481,10 +485,12 @@ export function ProductQuantityAction({
                 type="button"
                 onClick={handleWishlistToggle}
                 variant="outline"
-                className="w-full h-10 rounded-xl border-slate-200 text-slate-700 hover:text-rose-600 hover:border-rose-200 font-semibold text-xs transition-colors"
+                className={`w-full h-10 rounded-xl border-slate-200 text-slate-700 hover:text-rose-600 hover:border-rose-200 font-semibold text-xs transition-transform duration-150 active:scale-95 cursor-pointer ${
+                  isWishlisted ? "text-rose-600 border-rose-200 bg-rose-50/50" : ""
+                }`}
               >
                 <Heart
-                  className={`w-4 h-4 ${isWishlisted ? "fill-rose-600 text-rose-600" : ""}`}
+                  className={`w-4 h-4 transition-colors ${isWishlisted ? "fill-rose-600 text-rose-600" : ""}`}
                 />
                 <span>{isWishlisted ? "In Wishlist" : "Add to Wishlist"}</span>
               </Button>
