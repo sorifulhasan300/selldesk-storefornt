@@ -83,9 +83,10 @@ function normalizeLegacyItem(
 export function resolveBottomNavItems(
   config?: StorefrontBottomNavConfig,
   wishlistConfig?: { active: boolean },
+  accountConfig?: { active: boolean },
 ): StorefrontBottomNavItemConfig[] {
   const configuredItems = config?.items;
-  const items = !configuredItems?.length
+  let items = !configuredItems?.length
     ? DEFAULT_BOTTOM_NAV_ITEMS
     : configuredItems.map((item) => {
         if (typeof item === "string") {
@@ -95,11 +96,20 @@ export function resolveBottomNavItems(
       });
 
   if (wishlistConfig?.active === false) {
-    return items.filter(
+    items = items.filter(
       (item) =>
         item.href !== "/wishlist" &&
         item.iconName !== "heart" &&
         item.label?.toLowerCase() !== "wishlist",
+    );
+  }
+
+  if (accountConfig?.active === false) {
+    items = items.filter(
+      (item) =>
+        item.href !== "/account" &&
+        item.iconName !== "user" &&
+        item.label?.toLowerCase() !== "account",
     );
   }
 

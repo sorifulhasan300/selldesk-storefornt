@@ -357,6 +357,7 @@ export interface StorefrontConfig {
   popup?: StorefrontPopupConfig;
   checkout?: StorefrontCheckoutConfig;
   wishlist?: { active: boolean };
+  account?: { active: boolean };
   [key: string]: unknown;
 }
 
@@ -452,5 +453,6 @@ export interface StorefrontBootstrap {
   config?: StorefrontConfig;
   checkout?: StorefrontCheckoutConfig;
   wishlist?: { active: boolean };
+  account?: { active: boolean };
   business?: unknown;
 }

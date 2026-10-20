@@ -42,6 +42,7 @@ interface StoreHeaderConfig {
   navbar?: StorefrontNavbarConfig;
   header?: StorefrontHeaderConfig;
   wishlist?: { active: boolean };
+  account?: { active: boolean };
 }
 
 export interface StoreHeaderProps {
@@ -50,6 +51,7 @@ export interface StoreHeaderProps {
   header?: StorefrontHeaderConfig;
   navbar?: StorefrontNavbarConfig;
   wishlist?: { active: boolean };
+  account?: { active: boolean };
   categories?: Array<{ id: string; name: string; slug: string }>;
   contactPhone?: string;
 }
@@ -523,6 +525,7 @@ export function StoreHeader({
   header,
   navbar,
   wishlist,
+  account,
   categories,
   contactPhone,
 }: StoreHeaderProps) {
@@ -570,12 +573,16 @@ export function StoreHeader({
   const isWishlistDisabled =
     wishlist?.active === false || config?.wishlist?.active === false;
 
+  const isAccountDisabled =
+    account?.active === false || config?.account?.active === false;
+
   const actions = [
     ...(resolvedHeader?.actions?.length
       ? resolvedHeader.actions
       : DEFAULT_ACTIONS),
   ]
     .filter((action) => !isWishlistDisabled || action.type !== "wishlist")
+    .filter((action) => !isAccountDisabled || action.type !== "account")
     .sort((left, right) => (left.order ?? Infinity) - (right.order ?? Infinity));
   const iconSize = resolvedHeader?.actionIconSize ?? 18;
   const actionFontSize = resolvedHeader?.actionFontSize ?? 12;

@@ -16,6 +16,7 @@ export interface BottomNavigationProps {
   config?: StorefrontBottomNavConfig;
   storeSlug: string;
   wishlist?: { active: boolean };
+  account?: { active: boolean };
 }
 
 function isActiveItem(pathname: string, item: StorefrontBottomNavItemConfig) {
@@ -29,15 +30,25 @@ function getDisplayItems(
   configuredItems: StorefrontBottomNavItemConfig[],
   isNotchLayout: boolean,
   isWishlistDisabled: boolean,
+  isAccountDisabled: boolean,
 ): StorefrontBottomNavItemConfig[] {
-  const fallbackList = isWishlistDisabled
-    ? DEFAULT_BOTTOM_NAV_ITEMS.filter(
-        (candidate) =>
-          candidate.href !== "/wishlist" &&
-          candidate.iconName !== "heart" &&
-          candidate.label?.toLowerCase() !== "wishlist",
-      )
-    : DEFAULT_BOTTOM_NAV_ITEMS;
+  let fallbackList = DEFAULT_BOTTOM_NAV_ITEMS;
+  if (isWishlistDisabled) {
+    fallbackList = fallbackList.filter(
+      (candidate) =>
+        candidate.href !== "/wishlist" &&
+        candidate.iconName !== "heart" &&
+        candidate.label?.toLowerCase() !== "wishlist",
+    );
+  }
+  if (isAccountDisabled) {
+    fallbackList = fallbackList.filter(
+      (candidate) =>
+        candidate.href !== "/account" &&
+        candidate.iconName !== "user" &&
+        candidate.label?.toLowerCase() !== "account",
+    );
+  }
 
   const items = [...configuredItems];
   while (items.length < 5) {
@@ -46,6 +57,7 @@ function getDisplayItems(
         (candidate) =>
           !items.some((item) => item.label === candidate.label),
       ) ?? fallbackList[items.length % fallbackList.length];
+    if (!fallbackItem) break;
     items.push(fallbackItem);
   }
 
@@ -57,6 +69,7 @@ export function BottomNavigation({
   config,
   storeSlug,
   wishlist,
+  account,
 }: BottomNavigationProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -65,11 +78,13 @@ export function BottomNavigation({
   if (config?.active === false) return null;
 
   const isWishlistDisabled = wishlist?.active === false;
+  const isAccountDisabled = account?.active === false;
   const isNotchLayout = config?.layout === 2;
   const items = getDisplayItems(
-    resolveBottomNavItems(config, wishlist),
+    resolveBottomNavItems(config, wishlist, account),
     isNotchLayout,
     isWishlistDisabled,
+    isAccountDisabled,
   );
   const backgroundColor = config?.bgColor ?? "var(--store-bg, #ffffff)";
   const iconColor = config?.iconColor ?? "#8a94a6";

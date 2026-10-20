@@ -79,6 +79,7 @@ export default async function TenantLayout({
         header={headerConfig}
         navbar={navbarConfig}
         wishlist={config?.wishlist}
+        account={config?.account}
         contactPhone={config?.contact?.phone ?? store.contactPhone ?? undefined}
       />
       <main
@@ -113,6 +114,7 @@ export default async function TenantLayout({
         config={bottomNavConfig}
         storeSlug={storeSlug}
         wishlist={config?.wishlist}
+        account={config?.account}
       />
       <PromotionalPopup popup={config?.popup} />
     </div>

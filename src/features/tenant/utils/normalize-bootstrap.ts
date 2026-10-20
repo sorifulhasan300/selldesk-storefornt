@@ -119,6 +119,18 @@ function normalizeWishlistConfig(rawWishlist: unknown): { active: boolean } {
   return { active: true };
 }
 
+function normalizeAccountConfig(rawAccount: unknown): { active: boolean } {
+  if (
+    rawAccount &&
+    typeof rawAccount === "object" &&
+    "active" in rawAccount &&
+    typeof (rawAccount as { active: unknown }).active === "boolean"
+  ) {
+    return { active: (rawAccount as { active: boolean }).active };
+  }
+  return { active: true };
+}
+
 export function normalizeBootstrap(
   rawInput: unknown,
   storeSlug: string,
@@ -135,8 +147,10 @@ export function normalizeBootstrap(
       },
       checkout: { ...DEFAULT_CHECKOUT_CONFIG },
       wishlist: { active: true },
+      account: { active: true },
       config: {
         wishlist: { active: true },
+        account: { active: true },
         checkout: { ...DEFAULT_CHECKOUT_CONFIG },
       },
     };
@@ -270,6 +284,12 @@ export function normalizeBootstrap(
     rawConfig.wishlist;
   const wishlist = normalizeWishlistConfig(rawWishlist);
 
+  const rawAccount =
+    raw.account ??
+    config.account ??
+    rawConfig.account;
+  const account = normalizeAccountConfig(rawAccount);
+
   return {
     ...raw,
     store,
@@ -280,6 +300,7 @@ export function normalizeBootstrap(
       (config.deliveryCharge as StorefrontBootstrap["deliveryCharge"]),
     checkout,
     wishlist,
+    account,
     homePage: {
       ...rawHome,
       sections: homePageSections,
@@ -293,6 +314,7 @@ export function normalizeBootstrap(
       ...(productPage ? { productPage } : {}),
       checkout,
       wishlist,
+      account,
       homePage: {
         ...(config.homePage as Record<string, unknown> | undefined),
         sections: homePageSections,
