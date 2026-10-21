@@ -22,7 +22,7 @@ export default async function CartPage({ params }: CartPageProps) {
   const currency = bootstrap.store?.currency || "USD";
 
   return (
-    <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 max-w-[var(--store-content-max-w,1200px)] py-6 space-y-6">
       <CartView storeSlug={storeSlug} currency={currency} />
     </div>
   );

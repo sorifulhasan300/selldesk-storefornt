@@ -23,6 +23,18 @@ import type {
   BottomNavIconName,
   StorefrontBottomNavItemConfig,
 } from "@/shared/types";
+import { StorefrontIcon, type StorefrontIconName } from "./StorefrontIcon";
+
+const THEME_ICONS = new Set([
+  "home",
+  "search",
+  "cart",
+  "shopping-bag",
+  "shopping-cart",
+  "user",
+  "heart",
+  "wishlist",
+]);
 
 type IconComponent = ComponentType<LucideProps>;
 
@@ -111,7 +123,7 @@ export function BottomNavigationItem({
               className="size-full object-contain"
             />
           ) : (
-            <Icon className="size-5" aria-hidden="true" />
+            <StorefrontIcon name="home" size={20} className="size-5 text-white" aria-hidden="true" />
           )}
         </span>
       ) : (
@@ -122,6 +134,13 @@ export function BottomNavigationItem({
               src={homeIcon}
               alt="Home"
               className="size-5 object-contain"
+            />
+          ) : THEME_ICONS.has(item.iconName) ? (
+            <StorefrontIcon
+              name={item.iconName as StorefrontIconName}
+              size={20}
+              className="size-5"
+              aria-hidden="true"
             />
           ) : (
             <Icon className="size-5" aria-hidden="true" />

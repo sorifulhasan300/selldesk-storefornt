@@ -19,7 +19,7 @@ export function FooterBottomBar({
         className={`mx-auto flex flex-col items-center gap-4 ${
           layout === 3
             ? "max-w-4xl justify-center"
-            : "max-w-7xl justify-between md:flex-row"
+            : "w-full max-w-[var(--store-content-max-w,1200px)] justify-between md:flex-row"
         }`}
       >
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-center text-xs opacity-70">

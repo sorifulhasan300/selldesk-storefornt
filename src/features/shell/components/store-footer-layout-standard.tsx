@@ -37,7 +37,7 @@ export function FooterLayoutStandard({
   if (layout === 1) {
     return (
       <div
-        className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 sm:px-6 md:grid-cols-[minmax(0,3fr)_minmax(0,7fr)] lg:px-8"
+        className="mx-auto grid w-full max-w-[var(--store-content-max-w,1200px)] grid-cols-1 gap-10 px-4 sm:px-6 md:grid-cols-[minmax(0,3fr)_minmax(0,7fr)] lg:px-8"
         style={contentStyle}
       >
         <div className="space-y-4">
@@ -62,7 +62,7 @@ export function FooterLayoutStandard({
 
   return (
     <div
-      className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 sm:px-6 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)] lg:px-8"
+      className="mx-auto grid w-full max-w-[var(--store-content-max-w,1200px)] grid-cols-1 gap-10 px-4 sm:px-6 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)] lg:px-8"
       style={contentStyle}
     >
       <div className="space-y-4">

@@ -11,7 +11,7 @@ export default async function TrackOrderPage({
 }) {
   const { storeSlug } = await params;
   return (
-    <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
+    <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 max-w-[var(--store-content-max-w,1200px)] py-6">
       <OrderTrackingPage storeSlug={storeSlug} />
     </div>
   );

@@ -8,3 +8,9 @@ export { BottomNavigation } from "./components/bottom-navigation";
 export type { BottomNavigationProps } from "./components/bottom-navigation";
 export { PromotionalPopup } from "./components/PromotionalPopup";
 export type { PromotionalPopupProps } from "./components/PromotionalPopup";
+export {
+  StorefrontIcon,
+  IconSetProvider,
+  useStorefrontIconSet,
+} from "./components/StorefrontIcon";
+export type { StorefrontIconName } from "./components/StorefrontIcon";

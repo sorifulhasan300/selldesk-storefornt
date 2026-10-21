@@ -17,7 +17,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
   const checkoutConfig = bootstrap.config?.checkout || bootstrap.checkout;
 
   return (
-    <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 max-w-[var(--store-content-max-w,1200px)] py-6 space-y-6">
       <div className="border-b border-slate-200/80 pb-4">
         <h1 className="text-2xl sm:text-3xl font-black text-slate-900">
           Checkout

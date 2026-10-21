@@ -174,7 +174,7 @@ export function getSectionContainerClass(section: HomePageSection): string {
     layout === 3 ||
     layout === "3"
   ) {
-    return "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8";
+    return "w-full mx-auto px-4 sm:px-6 lg:px-8 max-w-[var(--store-content-max-w,1200px)]";
   }
 
   const typeStr = (section.type || section.key || "")
@@ -187,7 +187,7 @@ export function getSectionContainerClass(section: HomePageSection): string {
     return "w-full px-0";
   }
 
-  return "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8";
+  return "w-full mx-auto px-4 sm:px-6 lg:px-8 max-w-[var(--store-content-max-w,1200px)]";
 }
 
 export function buildCardVariables(s: HomePageSection): React.CSSProperties {

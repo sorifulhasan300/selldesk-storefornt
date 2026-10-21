@@ -45,7 +45,7 @@ export function MobileStickyBuyBar() {
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur md:hidden">
-      <div className="mx-auto flex max-w-7xl items-center gap-3">
+      <div className="mx-auto flex w-full max-w-[var(--store-content-max-w,1200px)] items-center gap-3">
         <div className="min-w-0 shrink-0">
           <p className="text-lg font-extrabold leading-tight text-slate-900">
             {formatCurrency(currentPrice, currency)}

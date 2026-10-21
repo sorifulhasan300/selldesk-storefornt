@@ -23,6 +23,7 @@ import {
   UserRound,
   X,
 } from "lucide-react";
+import { StorefrontIcon } from "./StorefrontIcon";
 import { useMemo, useState, type FormEvent } from "react";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -96,7 +97,9 @@ const DEFAULT_ACTIONS: HeaderActionItem[] = [
 ];
 
 function sortNavLinks(links: NavLink[]): NavLink[] {
-  return [...links].sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+  return [...links].sort(
+    (a, b) => (a.order ?? Infinity) - (b.order ?? Infinity),
+  );
 }
 
 function getLogoUrl(
@@ -205,22 +208,21 @@ function HeaderSearchBar({
             : "ml-2 rounded-full p-1"
         }`}
       >
-        <Search size={iconSize} aria-hidden="true" />
+        <StorefrontIcon name="search" size={iconSize} aria-hidden="true" />
       </button>
     </form>
   );
 }
 
 type NavbarStyle = NonNullable<StorefrontNavbarConfig["style"]>;
-type NavbarMenuItem = NonNullable<
-  StorefrontNavbarConfig["menuItems"]
->[number];
+type NavbarMenuItem = NonNullable<StorefrontNavbarConfig["menuItems"]>[number];
 
 const NAV_LINK_STYLE: Record<NavbarStyle, string> = {
   default: "",
   pill: "rounded-full px-3 py-1.5 hover:bg-black/5",
   underline: "border-b-2 border-transparent px-1 py-2 hover:border-current",
-  bordered: "rounded-md border border-current/20 px-3 py-1.5 hover:border-current",
+  bordered:
+    "rounded-md border border-current/20 px-3 py-1.5 hover:border-current",
 };
 
 function DesktopNav({
@@ -335,14 +337,22 @@ function ConfiguredDesktopNavbar({
     if (isWishlistDisabled) {
       const link = item.link?.toLowerCase().trim() ?? "";
       const label = item.label?.toLowerCase().trim() ?? "";
-      if (link === "/wishlist" || link.endsWith("/wishlist") || label === "wishlist") {
+      if (
+        link === "/wishlist" ||
+        link.endsWith("/wishlist") ||
+        label === "wishlist"
+      ) {
         return false;
       }
     }
     if (isAccountDisabled) {
       const link = item.link?.toLowerCase().trim() ?? "";
       const label = item.label?.toLowerCase().trim() ?? "";
-      if (link === "/account" || link.endsWith("/account") || label === "account") {
+      if (
+        link === "/account" ||
+        link.endsWith("/account") ||
+        label === "account"
+      ) {
         return false;
       }
     }
@@ -352,8 +362,7 @@ function ConfiguredDesktopNavbar({
   const megaCategory = navbar.megaCategory;
   const showCategoryButton =
     megaCategory?.active !== false && (categories?.length ?? 0) > 0;
-  const CategoryIcon =
-    megaCategory?.icon === "MenuOutlined" ? Menu : Grid2X2;
+  const CategoryIcon = megaCategory?.icon === "MenuOutlined" ? Menu : Grid2X2;
 
   return (
     <nav
@@ -367,7 +376,7 @@ function ConfiguredDesktopNavbar({
       }}
     >
       <div
-        className={`mx-auto flex min-h-[inherit] max-w-7xl items-center gap-5 px-4 sm:px-6 lg:px-8 ${
+        className={`mx-auto flex min-h-[inherit] w-full max-w-[var(--store-content-max-w,1200px)] items-center gap-5 px-4 sm:px-6 lg:px-8 ${
           layout === 2
             ? "justify-between"
             : layout === 3
@@ -445,14 +454,22 @@ function MobileDrawer({
     if (isWishlistDisabled) {
       const url = link.url.toLowerCase();
       const title = link.title.toLowerCase();
-      if (url === "/wishlist" || url.endsWith("/wishlist") || title === "wishlist") {
+      if (
+        url === "/wishlist" ||
+        url.endsWith("/wishlist") ||
+        title === "wishlist"
+      ) {
         return false;
       }
     }
     if (isAccountDisabled) {
       const url = link.url.toLowerCase();
       const title = link.title.toLowerCase();
-      if (url === "/account" || url.endsWith("/account") || title === "account") {
+      if (
+        url === "/account" ||
+        url.endsWith("/account") ||
+        title === "account"
+      ) {
         return false;
       }
     }
@@ -464,14 +481,22 @@ function MobileDrawer({
     if (isWishlistDisabled) {
       const link = item.link?.toLowerCase().trim() ?? "";
       const label = item.label?.toLowerCase().trim() ?? "";
-      if (link === "/wishlist" || link.endsWith("/wishlist") || label === "wishlist") {
+      if (
+        link === "/wishlist" ||
+        link.endsWith("/wishlist") ||
+        label === "wishlist"
+      ) {
         return false;
       }
     }
     if (isAccountDisabled) {
       const link = item.link?.toLowerCase().trim() ?? "";
       const label = item.label?.toLowerCase().trim() ?? "";
-      if (link === "/account" || link.endsWith("/account") || label === "account") {
+      if (
+        link === "/account" ||
+        link.endsWith("/account") ||
+        label === "account"
+      ) {
         return false;
       }
     }
@@ -514,14 +539,14 @@ function MobileDrawer({
         {menuItems
           ? renderMenuItems(filteredMenuItems)
           : filteredLinks.map((link) => (
-          <Link
-            key={`${link.url}-${link.title}`}
-            href={link.url}
-            onClick={onClose}
-            className={`block w-fit text-base font-semibold text-inherit hover:text-(--store-primary) ${NAV_LINK_STYLE[style]}`}
-          >
-            {link.title}
-          </Link>
+              <Link
+                key={`${link.url}-${link.title}`}
+                href={link.url}
+                onClick={onClose}
+                className={`block w-fit text-base font-semibold text-inherit hover:text-(--store-primary) ${NAV_LINK_STYLE[style]}`}
+              >
+                {link.title}
+              </Link>
             ))}
       </nav>
     </SheetContent>
@@ -572,7 +597,11 @@ function ActionLink({
       title={label}
       className={`inline-flex items-center justify-center rounded-md px-2 py-1.5 text-inherit hover:bg-black/5 ${actionLayoutClass(actionStyle)} ${className}`}
     >
-      <Icon size={iconSize} aria-hidden="true" />
+      {href === "/account" ? (
+        <StorefrontIcon name="user" size={iconSize} aria-hidden="true" />
+      ) : (
+        <Icon size={iconSize} aria-hidden="true" />
+      )}
       {Number(actionStyle) !== 1 && (
         <span className="text-xs font-medium" style={{ fontSize }}>
           {label}
@@ -595,7 +624,7 @@ export function StoreHeader({
   const { itemCount, toggleDrawer } = useCart(store.subDomain);
   const wishlistCount = useWishlistStore((state) =>
     state.hasHydrated
-      ? state.productsByStore[store.subDomain]?.length ?? 0
+      ? (state.productsByStore[store.subDomain]?.length ?? 0)
       : 0,
   );
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -627,59 +656,52 @@ export function StoreHeader({
   const isAccountDisabled =
     account?.active === false || config?.account?.active === false;
 
-  const sortedNavLinks = useMemo(
-    () => {
-      let list: NavLink[] = [];
-      if (hasConfiguredMenuItems) {
-        list = (resolvedNavbar?.menuItems ?? [])
-          .filter((item) => Boolean(item.label?.trim()))
-          .map((item, index) => ({
-            title: item.label?.trim() ?? "",
-            url: item.link?.trim() || "#",
-            order: index + 1,
-          }));
-      } else {
-        list =
-          rawLinks && rawLinks.length > 0
-            ? sortNavLinks(rawLinks)
-            : defaultLinks;
-      }
+  const sortedNavLinks = useMemo(() => {
+    let list: NavLink[] = [];
+    if (hasConfiguredMenuItems) {
+      list = (resolvedNavbar?.menuItems ?? [])
+        .filter((item) => Boolean(item.label?.trim()))
+        .map((item, index) => ({
+          title: item.label?.trim() ?? "",
+          url: item.link?.trim() || "#",
+          order: index + 1,
+        }));
+    } else {
+      list =
+        rawLinks && rawLinks.length > 0 ? sortNavLinks(rawLinks) : defaultLinks;
+    }
 
-      if (isWishlistDisabled) {
-        list = list.filter((link) => {
-          const url = link.url.toLowerCase();
-          const title = link.title.toLowerCase();
-          return (
-            url !== "/wishlist" &&
-            !url.endsWith("/wishlist") &&
-            title !== "wishlist"
-          );
-        });
-      }
+    if (isWishlistDisabled) {
+      list = list.filter((link) => {
+        const url = link.url.toLowerCase();
+        const title = link.title.toLowerCase();
+        return (
+          url !== "/wishlist" &&
+          !url.endsWith("/wishlist") &&
+          title !== "wishlist"
+        );
+      });
+    }
 
-      if (isAccountDisabled) {
-        list = list.filter((link) => {
-          const url = link.url.toLowerCase();
-          const title = link.title.toLowerCase();
-          return (
-            url !== "/account" &&
-            !url.endsWith("/account") &&
-            title !== "account"
-          );
-        });
-      }
+    if (isAccountDisabled) {
+      list = list.filter((link) => {
+        const url = link.url.toLowerCase();
+        const title = link.title.toLowerCase();
+        return (
+          url !== "/account" && !url.endsWith("/account") && title !== "account"
+        );
+      });
+    }
 
-      return list;
-    },
-    [
-      hasConfiguredMenuItems,
-      resolvedNavbar?.menuItems,
-      rawLinks,
-      defaultLinks,
-      isWishlistDisabled,
-      isAccountDisabled,
-    ],
-  );
+    return list;
+  }, [
+    hasConfiguredMenuItems,
+    resolvedNavbar?.menuItems,
+    rawLinks,
+    defaultLinks,
+    isWishlistDisabled,
+    isAccountDisabled,
+  ]);
 
   const configuredActions = resolvedHeader?.actions?.length
     ? [...resolvedHeader.actions]
@@ -711,7 +733,9 @@ export function StoreHeader({
     })
     .filter((action) => !isWishlistDisabled || action.type !== "wishlist")
     .filter((action) => !isAccountDisabled || action.type !== "account")
-    .sort((left, right) => (left.order ?? Infinity) - (right.order ?? Infinity));
+    .sort(
+      (left, right) => (left.order ?? Infinity) - (right.order ?? Infinity),
+    );
   const iconSize = resolvedHeader?.actionIconSize ?? 18;
   const actionFontSize = resolvedHeader?.actionFontSize ?? 12;
   const actionStyle = resolvedHeader?.actionStyle ?? 3;
@@ -726,13 +750,11 @@ export function StoreHeader({
   const rawLayout = resolvedHeader?.layout ?? 1;
   const candidateLayout =
     typeof rawLayout === "string"
-      ? layoutByName[rawLayout] ?? Number(rawLayout)
+      ? (layoutByName[rawLayout] ?? Number(rawLayout))
       : rawLayout;
   const normalizedLayout =
     candidateLayout === 4 ? 1 : candidateLayout === 5 ? 3 : candidateLayout;
-  const layout = [1, 2, 3].includes(normalizedLayout)
-    ? normalizedLayout
-    : 1;
+  const layout = [1, 2, 3].includes(normalizedLayout) ? normalizedLayout : 1;
   const isCentered = layout === 2;
   const isMinimal = layout === 3;
   const navbarStyle = resolvedNavbar?.style ?? "default";
@@ -757,7 +779,7 @@ export function StoreHeader({
             Number(actionStyle) === 2 ? "h-auto min-h-9 px-2 py-1.5" : "px-2"
           }`}
         >
-          <Search size={iconSize} />
+          <StorefrontIcon name="search" size={iconSize} />
           {Number(actionStyle) !== 1 && (
             <span
               className="text-xs font-medium"
@@ -788,7 +810,7 @@ export function StoreHeader({
               aria-label={label}
               title={label}
             >
-              <ShoppingBag size={iconSize} />
+              <StorefrontIcon name="cart" size={iconSize} />
               {itemCount > 0 && (
                 <Badge className="absolute -right-1 -top-1 size-5 justify-center border border-white/30 p-0 text-[11px] shadow-sm ring-2 ring-white">
                   {itemCount}
@@ -817,7 +839,11 @@ export function StoreHeader({
               className={`relative inline-flex items-center justify-center rounded-md px-2 py-1.5 text-inherit hover:bg-black/5 ${actionLayoutClass(actionStyle)} ${iconClassName}`}
             >
               <div className="relative inline-flex">
-                <Heart size={iconSize} aria-hidden="true" />
+                <StorefrontIcon
+                  name="wishlist"
+                  size={iconSize}
+                  aria-hidden="true"
+                />
                 {wishlistCount > 0 && (
                   <Badge className="absolute -right-2 -top-2 size-4 min-w-4 justify-center border border-white/30 p-0 text-[10px] shadow-sm ring-2 ring-white">
                     {wishlistCount > 99 ? "99+" : wishlistCount}
@@ -879,24 +905,24 @@ export function StoreHeader({
     </div>
   );
 
-  const menuButton =
-    (!isConfiguredNavbar || navbarActive) && sortedNavLinks.length > 0 && (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-      className={`text-inherit lg:hidden ${
-        isCentered ? "absolute left-4 sm:left-6 lg:left-8" : ""
-      }`}
-      aria-label="Toggle Navigation"
-    >
-      {mobileMenuOpen ? (
-        <X className="h-6 w-6" />
-      ) : (
-        <Menu className="h-6 w-6" />
-      )}
-    </Button>
-  );
+  const menuButton = (!isConfiguredNavbar || navbarActive) &&
+    sortedNavLinks.length > 0 && (
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        className={`text-inherit lg:hidden ${
+          isCentered ? "absolute left-4 sm:left-6 lg:left-8" : ""
+        }`}
+        aria-label="Toggle Navigation"
+      >
+        {mobileMenuOpen ? (
+          <X className="h-6 w-6" />
+        ) : (
+          <Menu className="h-6 w-6" />
+        )}
+      </Button>
+    );
 
   const logo = (
     <Link
@@ -916,10 +942,12 @@ export function StoreHeader({
         className={`${resolvedHeader?.stickyHeader === false ? "relative" : "sticky"} top-0 z-40 border-b border-slate-200/80 backdrop-blur-md`}
         style={headerStyle}
       >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-[var(--store-content-max-w,1200px)] px-4 sm:px-6 lg:px-8">
           <div className="relative flex min-h-[inherit] items-center">
             <div className="relative flex min-h-13 w-full items-center justify-between lg:hidden">
-              {menuButton ?? <span className="size-9 shrink-0" aria-hidden="true" />}
+              {menuButton ?? (
+                <span className="size-9 shrink-0" aria-hidden="true" />
+              )}
               <div className="absolute left-1/2 -translate-x-1/2">{logo}</div>
               {renderActions(true)}
             </div>
@@ -936,10 +964,10 @@ export function StoreHeader({
                       />
                     </div>
                   )}
-                  <div className="absolute left-1/2 -translate-x-1/2">{logo}</div>
-                  <div className="ml-auto">
-                    {renderActions(false)}
+                  <div className="absolute left-1/2 -translate-x-1/2">
+                    {logo}
                   </div>
+                  <div className="ml-auto">{renderActions(false)}</div>
                 </>
               ) : (
                 <>
@@ -953,9 +981,7 @@ export function StoreHeader({
                       />
                     </div>
                   )}
-                  <div className="ml-auto">
-                    {renderActions(isMinimal)}
-                  </div>
+                  <div className="ml-auto">{renderActions(isMinimal)}</div>
                 </>
               )}
             </div>
@@ -979,7 +1005,7 @@ export function StoreHeader({
               isConfiguredNavbar ? resolvedNavbar?.menuItems : undefined
             }
             fontSize={
-              isConfiguredNavbar ? resolvedNavbar?.fontSize ?? 13 : undefined
+              isConfiguredNavbar ? (resolvedNavbar?.fontSize ?? 13) : undefined
             }
             onClose={() => setMobileMenuOpen(false)}
             style={navbarStyle}

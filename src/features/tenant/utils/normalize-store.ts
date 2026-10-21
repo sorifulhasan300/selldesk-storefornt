@@ -95,6 +95,11 @@ export function buildStoreConfig(
       rawStore.themeColor || color.primary || color.theme,
       "#2563eb",
     ),
+    fontFamily:
+      (rawStore.fontFamily as string) ||
+      ((config.font as Record<string, unknown>)?.family as string) ||
+      ((raw.theme as Record<string, unknown>)?.font as Record<string, unknown>)?.family as string ||
+      null,
     description:
       (rawStore.description as string) ||
       ((config.seo as Record<string, unknown>)?.metaDescription as string) ||

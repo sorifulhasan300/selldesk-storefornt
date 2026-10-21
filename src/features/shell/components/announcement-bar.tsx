@@ -195,7 +195,7 @@ export function AnnouncementBar({
       )}
       style={customStyle}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-between gap-4">
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 max-w-[var(--store-content-max-w,1200px)] py-2 flex items-center justify-between gap-4">
         <p className="flex-1 text-center sm:text-left truncate">
           {text}
         </p>

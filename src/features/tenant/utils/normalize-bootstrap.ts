@@ -312,6 +312,19 @@ export function normalizeBootstrap(
       ...(popupConfig ? { popup: popupConfig } : {}),
       ...(productCard ? { productCard } : {}),
       ...(productPage ? { productPage } : {}),
+      font: (config.font || rawConfig.font || rawTheme.font) as
+        | { family?: string; size?: string }
+        | undefined,
+      contentWidth: (config.contentWidth ||
+        rawConfig.contentWidth ||
+        rawTheme.contentWidth) as { mode?: string; customPx?: number } | undefined,
+      iconSet: (config.iconSet ||
+        rawConfig.iconSet ||
+        rawTheme.iconSet ||
+        "set1") as string,
+      theme: (config.theme || rawConfig.theme || raw.theme) as
+        | Record<string, unknown>
+        | undefined,
       checkout,
       wishlist,
       account,

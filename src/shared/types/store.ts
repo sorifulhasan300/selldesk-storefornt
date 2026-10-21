@@ -12,6 +12,7 @@ export interface StoreConfig {
   contactEmail?: string | null;
   contactPhone?: string | null;
   themeColor?: string | null;
+  fontFamily?: string | null;
   description?: string | null;
   facebookUrl?: string | null;
   instagramUrl?: string | null;

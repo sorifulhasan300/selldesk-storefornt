@@ -4,7 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { useCart } from "../hooks/use-cart";
 import { formatCurrency } from "@/shared/lib/utils";
-import { Trash2, Plus, Minus, ArrowRight, ShoppingBag } from "lucide-react";
+import { Trash2, Plus, Minus, ArrowRight } from "lucide-react";
+import { StorefrontIcon } from "@/features/shell";
 
 interface CartViewProps {
   storeSlug: string;
@@ -27,7 +28,7 @@ export function CartView({ storeSlug, currency = "USD" }: CartViewProps) {
     return (
       <div className="py-20 text-center max-w-md mx-auto">
         <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mx-auto mb-4">
-          <ShoppingBag className="w-8 h-8" />
+          <StorefrontIcon name="cart" className="w-8 h-8" />
         </div>
         <h1 className="text-2xl font-black text-slate-800">
           Your Cart is Empty
@@ -191,4 +192,3 @@ export function CartView({ storeSlug, currency = "USD" }: CartViewProps) {
     </div>
   );
 }
-

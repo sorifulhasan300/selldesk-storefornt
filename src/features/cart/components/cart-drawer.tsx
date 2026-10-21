@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "../hooks/use-cart";
 import { formatCurrency } from "@/shared/lib/utils";
-import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from "lucide-react";
+import { Trash2, Plus, Minus, ArrowRight } from "lucide-react";
+import { StorefrontIcon } from "@/features/shell";
 import { Button } from "@/shared/ui/button";
 import {
   Sheet,
@@ -43,7 +44,7 @@ export function CartDrawer({
         {/* Header */}
         <div className="flex items-center border-b border-slate-200 p-5 pr-12">
           <div className="flex items-center gap-2">
-            <ShoppingBag className="w-5 h-5 text-slate-800" />
+            <StorefrontIcon name="cart" className="w-5 h-5 text-slate-800" />
             <SheetTitle className="text-lg font-bold text-slate-900">
               Your Cart ({itemCount})
             </SheetTitle>
@@ -58,7 +59,7 @@ export function CartDrawer({
           {items.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center py-12">
               <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-4">
-                <ShoppingBag className="w-8 h-8" />
+                <StorefrontIcon name="cart" className="w-8 h-8" />
               </div>
               <h3 className="font-bold text-slate-800 text-lg">
                 Your cart is empty

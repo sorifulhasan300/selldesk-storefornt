@@ -28,6 +28,18 @@
     --background: 210 40% 98%;
     --foreground: 222 47% 11%;
     --primary: 221.2 83.2% 53.3%;
+    --store-font-family: inherit;
+  }
+
+  [data-store-container] {
+    font-family: var(--store-font-family, inherit);
+  }
+
+  [data-store-container] button,
+  [data-store-container] input,
+  [data-store-container] select,
+  [data-store-container] textarea {
+    font-family: inherit;
   }
 
   body {

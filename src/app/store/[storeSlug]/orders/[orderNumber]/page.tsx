@@ -14,7 +14,7 @@ export default async function OrderConfirmationPage({
   const { orderNumber } = await params;
 
   return (
-    <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
+    <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 max-w-[var(--store-content-max-w,1200px)] py-6">
       <div className="py-12 max-w-lg mx-auto text-center space-y-6">
         <div className="w-20 h-20 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto shadow-sm">
           <CheckCircle2 className="w-10 h-10" />

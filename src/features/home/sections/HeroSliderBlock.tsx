@@ -90,9 +90,7 @@ export function HeroSliderBlock({
   const containerClasses =
     layoutMode === 2
       ? "w-full px-0"
-      : layoutMode === 3
-      ? "max-w-6xl mx-auto px-4 sm:px-6"
-      : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8";
+      : "w-full mx-auto px-4 sm:px-6 lg:px-8 max-w-[var(--store-content-max-w,1200px)]";
 
   if (slides.length === 0) {
     if (!isPreview) return null;
