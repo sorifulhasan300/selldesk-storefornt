@@ -21,6 +21,7 @@ export function extractHeaderLogo(header: Record<string, unknown>): string | nul
     (thumbs?.large as string) ||
     (thumbs?.url as string) ||
     (thumbs?.medium as string) ||
+    (logoObj?.url as string) ||
     null
   );
 }

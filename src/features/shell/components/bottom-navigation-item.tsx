@@ -51,6 +51,7 @@ interface BottomNavigationItemProps {
   iconColor: string;
   activeColor: string;
   backgroundColor: string;
+  homeIcon?: string | null;
   onSelect: () => void;
 }
 
@@ -64,6 +65,7 @@ export function BottomNavigationItem({
   iconColor,
   activeColor,
   backgroundColor,
+  homeIcon,
   onSelect,
 }: BottomNavigationItemProps) {
   const Icon = ICON_MAP[item.iconName] ?? Home;
@@ -94,18 +96,36 @@ export function BottomNavigationItem({
     >
       {isRaisedHome ? (
         <span
-          className="absolute -top-5 flex size-11 items-center justify-center rounded-full border-4 shadow-md"
+          className="absolute -top-5 flex size-11 items-center justify-center rounded-full border-4 shadow-md overflow-hidden p-1.5"
           style={{
             backgroundColor: activeColor,
             borderColor: iconColor,
             color: backgroundColor,
           }}
         >
-          <Icon className="size-5" aria-hidden="true" />
+          {homeIcon ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={homeIcon}
+              alt="Home"
+              className="size-full object-contain"
+            />
+          ) : (
+            <Icon className="size-5" aria-hidden="true" />
+          )}
         </span>
       ) : (
         <span className="relative">
-          <Icon className="size-5" aria-hidden="true" />
+          {item.iconName === "home" && homeIcon ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={homeIcon}
+              alt="Home"
+              className="size-5 object-contain"
+            />
+          ) : (
+            <Icon className="size-5" aria-hidden="true" />
+          )}
           {badgeCount > 0 && (
             <Badge
               className="absolute -right-2 -top-2 h-[18px] min-w-[18px] justify-center p-0 text-[10px] font-bold ring-2"

@@ -120,6 +120,7 @@ export function BottomNavigation({
               iconColor={iconColor}
               activeColor={activeColor}
               backgroundColor={backgroundColor}
+              homeIcon={config?.homeIcon}
               onSelect={() => {
                 if (item.openCart) {
                   toggleDrawer(true);
