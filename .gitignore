@@ -28,3 +28,6 @@ pnpm-debug.log*
 *.tsbuildinfo
 next-env.d.ts
 
+
+# Local IDE
+.vscode/

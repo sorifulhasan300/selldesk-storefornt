@@ -436,6 +436,7 @@ export interface StorefrontPopupConfig {
 }
 
 export interface StorefrontBootstrap {
+  isOrderCapacityReached?: boolean;
   store: StoreConfig;
   sliders?: StoreSlider[];
   categories?: Array<{
