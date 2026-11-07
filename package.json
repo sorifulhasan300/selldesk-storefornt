@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "node init && next dev -H selldesk.test -p 3001",
-    "build": "node init && next build",
-    "start": "node init && next start -H selldesk.test -p 3001",
+    "dev": "next dev -H selldesk.test -p 3001",
+    "build": "next build",
+    "start": "next start -H selldesk.test -p 3001",
     "lint": "eslint"
   },
   "dependencies": {
