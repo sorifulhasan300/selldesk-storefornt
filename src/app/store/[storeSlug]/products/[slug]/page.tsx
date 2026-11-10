@@ -1,6 +1,9 @@
 import { cache } from "react";
 import { Metadata } from "next";
-import { getProductBySlug } from "@/features/product/server";
+import {
+  getProductBySlug,
+  sanitizeProductPageConfig,
+} from "@/features/product/server";
 import { getBootstrap } from "@/features/tenant/server";
 import { getProducts } from "@/features/catalog/server";
 import {
@@ -78,7 +81,7 @@ export default async function ProductDetailPage({ params }: PDPProps) {
     origin,
   ).toString();
 
-  const productPageConfig = bData?.config?.productPage;
+  const productPageConfig = sanitizeProductPageConfig(bData?.config?.productPage);
 
   // Concurrently fetch related products from same category
   let relatedProducts: Product[] = [];

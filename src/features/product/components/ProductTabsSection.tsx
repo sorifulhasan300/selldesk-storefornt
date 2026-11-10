@@ -5,14 +5,15 @@ import type { Product } from "@/shared/types";
 import { ProductSpecifications } from "./ProductSpecifications";
 import type {
   ProductTabLayout,
-  ProductTabItem,
+  SanitizedProductTabItem,
 } from "@/shared/types";
+import { SafeHtml } from "@/shared/ui/safe-html";
 import { ChevronDown, FileText, ListFilter } from "lucide-react";
 
 export interface ProductTabsSectionProps {
   product: Product;
   tabLayout?: ProductTabLayout; // 1: Classic, 2: Pill, 3: Accordion, 4: All Expanded
-  tabsConfig?: ProductTabItem[];
+  tabsConfig?: SanitizedProductTabItem[];
 }
 
 export function ProductTabsSection({
@@ -21,7 +22,7 @@ export function ProductTabsSection({
   tabsConfig,
 }: ProductTabsSectionProps) {
   // Built-in tabs fallback if not provided
-  const activeTabs: ProductTabItem[] =
+  const activeTabs: SanitizedProductTabItem[] =
     Array.isArray(tabsConfig) && tabsConfig.length > 0
       ? tabsConfig
       : [
@@ -61,7 +62,7 @@ export function ProductTabsSection({
     }));
   };
 
-  const renderTabContent = (tab: ProductTabItem) => {
+  const renderTabContent = (tab: SanitizedProductTabItem) => {
     if (tab.key === "description") {
       return (
         <div className="prose prose-slate max-w-none text-slate-700 leading-relaxed text-sm sm:text-base space-y-4">
@@ -89,9 +90,13 @@ export function ProductTabsSection({
       <div className="prose prose-slate max-w-none text-slate-700 leading-relaxed text-sm sm:text-base">
         {tab.content ? (
           /<\/?[a-z][\s\S]*>/i.test(tab.content) ? (
-            <div dangerouslySetInnerHTML={{ __html: tab.content }} />
+            <SafeHtml html={tab.content} />
           ) : (
-            <p className="whitespace-pre-line">{tab.content}</p>
+            <SafeHtml
+              as="p"
+              html={tab.content}
+              className="whitespace-pre-line"
+            />
           )
         ) : (
           <p className="text-slate-400 italic">No additional information available.</p>

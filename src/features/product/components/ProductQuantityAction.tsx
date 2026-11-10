@@ -31,12 +31,14 @@ import {
 } from "../utils/product-url.utils";
 import type {
   ProductActionButtonItem,
+  SanitizedProductPageSizeGuide,
 } from "@/shared/types";
+import { SafeHtml } from "@/shared/ui/safe-html";
 
 export interface ProductQuantityActionProps {
   storeSlug: string;
   actionsConfig?: ProductActionButtonItem[];
-  sizeGuide?: { enabled?: boolean; title?: string; content?: string | null } | null;
+  sizeGuide?: SanitizedProductPageSizeGuide | null;
   contactPhone?: string | null;
   whatsappPhone?: string | null;
   facebookUrl?: string | null;
@@ -515,14 +517,15 @@ export function ProductQuantityAction({
             <div className="text-sm text-slate-700 leading-relaxed">
               {sizeGuide.content ? (
                 /<\/?[a-z][\s\S]*>/i.test(sizeGuide.content) ? (
-                  <div
-                    dangerouslySetInnerHTML={{ __html: sizeGuide.content }}
+                  <SafeHtml
+                    html={sizeGuide.content}
                     className="prose prose-sm max-w-none text-slate-700"
                   />
                 ) : (
-                  <div className="whitespace-pre-line text-slate-700 leading-relaxed">
-                    {sizeGuide.content}
-                  </div>
+                  <SafeHtml
+                    html={sizeGuide.content}
+                    className="whitespace-pre-line text-slate-700 leading-relaxed"
+                  />
                 )
               ) : (
                 <p className="text-slate-400 italic">

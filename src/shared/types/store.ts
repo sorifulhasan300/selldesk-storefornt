@@ -1,5 +1,6 @@
 import { HomePageSection } from "./section";
 import { Product } from "./product";
+import type { SanitizedHtml } from "@/shared/lib/sanitize-html";
 
 export interface StoreConfig {
   id: string;
@@ -382,20 +383,20 @@ export interface ProductActionButtonItem {
   width: ActionButtonWidth;
 }
 
-export interface ProductTabItem {
+export interface ProductTabItem<TContent = string> {
   key: string;
   type: "builtin" | "custom";
   label: string;
-  content?: string | null;
+  content?: TContent | null;
 }
 
-export interface ProductPageSizeGuide {
+export interface ProductPageSizeGuide<TContent = string> {
   enabled?: boolean;
   title?: string;
-  content?: string | null;
+  content?: TContent | null;
 }
 
-export interface ProductPageConfig {
+export interface ProductPageConfig<TContent = string> {
   layout?: ProductPageLayout;
   tabLayout?: ProductTabLayout;
   showBreadcrumb?: boolean;
@@ -404,14 +405,17 @@ export interface ProductPageConfig {
   showReviews?: boolean;
   showStickyBuyButton?: boolean;
   showStockCounter?: boolean;
-  sizeGuide?: ProductPageSizeGuide | null;
+  sizeGuide?: ProductPageSizeGuide<TContent> | null;
   defaultVariantSelection?: "first" | "none";
   actions?: ProductActionButtonItem[];
-  tabs?: ProductTabItem[];
+  tabs?: ProductTabItem<TContent>[];
   [key: string]: unknown;
 }
 
 export type StorefrontProductPageConfig = ProductPageConfig;
+export type SanitizedProductTabItem = ProductTabItem<SanitizedHtml>;
+export type SanitizedProductPageSizeGuide = ProductPageSizeGuide<SanitizedHtml>;
+export type SanitizedProductPageConfig = ProductPageConfig<SanitizedHtml>;
 
 export interface StorefrontPopupImageThumbs {
   large?: string;
